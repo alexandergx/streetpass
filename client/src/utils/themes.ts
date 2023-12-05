@@ -29,71 +29,70 @@ const lightSpectrums = {
 
 const Light = {
   // mapStyle: light,
-  // animation: require('../assets/animations/test.lottie'),
-  animation: null,
+  animation: require('../assets/animations/test.json'),
   ...lightSpectrums,
   gradient: ['rgba(185,185,185,0.5)', 'rgba(235,235,235,0.5)', 'rgba(185,185,185,0.1)'],
 }
 
 const Dark = {
   // mapStyle: dark,
-  animation: null,
+  animation: require('../assets/animations/test.json'),
   ...darkSpectrums,
   gradient: ['rgba(25,25,25,1)', 'rgba(15,15,15,1)', 'rgba(25,25,25,1)',],
 }
 
 const Fairy = {
   // mapStyle: fairy,
-  animation: null,
+  animation: require('../assets/animations/test.json'),
   ...lightSpectrums,
   gradient: ['rgba(238,174,202,1)', 'rgba(148,187,233,1)',],
 }
 
 const Glitterbomb = {
   // mapStyle: glitterbomb,
-  animation: null,
+  animation: require('../assets/animations/test.json'),
   ...darkSpectrums,
   gradient: ['rgba(63,94,251,1)', 'rgba(252,70,107,1)',],
 }
 
 const Popsicle = {
   // mapStyle: popsicle,
-  animation: null,
+  animation: require('../assets/animations/test.json'),
   ...darkSpectrums,
   gradient: ['rgba(131,58,180,1)', 'rgba(253,29,29,1)', 'rgba(252,176,69,1)',],
 }
 
 const Laguna = {
   // mapStyle: laguna,
-  animation: null,
+  animation: require('../assets/animations/test.json'),
   ...lightSpectrums,
   gradient: ['rgba(52, 220, 255, 1)', 'rgba(255, 169, 155, 1)', 'rgba(255,255,255,1)'],
 }
 
 const Rally = {
   // mapStyle: rally,
-  animation: null,
+  animation: require('../assets/animations/test.json'),
   ...darkSpectrums,
   gradient: ['rgba(44, 62, 80, 1)', 'rgba(129, 135, 139, 1)', 'rgba(149, 155, 159, 1)', 'rgba(44, 62, 80, 1)'],
 }
 
 const Submarine = {
   // mapStyle: submarine,
-  animation: null,
+  animation: require('../assets/animations/test.json'),
   ...lightSpectrums,
   gradient: ['rgba(47, 128, 237, 1)', 'rgba(86, 204, 242, 1)'],
 }
 
 const Latte = {
   // mapStyle: latte,
-  animation: null,
+  animation: require('../assets/animations/test.json'),
   ...lightSpectrums,
   gradient: ['rgba(226, 209, 195, 1)', 'rgba(253, 252, 251, 1)'],
 }
 
 const Carbon = {
   // mapStyle: carbon,
-  animation: null,
+  animation: require('../assets/animations/test.json'),
   ...darkSpectrums,
   gradient: ['rgb(35, 37, 38)', 'rgb(65, 67, 69)'],
 }

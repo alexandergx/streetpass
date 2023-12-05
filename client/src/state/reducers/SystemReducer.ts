@@ -70,7 +70,7 @@ const INITIAL_STATE: ISystemStore = {
   Fonts: {
     xs: 8,
     sm: 12,
-    md: 16,
+    md: 15,
     lg: 20,
     xl: 24,
     xxl: 28,

@@ -28,6 +28,7 @@ import LinearGradient from 'react-native-linear-gradient'
 import { timePassedSince } from '../utils/functions'
 import EditProfileModal from '../components/editProfileModal'
 import UserSettingsModal from '../components/userSettingsModal'
+import AnimatedBackground from '../components/animated/AnimatedBackground'
 
 const mapStateToProps = (state: IStores) => {
   const { systemStore, userStore, } = state
@@ -75,6 +76,9 @@ class UserScreen extends React.Component<IUserScreenProps> {
 
     return (
       <>
+        <GradientBackground systemStore={systemStore} />
+        <AnimatedBackground systemStore={systemStore} />
+
         {this.state.editProfile &&
           <EditProfileModal
             navigation={navigation}
@@ -97,9 +101,6 @@ class UserScreen extends React.Component<IUserScreenProps> {
         }
 
         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center',}}>
-          <GradientBackground systemStore={systemStore} />
-          {/* <AnimatedBackground systemStore={systemStore} /> */}
-
           <NavHeader
             systemStore={systemStore}
             color={Colors.lightest}

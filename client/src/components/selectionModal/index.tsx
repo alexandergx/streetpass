@@ -49,7 +49,7 @@ class SelectionModal extends React.Component<ISelectionModalProps> {
               <View style={{marginTop: 16,}}>
                 <Button
                   systemStore={systemStore}
-                  // title={Lit[systemStore.Locale].Button.Done}
+                  title={Lit[systemStore.Locale].Button.Done}
                   color={Colors.darkerBackground}
                   onPress={this.props.toggleModal}
                 />

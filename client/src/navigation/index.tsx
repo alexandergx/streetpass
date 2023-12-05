@@ -9,15 +9,27 @@ import { IStores } from '../state/store'
 import { MMKVLoader } from 'react-native-mmkv-storage'
 import { AppVersion, AuthStore, LocalStorage, OS, } from '../utils/constants'
 import { getDeviceId, getCarrier, } from 'react-native-device-info'
+import { IUserStore } from '../state/reducers/UserReducer'
+import { ISystemStore } from '../state/reducers/SystemReducer'
+import { getIP, getLocation, requestPushNotifications } from '../utils/services'
+// import { registerDevice } from '../api/user'
 
 // MAIN ROUTES
 import StreetPassScreen from '../screens/StreetPassScreen'
 import ChatsScreen from '../screens/ChatsScreen'
 import UserScreen from '../screens/UserScreen'
-import { IUserStore } from '../state/reducers/UserReducer'
-import { ISystemStore } from '../state/reducers/SystemReducer'
-import { getIP, getLocation, requestPushNotifications } from '../utils/services'
-// import { registerDevice } from '../api/user'
+// SUB ROUTES
+import SignInScreen from '../screens/subScreens/SignInScreen'
+import VerifyPhoneScreen from '../screens/subScreens/VerifyPhoneScreen'
+import PersonalInfoScreen from '../screens/subScreens/PersonalInfoScreen'
+import ChatScreen from '../screens/subScreens/ChatScreen'
+// ALT ROUTES
+import AppStyleScreen from '../screens/altScreens/AppStyleScreen'
+import NotificationsScreen from '../screens/altScreens/NotificationsScreen'
+import BlockingScreen from '../screens/altScreens/BlockingScreen'
+import EmailScreen from '../screens/altScreens/EmailScreen'
+import PhoneNumberScreen from '../screens/altScreens/PhoneNumberScreen'
+import DeleteAccountScreen from '../screens/altScreens/DeleteAccountScreen'
 
 const MMKV = new MMKVLoader().withEncryption().withInstanceID(LocalStorage.AuthStore).initialize()
 
@@ -40,6 +52,18 @@ export enum Screens {
   StreetPass = 'STREETPASS',
   Chats = 'CHATS',
   User = 'USER',
+  // SUB ROUTES
+  SignIn = 'SIGN_IN',
+  VerifyPhone = 'VERIFY_PHONE',
+  PersonalInfo = 'PERSONAL_INFO',
+  Chat = 'CHAT',
+  // ALT ROUTES
+  AppStyle = 'APP_STYLE',
+  Notifications = 'NOTIFICATIONS',
+  Blocking = 'BLOCKING',
+  Email = 'EMAIL',
+  PhoneNumber = 'PHONE_NUMBER',
+  DeleteAccount = 'DELETE_ACCOUNT',
 }
 
 interface IMapScreenProps {
@@ -103,13 +127,13 @@ function AppNavigation({ userStore, systemStore, actions, }: IMapScreenProps) {
     <NavigationContainer>
       {initialized ?
         <App.Navigator
-          initialRouteName={Screens.StreetPass}
+          initialRouteName={userStore.signedIn ? Screens.StreetPass : Screens.SignIn}
           screenOptions={{ headerShown: false, }}
         >
           {/* MAIN ROUTES */}
           <App.Screen name={Screens.StreetPass} component={StreetPassScreen}
             options={{
-              animation: 'none',
+              animation: 'fade_from_bottom',
               gestureEnabled: false,
             }}
           />
@@ -123,6 +147,52 @@ function AppNavigation({ userStore, systemStore, actions, }: IMapScreenProps) {
             options={{
               animation: 'none',
               gestureEnabled: false,
+            }}
+          />
+          {/* SUB ROUTES */}
+          <App.Screen name={Screens.SignIn} component={SignInScreen}
+            options={{
+              animation: 'fade_from_bottom',
+            }}
+          />
+          <App.Screen name={Screens.VerifyPhone} component={VerifyPhoneScreen}
+            options={{
+              animation: 'fade_from_bottom',
+            }}
+          />
+          <App.Screen name={Screens.PersonalInfo} component={PersonalInfoScreen}
+            options={{
+              animation: 'fade_from_bottom',
+            }}
+          />
+          <App.Screen name={Screens.Chat} component={ChatScreen}
+            options={{
+              animation: 'fade_from_bottom',
+            }}
+          />
+          {/* ALT ROUTES */}
+          <App.Screen name={Screens.AppStyle} component={AppStyleScreen}
+            options={{
+            }}
+          />
+          <App.Screen name={Screens.Notifications} component={NotificationsScreen}
+            options={{
+            }}
+          />
+          <App.Screen name={Screens.Blocking} component={BlockingScreen}
+            options={{
+            }}
+          />
+          <App.Screen name={Screens.Email} component={EmailScreen}
+            options={{
+            }}
+          />
+          <App.Screen name={Screens.PhoneNumber} component={PhoneNumberScreen}
+            options={{
+            }}
+          />
+          <App.Screen name={Screens.DeleteAccount} component={DeleteAccountScreen}
+            options={{
             }}
           />
         </App.Navigator>

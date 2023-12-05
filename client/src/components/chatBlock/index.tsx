@@ -23,24 +23,26 @@ import ExclamationCircledIcon from '../../assets/icons/exclamation-circled.svg'
 import { ISystemStore } from '../../state/reducers/SystemReducer'
 import { MMKVLoader } from 'react-native-mmkv-storage'
 import { AuthStore, InputLimits, LocalStorage, Time } from '../../utils/constants'
-import { IChatScreenState } from '../../screens/ChatsScreen'
 import GradientBackground from '../gradientBackground'
 import { IListGroupConfig } from '../listGroup'
 import { useSubscription } from '@apollo/client'
-import { SUBSCRIBE_MESSAGES, apiRequest, baseUrl, protocol } from '../../api'
+// import { SUBSCRIBE_MESSAGES, apiRequest, baseUrl, protocol } from '../../api'
 import { IMessage } from '../../state/reducers/ChatsReducer'
 import { Screens } from '../../navigation'
-import { ISetChatId, ISetReadChat } from '../../state/actions/ChatsActions'
+// import { ISetChatId, ISetReadChat } from '../../state/actions/ChatsActions'
 import { useIsFocused } from '@react-navigation/native'
 import { Lit, Locales, } from '../../utils/locale'
 import { FlashList, } from '@shopify/flash-list'
-import { IMedia } from '../../state/reducers/MediaReducer'
+import { IChatScreenState } from '../../screens/subScreens/ChatScreen'
+import { IMatch } from '../../state/reducers/MatchesReducer'
+import { baseUrl, protocol } from '../../api'
+import StreetPassModal from '../streetPassModal'
 
 const MMKV = new MMKVLoader().withEncryption().withInstanceID(LocalStorage.AuthStore).initialize()
 
 interface IChatBlockProps {
   navigation: any,
-  route: { params: { chatId?: string, userId: string, username: string, name?: string, profilePicture: string, }, } | any,
+  route: { params: { chatId?: string, match: IMatch, }, } | any,
   systemStore: ISystemStore,
   userStore: IUserStore,
   state: IChatScreenState,
@@ -54,72 +56,80 @@ interface IChatBlockProps {
   removeMessage: (params: { chatId: string, messageId: string, pushDelete?: boolean, }) => void,
   setMessageReaction: (params: { chatId: string, messageId: string, userId: string, reaction?: string, pushReact?: boolean, }) => void,
   setNotifications: () => void,
-  goToProfile: (params: string) => void,
-  setMedia: (params: IMedia) => void,
+  setStreetPass: () => void,
   actions: {
-    setChatId: (params: ISetChatId) => void,
-    setReadChat: (params: ISetReadChat) => void,
+    // setChatId: (params: ISetChatId) => void,
+    // setReadChat: (params: ISetReadChat) => void,
   }
 }
 const ChatBlock: React.FC<IChatBlockProps> = ({
   navigation, route, systemStore, userStore, state, setMessage, setMessageId, setMessageIdTime, setSelectionModalConfig,
-  setNewMessage, loadMessages, sendMessage, removeMessage, setMessageReaction, setNotifications, goToProfile, setMedia, actions,
+  setNewMessage, loadMessages, sendMessage, removeMessage, setMessageReaction, setNotifications, setStreetPass, actions,
 }) => {
   const { Colors, Fonts, } = systemStore
   const flatListRef = useRef(null)
   const isFocused = useIsFocused()
 
-  useSubscription(SUBSCRIBE_MESSAGES({
-    chatId: route.params?.chatId || state.chat?.chatId || undefined,
-    userId: userStore.user.userId,
-  }), {
-    skip: !userStore.loggedIn || !MMKV.getString(AuthStore.AccessToken),
-    shouldResubscribe: true,
-    onData: (data) => {
-      if (data.data.data.messageSent.deleted) {
-        removeMessage({ chatId: data.data.data.messageSent.chatId, messageId: data.data.data.messageSent.messageId, pushDelete: true, })
-        return
-      }
-      if (data.data.data.messageSent.authUserReaction || data.data.data.messageSent.userReaction) {
-        let reaction = null
-        if ((data.data.data.messageSent.authUserReaction && data.data.data.messageSent.authUserReaction !== 'null') || data.data.data.messageSent.authUserReaction === null) {
-          reaction = data.data.data.messageSent?.authUserReaction
-        }
-        if ((data.data.data.messageSent?.userReaction && data.data.data.messageSent.userReaction !== 'null') || data.data.data.messageSent.userReaction === null) {
-          reaction = data.data.data.messageSent?.userReaction
-        }
-        setMessageReaction({
-          chatId: data.data.data.messageSent.chatId,
-          messageId: data.data.data.messageSent.messageId,
-          userId: data.data.data.messageSent.userId,
-          reaction: reaction,
-          pushReact: true,
-        })
-        return
-      }
-      if (isFocused) actions.setChatId(data.data.data.messageSent.chatId)
-      else actions.setChatId(null)
-      setNewMessage(data.data.data.messageSent)
-    },
-    onError: async (error) => {
-      console.log('[SUBSCRIPTION ERROR]', error)
-      await apiRequest(null)
-    }
-  })
+  // useSubscription(SUBSCRIBE_MESSAGES({
+  //   chatId: route.params?.chatId || state.chat?.chatId || undefined,
+  //   userId: userStore.user.userId,
+  // }), {
+  //   skip: !userStore.loggedIn || !MMKV.getString(AuthStore.AccessToken),
+  //   shouldResubscribe: true,
+  //   onData: (data) => {
+  //     if (data.data.data.messageSent.deleted) {
+  //       removeMessage({ chatId: data.data.data.messageSent.chatId, messageId: data.data.data.messageSent.messageId, pushDelete: true, })
+  //       return
+  //     }
+  //     if (data.data.data.messageSent.authUserReaction || data.data.data.messageSent.userReaction) {
+  //       let reaction = null
+  //       if ((data.data.data.messageSent.authUserReaction && data.data.data.messageSent.authUserReaction !== 'null') || data.data.data.messageSent.authUserReaction === null) {
+  //         reaction = data.data.data.messageSent?.authUserReaction
+  //       }
+  //       if ((data.data.data.messageSent?.userReaction && data.data.data.messageSent.userReaction !== 'null') || data.data.data.messageSent.userReaction === null) {
+  //         reaction = data.data.data.messageSent?.userReaction
+  //       }
+  //       setMessageReaction({
+  //         chatId: data.data.data.messageSent.chatId,
+  //         messageId: data.data.data.messageSent.messageId,
+  //         userId: data.data.data.messageSent.userId,
+  //         reaction: reaction,
+  //         pushReact: true,
+  //       })
+  //       return
+  //     }
+  //     if (isFocused) actions.setChatId(data.data.data.messageSent.chatId)
+  //     else actions.setChatId(null)
+  //     setNewMessage(data.data.data.messageSent)
+  //   },
+  //   onError: async (error) => {
+  //     console.log('[SUBSCRIPTION ERROR]', error)
+  //     await apiRequest(null)
+  //   }
+  // })
 
   return (
     <>
-      <GradientBackground systemStore={systemStore} />
+      {state.streetPass &&
+        <StreetPassModal
+          navigation={navigation}
+          systemStore={systemStore}
+          streetPass={state.streetPass}
+          streetPassImageIndex={0}
+          hideActions={true}
+          unsetStreetPass={setStreetPass}
+        />
+      }
+
       <NavHeader
         systemStore={systemStore}
         navigation={navigation}
-        title={route.params.name ? route.params.name : route.params.username}
-        subtitle={route.params.name ? route.params.username : undefined}
-        thumbnail={route.params.profilePicture}
+        title={route.params.match.name}
+        thumbnail={route.params.match.media[0].image || null}
         EndIcon={EllipsisIcon}
         onPress={() => {
-          actions.setChatId(null)
-          state.chat?.chatId && actions.setReadChat(state.chat.chatId)
+          // actions.setChatId(null)
+          // state.chat?.chatId && actions.setReadChat(state.chat.chatId)
           navigation.goBack()
         }}
         onPressEnd={() => {
@@ -132,17 +142,12 @@ const ChatBlock: React.FC<IChatBlockProps> = ({
                 title: state.chat?.notifications || state.chat?.notifications === null ? Lit[systemStore.Locale].Button.Mute : Lit[systemStore.Locale].Button.Unmute,
                 disabled: !state.messages?.length, noRight: true, onPress: setNotifications,
               },
-              { Icon: ExclamationCircledIcon, title: Lit[systemStore.Locale].Button.ReportUser, noRight: true, onPress: () => Linking.openURL(`${protocol[0]}${baseUrl}/help`), },
+              { Icon: ExclamationCircledIcon, title: Lit[systemStore.Locale].Button.Block, noRight: true, onPress: () => Linking.openURL(`${protocol[0]}${baseUrl}/help`), },
+              { Icon: ExclamationCircledIcon, title: Lit[systemStore.Locale].Button.Report, noRight: true, onPress: () => Linking.openURL(`${protocol[0]}${baseUrl}/help`), },
             ],
-          }
-        )}}
-        onPressThumbnail={route.params?.chatId
-          ? () => {
-              Keyboard.dismiss()
-              navigation.push(Screens.Profile, { userId: route.params.userId, chatId: route.params?.chatId || state.chat?.chatId, })
-            }
-          : undefined
-        }
+          })
+        }}
+        onPressThumbnail={setStreetPass}
       />
 
       <KeyboardAvoidingView
@@ -168,8 +173,6 @@ const ChatBlock: React.FC<IChatBlockProps> = ({
                   setMessageIdTime={setMessageIdTime}
                   removeMessage={removeMessage}
                   setMessageReaction={setMessageReaction}
-                  goToProfile={goToProfile}
-                  setMedia={setMedia}
                   systemStore={systemStore}
                   userId={userStore.user.userId}
                 />
@@ -221,23 +224,23 @@ const ChatBlock: React.FC<IChatBlockProps> = ({
             <View style={{width: '100%', justifyContent: 'center', alignItems: 'center', flexDirection: 'row', marginBottom: state.keyboard ? 0 : 24,}}>
               <View style={{flex: 0, paddingLeft: 16,}}>
                 <View style={{marginRight: 16,}}>
-                  <Thumbnail systemStore={systemStore} uri={userStore.user.profilePicture} size={40} />
+                  <Thumbnail systemStore={systemStore} uri={userStore.user.media[0]?.image || null} size={40} />
                 </View>
               </View>
 
-              <View style={{flex: 1, paddingRight: 16, paddingVertical: 8,}}>
+              <View style={{flex: 1, padding: 16, paddingVertical: 8,}}>
                 <TextInput
                   systemStore={systemStore}
                   value={state.message}
                   loading={state.messageLoading}
-                  disabled={(state.chat?.private && !state.messages?.length) || state.chat?.isBlocking || state.chat?.isBlocker || !route.params.userId}
+                  // disabled={(state.chat?.private && !state.messages?.length) || state.chat?.isBlocking || state.chat?.isBlocker || !route.params.userId}
                   onChangeText={(text: string) => setMessage(text)}
-                  placeholder={(state.chat?.private && !state.messages?.length)
-                    ? Lit[systemStore.Locale].Input.MessagesLimited
-                    : state.chat?.isBlocking || state.chat?.isBlocker
-                      ? Lit[systemStore.Locale].Input.MessagesBlocked
-                      : Lit[systemStore.Locale].Input.Message
-                  }
+                  // placeholder={(state.chat?.private && !state.messages?.length)
+                  //   ? Lit[systemStore.Locale].Input.MessagesLimited
+                  //   : state.chat?.isBlocking || state.chat?.isBlocker
+                  //     ? Lit[systemStore.Locale].Input.MessagesBlocked
+                  //     : Lit[systemStore.Locale].Input.Message
+                  // }
                   multiline={true}
                   EndIcon={SendIcon}
                   exceedChars={InputLimits.DescriptionMin}

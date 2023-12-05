@@ -29,6 +29,7 @@ interface IButtonInputProps {
   StartIcon?: React.FC<SvgProps>,
   EndIcon?: React.FC<SvgProps>,
   iconColor?: string,
+  style?: any,
   onPress?: () => void,
   onChangeText: (params: string) => void,
   onEndEditing?: () => void,
@@ -123,14 +124,15 @@ class ButtonInput extends React.Component<IButtonInputProps> {
               placeholderTextColor={this.props.placeholderColor
                 ? this.props.placeholderColor
                 : this.props.disabled
-                  ? Colors.darker
-                  : Colors.light
+                  ? Colors.light
+                  : Colors.lighter
               }
               autoCapitalize={'none'}
               style={{
                 color: this.props.textColor !== undefined ? this.props.textColor : Colors.lightest,
                 fontWeight: this.props.disabled ? Fonts.welterWeight : Fonts.middleWeight as any,
                 width: '100%', height: '100%', opacity: this.props.editable === false ? 0.4 : 1,
+                ...this.props.style,
               }}
               {...this.props}
             />

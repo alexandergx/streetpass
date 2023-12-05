@@ -1,29 +1,91 @@
 import en from './locales/en'
-import fr from './locales/fr'
-import es from './locales/es'
-import de from './locales/de'
-import ru from './locales/ru'
+// import fr from './locales/fr'
+// import es from './locales/es'
+// import de from './locales/de'
+// import ru from './locales/ru'
 
 export enum Locales {
   'English' = 'en',
-  'Français' = 'fr',
-  'Español' = 'es',
-  'Deutsch' = 'de',
-  'Русский' = 'ru',
+  // 'Français' = 'fr',
+  // 'Español' = 'es',
+  // 'Deutsch' = 'de',
+  // 'Русский' = 'ru',
 }
 
 export const Lit: ILit = {
   en: {...en},
-  fr: {...fr},
-  es: {...es},
-  de: {...de},
-  ru: {...ru},
+  // fr: {...fr},
+  // es: {...es},
+  // de: {...de},
+  // ru: {...ru},
 }
 
 export type ILit = { [K in Locales]: ILocale }
 export type ILocale = {
+  ScreenTitle: {
+    AppStyleScreen: string,
+    NotificationsScreen: string,
+    EmailScreen: string,
+    BlockingScreen: string,
+    PhoneNumberScreen: string,
+    DeleteAccountScreen: string,
+    VerifyPhoneScreen: string,
+    PersonalInfoScreen: string,
+  },
   Title: {
+    App: string,
+    Account: string,
+    Support: string,
+    About: string,
+    Help: string,
+    ToS: string,
+    Alerts: string,
+    Messages: string,
+    Matches: string,
+    StreetPasses: string,
+    Email: string,
+    EmailNotifications: string,
+    Newsletters: string,
+    SignOut: string,
+    DeleteAccount: string,
     NotConnected: string,
+    ConnectWithOthers: string,
+    StreetPass: string,
+    ShowMeOthers: string,
+    ShowOthersMe: string,
+    Discoverable: string,
+    AgePreference: string,
+    Sex: string,
+    Male: string,
+    Female: string,
+    RatherNotSay: string,
+    Men: string,
+    Women: string,
+    Everybody: string,
+    IAm: string,
+    DOB: string,
+    Deleted: string,
+  },
+  Copywrite: {
+    NotFound: string,
+    StreetPassDescription: string,
+    DiscoverableDescription: string,
+  },
+  Button: {
+    Save: string,
+    Remove: string,
+    Block: string,
+    Unblock: string,
+    Report: string,
+    Delete: string,
+    Next: string,
+    Continue: string,
+    Verify: string,
+    SendPin: string,
+    DeleteAccount: string,
+    Mute: string,
+    Unmute: string,
+    Done: string,
   },
   Time: {
     Year: string,

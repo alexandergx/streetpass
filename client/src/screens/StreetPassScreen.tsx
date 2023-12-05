@@ -27,6 +27,7 @@ import StreetPassSettingsModal from '../components/streetPassSettingsModal'
 import StreetPassModal from '../components/streetPassModal'
 import { CardItemHandle } from 'rn-tinder-card'
 import { mockStreetPasses, } from '../utils/MockData'
+import AnimatedBackground from '../components/animated/AnimatedBackground'
 
 const mapStateToProps = (state: IStores) => {
   const { systemStore, userStore, chatsStore, } = state
@@ -75,6 +76,9 @@ class StreetPassScreen extends React.Component<IStreetPassScreenProps> {
 
     return (
       <>
+        <GradientBackground systemStore={systemStore} />
+        <AnimatedBackground systemStore={systemStore} />
+
         {this.state.streetPassSettings &&
           <StreetPassSettingsModal
             navigation={navigation}
@@ -99,9 +103,6 @@ class StreetPassScreen extends React.Component<IStreetPassScreenProps> {
         }
 
         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center',}}>
-          <GradientBackground systemStore={systemStore} />
-          {/* <AnimatedBackground systemStore={systemStore} /> */}
-
           <NavHeader
             systemStore={systemStore}
             color={Colors.lightest}

@@ -27,12 +27,13 @@ interface IStreetPassModalProps {
   navigation: any,
   systemStore: ISystemStore,
   streetPass: any,
-  streetPassCardRef: RefObject<CardItemHandle> | null,
+  streetPassCardRef?: RefObject<CardItemHandle> | null,
   streetPassImageIndex: number | null,
+  hideActions?: boolean,
   unsetStreetPass: () => void,
 }
 const StreetPassModal: React.FC<IStreetPassModalProps> = ({
-  navigation, systemStore, streetPass, streetPassCardRef, streetPassImageIndex, unsetStreetPass,
+  navigation, systemStore, streetPass, streetPassCardRef, streetPassImageIndex, hideActions, unsetStreetPass,
 }) => {
   const { Colors, Fonts, } = systemStore
   const streetPassCarouselRef: RefObject<ICarouselInstance> = React.createRef()
@@ -43,7 +44,7 @@ const StreetPassModal: React.FC<IStreetPassModalProps> = ({
 
   return (
     <>
-      <BlurView blurType={Colors.darkBlur as any} style={{position: 'absolute', zIndex: 1, width: '100%', height: '100%',}}>
+      <BlurView blurType={Colors.darkBlur as any} style={{position: 'absolute', zIndex: 3, width: '100%', height: '100%',}}>
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={{marginTop: 64,}}>
             <Carousel
@@ -125,33 +126,35 @@ const StreetPassModal: React.FC<IStreetPassModalProps> = ({
               <Text numberOfLines={1} style={{color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.featherWeight, textShadowColor: Colors.darkest, textShadowRadius: 2}}>Streetpassed {timePassedSince(streetPass.streetPassDate, systemStore.Locale)}</Text>
             </View>
 
-            <View style={{flex: 0, flexDirection: 'row',}}>
-              <TouchableOpacity
-                onPress={async () => {
-                  await unsetStreetPass()
-                  swipeLeft && swipeLeft()
-                }}
-                activeOpacity={Colors.activeOpacity}
-                style={{padding: 12, borderWidth: 1, borderRadius: 64, marginHorizontal: 8, borderColor: Colors.lightBlue,}}
-              >
-                <CrossIcon fill={Colors.lightBlue} width={24} height={24} />
-              </TouchableOpacity>
+            {!hideActions &&
+              <View style={{flex: 0, flexDirection: 'row',}}>
+                <TouchableOpacity
+                  onPress={async () => {
+                    await unsetStreetPass()
+                    swipeLeft && swipeLeft()
+                  }}
+                  activeOpacity={Colors.activeOpacity}
+                  style={{padding: 12, borderWidth: 1, borderRadius: 64, marginHorizontal: 8, borderColor: Colors.lightBlue,}}
+                >
+                  <CrossIcon fill={Colors.lightBlue} width={24} height={24} />
+                </TouchableOpacity>
 
-              <TouchableOpacity
-                onPress={async () => {
-                  await unsetStreetPass()
-                  swipeRight && swipeRight()
-                }}
-                activeOpacity={Colors.activeOpacity}
-                style={{padding: 12, borderWidth: 1, borderRadius: 64, marginHorizontal: 8, borderColor: Colors.red,}}
-              >
-                <HeartIcon fill={Colors.red} width={24} height={24} />
-              </TouchableOpacity>
-            </View>
+                <TouchableOpacity
+                  onPress={async () => {
+                    await unsetStreetPass()
+                    swipeRight && swipeRight()
+                  }}
+                  activeOpacity={Colors.activeOpacity}
+                  style={{padding: 12, borderWidth: 1, borderRadius: 64, marginHorizontal: 8, borderColor: Colors.red,}}
+                >
+                  <HeartIcon fill={Colors.red} width={24} height={24} />
+                </TouchableOpacity>
+              </View>
+            }
           </View>
 
           <View style={{flex: 1, paddingHorizontal: 16,}}>
-            <Text style={{marginTop: 16, color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.lightWeight, textShadowColor: Colors.darkest, textShadowRadius: 2}}>{streetPass.bio}</Text>
+            <Text style={{marginTop: 16, color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.welterWeight, textShadowColor: Colors.darkest, textShadowRadius: 2}}>{streetPass.bio}</Text>
           </View>
 
           <View style={{height: 80,}} />

@@ -9,7 +9,8 @@ import ButtonInput from './ButtonInput'
 
 interface ICodeInputProps {
   systemStore: ISystemStore,
-  onPress: () => void,
+  disabled?: boolean,
+  onPress?: () => void,
   onChangeText: (params: string) => void,
 }
 class CodeInput extends React.Component<ICodeInputProps> {
@@ -63,19 +64,21 @@ class CodeInput extends React.Component<ICodeInputProps> {
 
     return (
       <View style={{width: '100%', flexDirection: 'row', alignItems: 'center',}}>
-        <TouchableOpacity
-          onPress={() => {
-            this.handleResetInputs()
-            this.props.onPress()
-          }}
-          style={{flex: 1.2, alignItems: 'center', marginHorizontal: 4,}}
-        >
-          <RefreshIcon
-            fill={Colors.lightest}
-            width={16}
-            height={16}
-          />
-        </TouchableOpacity>
+        {this.props.onPress &&
+          <TouchableOpacity
+            onPress={() => {
+              this.handleResetInputs()
+              this.props.onPress && this.props.onPress()
+            }}
+            style={{flex: 1.2, alignItems: 'center', marginHorizontal: 4,}}
+          >
+            <RefreshIcon
+              fill={Colors.lightest}
+              width={16}
+              height={16}
+            />
+          </TouchableOpacity>
+        }
 
         <View style={{flex: 1, marginRight: 4,}}>
           <ButtonInput
@@ -93,6 +96,8 @@ class CodeInput extends React.Component<ICodeInputProps> {
             placeholder={'0'}
             keyboardType={'numeric'}
             textAlign={'center'}
+            disabled={this.props.disabled}
+            style={{fontSize: Fonts.lg, paddingVertical: 16,}}
           />
         </View>
 
@@ -109,6 +114,8 @@ class CodeInput extends React.Component<ICodeInputProps> {
             placeholder={'0'}
             keyboardType={'numeric'}
             textAlign={'center'}
+            disabled={this.props.disabled}
+            style={{fontSize: Fonts.lg, paddingVertical: 16,}}
           />
         </View>
         
@@ -125,6 +132,8 @@ class CodeInput extends React.Component<ICodeInputProps> {
             placeholder={'0'}
             keyboardType={'numeric'}
             textAlign={'center'}
+            disabled={this.props.disabled}
+            style={{fontSize: Fonts.lg, paddingVertical: 16,}}
           />
         </View>
 
@@ -141,6 +150,8 @@ class CodeInput extends React.Component<ICodeInputProps> {
             placeholder={'0'}
             keyboardType={'numeric'}
             textAlign={'center'}
+            disabled={this.props.disabled}
+            style={{fontSize: Fonts.lg, paddingVertical: 16,}}
           />
         </View>
 
@@ -157,6 +168,8 @@ class CodeInput extends React.Component<ICodeInputProps> {
             placeholder={'0'}
             keyboardType={'numeric'}
             textAlign={'center'}
+            disabled={this.props.disabled}
+            style={{fontSize: Fonts.lg, paddingVertical: 16,}}
           />
         </View>
 
@@ -173,6 +186,8 @@ class CodeInput extends React.Component<ICodeInputProps> {
             placeholder={'0'}
             keyboardType={'numeric'}
             textAlign={'center'}
+            disabled={this.props.disabled}
+            style={{fontSize: Fonts.lg, paddingVertical: 16,}}
           />
         </View>
       </View>

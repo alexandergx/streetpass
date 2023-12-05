@@ -10,15 +10,9 @@ import { BlurView } from '@react-native-community/blur'
 import ListGroup, { IListGroupConfig } from '../listGroup'
 import { IUserStore } from '../../state/reducers/UserReducer'
 import CrossIcon from '../../assets/icons/cross.svg'
-import ProfileIcon from '../../assets/icons/profile.svg'
-import LockedIcon from '../../assets/icons/locked.svg'
-import UnlockedIcon from '../../assets/icons/unlocked.svg'
-import CompassIcon from '../../assets/icons/compass.svg'
 import SwatchIcon from '../../assets/icons/swatch.svg'
-// import LanguageIcon from '../../assets/icons/locale.svg'
 import PhoneIcon from '../../assets/icons/phone.svg'
 import EmailIcon from '../../assets/icons/email.svg'
-import KeyIcon from '../../assets/icons/key.svg'
 import BellIcon from '../../assets/icons/bell-solid.svg'
 import RestrictedIcon from '../../assets/icons/restricted.svg'
 import DeleteIcon from '../../assets/icons/delete.svg'
@@ -42,12 +36,12 @@ interface IProfileSettingsModalProps {
 }
 interface IProfileSettingsModalState {
   settings: boolean,
-  loggingOut: boolean,
+  signingOut: boolean,
 }
 class UserSettingsModal extends React.Component<IProfileSettingsModalProps> {
   state: IProfileSettingsModalState = {
     settings: true,
-    loggingOut: false,
+    signingOut: false,
   }
 
   render() {
@@ -55,39 +49,38 @@ class UserSettingsModal extends React.Component<IProfileSettingsModalProps> {
     const { Colors, Fonts, } = systemStore
 
     const profileConfig: IListGroupConfig = {
-      title: 'App',
+      title: Lit[systemStore.Locale].Title.App,
       list: [
-        { Icon: SwatchIcon, title: 'App style', content: null, onPress: () => null, },
-        { Icon: BellIcon, title: 'Notifications', onPress: () => null, },
-        { Icon: RestrictedIcon, title: 'Blocked', onPress: () => null, },
+        { Icon: SwatchIcon, title: Lit[systemStore.Locale].ScreenTitle.AppStyleScreen, content: null, onPress: () => navigation.navigate(Screens.AppStyle), },
+        { Icon: BellIcon, title: Lit[systemStore.Locale].ScreenTitle.NotificationsScreen, onPress: () => navigation.navigate(Screens.Notifications), },
+        { Icon: RestrictedIcon, title: Lit[systemStore.Locale].ScreenTitle.BlockingScreen, onPress: () => navigation.navigate(Screens.Blocking), },
       ],
     }
 
     const accountConfig: IListGroupConfig = {
-      title: 'Account',
+      title: Lit[systemStore.Locale].Title.Account,
       list: [
-        { Icon: EmailIcon, title: 'Email', content: userStore.user.email, onPress: () => null, },
-        { Icon: PhoneIcon, title: 'Phone number', content:
+        { Icon: EmailIcon, title: Lit[systemStore.Locale].ScreenTitle.EmailScreen, content: userStore.user.email, onPress: () => navigation.navigate(Screens.Email), },
+        { Icon: PhoneIcon, title: Lit[systemStore.Locale].ScreenTitle.PhoneNumberScreen, content:
           `${userStore.user.countryCode && userStore.user.phoneNumber ? '+' : ''}${userStore.user.countryCode ? userStore.user.countryCode : ''} ${userStore.user.phoneNumber ? userStore.user.phoneNumber : ''}`,
-          onPress: () => null, },
-        { Icon: DeleteIcon, title: 'Delete account', onPress: () => null, },
-        // { Icon: ShieldIcon, title: '2FA', onPress: () => navigation.navigate(Screens.TwoFactor),},
-        { Icon: ExitIcon, title: 'Sign out', disabled: false, noRight: true, loading: this.state.loggingOut,
+          onPress: () => navigation.navigate(Screens.PhoneNumber), },
+        { Icon: DeleteIcon, title: Lit[systemStore.Locale].Title.DeleteAccount, onPress: () => navigation.navigate(Screens.DeleteAccount), },
+        { Icon: ExitIcon, title: Lit[systemStore.Locale].Title.SignOut, disabled: false, noRight: true, loading: this.state.signingOut,
           onPress: async () => {
-            // this.setState({ loggingOut: true, })
+            // this.setState({ signingOut: true, })
             // await handleLogout()
-            // this.setState({ loggingOut: false, })
+            // this.setState({ signingOut: false, })
           },
         },
       ],
     }
 
     const supportConfig: IListGroupConfig = {
-      title: 'Support',
+      title: Lit[systemStore.Locale].Title.Support,
       list: [
-        { Icon: InfoIcon, title: 'About', onPress: () => Linking.openURL(`${protocol[0]}${baseUrl}/about`), },
-        { Icon: QuestionIcon, title: 'Help', onPress: () => Linking.openURL(`${protocol[0]}${baseUrl}/help`), },
-        { Icon: BookIcon, title: 'Terms of Service & Privacy Policy', onPress: () => Linking.openURL(`${protocol[0]}${baseUrl}/tos`), },
+        { Icon: InfoIcon, title: Lit[systemStore.Locale].Title.About, onPress: () => Linking.openURL(`${protocol[0]}${baseUrl}/about`), },
+        { Icon: QuestionIcon, title: Lit[systemStore.Locale].Title.Help, onPress: () => Linking.openURL(`${protocol[0]}${baseUrl}/help`), },
+        { Icon: BookIcon, title: Lit[systemStore.Locale].Title.ToS, onPress: () => Linking.openURL(`${protocol[0]}${baseUrl}/tos`), },
       ],
     }
 
@@ -97,7 +90,7 @@ class UserSettingsModal extends React.Component<IProfileSettingsModalProps> {
           systemStore={systemStore}
           color={Colors.lightest}
           StartIcon={CrossIcon}
-          onPress={() => this.state.loggingOut ? null : toggleModal()}
+          onPress={() => this.state.signingOut ? null : toggleModal()}
         />
 
         <View style={{flex: 1, width: '100%', height: '100%',}}>

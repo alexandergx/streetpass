@@ -20,7 +20,6 @@ import { IMessage } from '../../state/reducers/ChatsReducer'
 import { ISystemStore } from '../../state/reducers/SystemReducer'
 import { Lit } from '../../utils/locale'
 import FastImage from 'react-native-fast-image'
-import { IMedia } from '../../state/reducers/MediaReducer'
 import LinearGradient from 'react-native-linear-gradient'
 import Pretext from '../pretext'
 import Thumbnail from '../thumbnail'
@@ -39,19 +38,18 @@ interface IMessageProps {
   setMessageIdTime: (params: string | null) => void,
   removeMessage: (params: { chatId: string, messageId: string, pushDelete?: boolean, }) => void,
   setMessageReaction: (params: { chatId: string, messageId: string, userId: string, reaction?: string, pushReact?: boolean, }) => void,
-  goToProfile: (params: string) => void,
-  setMedia: (params: IMedia) => void,
 }
 const Message: React.FC<IMessageProps>  = React.memo(({
-  systemStore, userId, item, index, messages, messageId, messageIdTime, setMessageId, setMessageIdTime,
-  removeMessage, setMessageReaction, goToProfile, setMedia,
+  systemStore, userId, item, index, messages, messageId, messageIdTime,
+  setMessageId, setMessageIdTime, removeMessage, setMessageReaction,
 }) => {
   const { Colors, Fonts, } = systemStore
   const me = item.userId === userId
-  const prev = messages && messages[index + 1]?.userId === item.userId && !messages[index + 1]?.deleted
+  const prev = messages && messages[index + 1]?.userId === item.userId && !messages[index + 1]?.deletedMessage
     && withinTime(item.date, messages[index + 1].date, Time.Hour * 1000) ? true : false
-  const next = messages && messages[index - 1]?.userId === item.userId && !messages[index - 1]?.deleted
+  const next = messages && messages[index - 1]?.userId === item.userId && !messages[index - 1]?.deletedMessage
     && withinTime(item.date, messages[index - 1].date, Time.Hour * 1000) ? true : false
+
   return (
     <>
       {messageId === item.messageId &&
@@ -62,7 +60,7 @@ const Message: React.FC<IMessageProps>  = React.memo(({
             style={{zIndex: 1, width: '100%', paddingHorizontal: 16, bottom: 2,}}
           >
             <View style={{alignSelf: me ? 'flex-end' : 'flex-start', marginBottom: 4,}}>
-              <ListGroup
+              {/* <ListGroup
                 systemStore={systemStore}
                 config={{
                   list: me ? [
@@ -78,7 +76,7 @@ const Message: React.FC<IMessageProps>  = React.memo(({
                     }, },
                   ],
                 }}
-              />
+              /> */}
             </View>
 
             <View style={{alignSelf: me ? 'flex-end' : 'flex-start', maxWidth: '80%', height: 52, borderRadius: 16, overflow: 'hidden',}}>
@@ -122,7 +120,7 @@ const Message: React.FC<IMessageProps>  = React.memo(({
         style={{width: '100%', alignItems: me ? 'flex-end' : 'flex-start', paddingHorizontal: 16,}}
       >
         {!prev && <View style={{height: 6,}} />}
-        {item.deleted
+        {item.deletedMessage
           ? <TouchableOpacity
             onPress={() => setMessageIdTime(messageIdTime === item.messageId ? null : item.messageId)}
             style={{marginTop: 8, opacity: 0.5,}}
@@ -142,7 +140,7 @@ const Message: React.FC<IMessageProps>  = React.memo(({
             >
               <View
                 style={{
-                  alignItems: 'center', overflow: 'hidden', maxWidth: item.media ? '60%' : '80%', marginTop: 2,
+                  alignItems: 'center', overflow: 'hidden', maxWidth: '80%', marginTop: 2,
                   borderTopLeftRadius: prev && !me ? 4 : 20, borderTopRightRadius: prev && me ? 4 : 20,
                   borderBottomLeftRadius: next && !me ? 4 : 20, borderBottomRightRadius: next && me ? 4 : 20,
                 }}
@@ -156,131 +154,17 @@ const Message: React.FC<IMessageProps>  = React.memo(({
                 <BlurView blurType={me ? Colors.safeDarkestBlur : Colors.safeDarkerBlur as any} style={{position: 'absolute', zIndex: -1, height: '100%', width: '100%', display: 'flex',}} />
                 <View style={{position: 'absolute', zIndex: -1, width: '100%', height: '100%', backgroundColor: me ? Colors.lightBlue : Colors.lightGrey,}} />
 
-                {item.media ?
-                  <>
-                    <TouchableOpacity
-                      onPress={() => setMedia(item.media!)}
-                      onLongPress={() => {
-                        softVibrate()
-                        setMessageId(messageId === item.messageId ? null : item.messageId)}
-                      }
-                      activeOpacity={Colors.activeOpacity}
-                      style={{
-                        width: '100%', aspectRatio: 1/1.3, alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
-                      }}
-                    >
-                      {item.media.thumbnail ?
-                        <FastImage
-                          source={{uri: item.media.thumbnail}}
-                          resizeMode={'cover'}
-                          style={{position: 'absolute', zIndex: 0, width: '120%', height: '100%',}}
-                        />
-                      : <View style={{position: 'absolute', zIndex: 0, width: '120%', height: '100%', backgroundColor: Colors.black,}} />}
-
-                      {item.media.video &&
-                        <View style={{position: 'absolute', top: 16, right: 16,}}>
-                          <PlayIcon fill={Colors.safeLightest} width={16} height={16} />
-                        </View>
-                      }
-
-                      <LinearGradient
-                        style={{position: 'absolute', width: '100%', height: '15%', bottom: 0,}}
-                        colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.2)', 'rgba(0,0,0,0.1)', 'rgba(0,0,0,0)']} start={{ x: 1, y: 1 }} end={{ x: 1, y: 0 }}
-                      />
-
-                      <Text
-                        style={{
-                          position: 'absolute', zIndex: 2, bottom: 8, left: 16,
-                          color: Colors.safeLightest, fontWeight: Fonts.cruiserWeight as any,
-                          shadowRadius: 2, shadowOpacity: 0.5, shadowOffset: { width: 0, height: 0, },
-                        }}
-                      >{item.media.username}</Text>
-
-                      <BlurView
-                        blurType={Colors.darkestBlur as any}
-                        style={{position: 'absolute', zIndex: -1, width: '100%', height: '100%',}}
-                      />
-                    </TouchableOpacity>
-
-                    {item.message &&
-                      <View style={{width: '100%',}}>
-                        <Pretext
-                          systemStore={systemStore}
-                          text={item.message}
-                          linkColor={me ? Colors.darkBlue : Colors.lightBlue}
-                          textStyle={{color: Colors.safeLightest, paddingVertical: 12, paddingHorizontal: 16,}}
-                          onPress={(word) => goToProfile(word)}
-                          onLongPress={() => {
-                            softVibrate()
-                            setMessageId(messageId === item.messageId ? null : item.messageId)}
-                          }
-                        />
-                      </View>
-                    }
-                  </>
-                : item.profile ?
-                  <>
-                    <TouchableOpacity
-                      onPress={() => item.profile ? goToProfile(item.profile.username) : null}
-                      onLongPress={() => {
-                        softVibrate()
-                        setMessageId(messageId === item.messageId ? null : item.messageId)}
-                      }
-                      activeOpacity={Colors.activeOpacity}
-                      style={{
-                        width: '100%', height: 64, alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
-                        paddingHorizontal: 16, flexDirection: 'row', backgroundColor: Colors.safeDarkBackground,
-                      }}
-                    >
-                      <View style={{flex: 0, marginRight: 12,}}>
-                        <Thumbnail systemStore={systemStore} uri={item.profile.profilePicture} size={40} />
-                      </View>
-                      <View style={{flex: 1,}}>
-                        <Text
-                          numberOfLines={1}
-                          style={{
-                            color: Colors.safeLightest, fontWeight: Fonts.cruiserWeight as any,
-                            shadowRadius: 2, shadowOpacity: 0.5, shadowOffset: { width: 0, height: 0, },
-                          }}
-                        >{item.profile.username}</Text>
-                        <Text
-                          numberOfLines={1}
-                          style={{
-                            color: Colors.safeLightest, fontWeight: Fonts.welterWeight as any,
-                            shadowRadius: 2, shadowOpacity: 0.5, shadowOffset: { width: 0, height: 0, },
-                          }}
-                        >{item.profile.name}</Text>
-                      </View>
-                    </TouchableOpacity>
-
-                    {item.message &&
-                      <View style={{width: '100%',}}>
-                        <Pretext
-                          systemStore={systemStore}
-                          text={item.message}
-                          linkColor={me ? Colors.darkBlue : Colors.lightBlue}
-                          textStyle={{color: Colors.safeLightest, paddingVertical: 12, paddingHorizontal: 16,}}
-                          onPress={(word) => goToProfile(word)}
-                          onLongPress={() => {
-                            softVibrate()
-                            setMessageId(messageId === item.messageId ? null : item.messageId)}
-                          }
-                        />
-                      </View>
-                    }
-                  </>
-                : <Pretext
-                    systemStore={systemStore}
-                    text={item.message}
-                    linkColor={me ? Colors.darkBlue : Colors.lightBlue}
-                    textStyle={{color: Colors.safeLightest, paddingVertical: 12, paddingHorizontal: 16,}}
-                    onPress={(word) => goToProfile(word)}
-                    onLongPress={() => {
-                      softVibrate()
-                      setMessageId(messageId === item.messageId ? null : item.messageId)}
-                    }
-                  />
-                }
+                <Pretext
+                  systemStore={systemStore}
+                  text={item.message}
+                  linkColor={me ? Colors.darkBlue : Colors.lightBlue}
+                  textStyle={{color: Colors.safeLightest, paddingVertical: 12, paddingHorizontal: 16,}}
+                  onPress={(word) => null}
+                  onLongPress={() => {
+                    softVibrate()
+                    setMessageId(messageId === item.messageId ? null : item.messageId)}
+                  }
+                />
               </View>
               <View
                 style={{

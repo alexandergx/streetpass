@@ -13,7 +13,8 @@ import { DraggableGrid } from 'react-native-draggable-grid'
 import { mockUserProfile } from '../../utils/MockData'
 import FastImage from 'react-native-fast-image'
 import TextInput from '../textInput'
-import { InputLimits } from '../../utils/constants'
+import { InputLimits, } from '../../utils/constants'
+import { Lit, } from '../../utils/locale'
 
 const userProfile = mockUserProfile
 
@@ -30,6 +31,7 @@ export interface IEditProfileModalState {
   profileMedia: any,
   scroll: boolean,
   keyboard: boolean,
+  loading: boolean,
 }
 class EditProfileModal extends React.Component<IEditProfileModalProps> {
   constructor(props: IEditProfileModalProps) {
@@ -42,6 +44,7 @@ class EditProfileModal extends React.Component<IEditProfileModalProps> {
     profileMedia: [...userProfile.media.map((item, index) => { return { ...item, key: index, } }), { key: null, }].slice(0, 9),
     scroll: true,
     keyboard: false,
+    loading: false,
   }
 
   private keyboardWillShowListener: any
@@ -97,7 +100,7 @@ class EditProfileModal extends React.Component<IEditProfileModalProps> {
                           style={{width: '100%', height: '100%', borderRadius: 8, overflow: 'hidden',}}
                         />
 
-                        <TouchableOpacity style={{position: 'absolute', bottom: -2, right: -4,}}>
+                        <TouchableOpacity activeOpacity={Colors.activeOpacity} style={{position: 'absolute', bottom: -2, right: -4,}}>
                           <CrossCircledIcon fill={Colors.safeLightest} width={32} height={32} />
                         </TouchableOpacity>
 
@@ -190,8 +193,8 @@ class EditProfileModal extends React.Component<IEditProfileModalProps> {
               <Button
                 systemStore={systemStore}
                 onPress={toggleModal}
-                // title={Lit[systemStore.Locale].Button.Save}
-                // loading={this.state.loading}
+                title={Lit[systemStore.Locale].Button.Save}
+                loading={this.state.loading}
               />
             </View>
           </KeyboardAvoidingView>

@@ -1,15 +1,4 @@
-import { InputLimits } from '../../utils/constants'
-
-export interface ICoordinates { lat: number, lon: number, }
-
-export interface IStreetPass {
-  userId: string,
-  name: string | null,
-  age: number,
-  sex: boolean | null,
-  coordinates: ICoordinates | null,
-  date: Date,
-}
+import { InputLimits, } from '../../utils/constants'
 
 export interface IStreetPassPreferences {
   discoverable: boolean,
@@ -30,12 +19,6 @@ export interface IPrivacyPreferences {
   //
 }
 
-export interface IProfile {
-  userId: string,
-  name: string | null,
-  bio?: string,
-}
-
 export interface IUser {
   userId: string,
   phoneNumber: string,
@@ -49,6 +32,10 @@ export interface IUser {
   streetPassPreferences: IStreetPassPreferences,
   notificationPreferences: INotificationPreferences,
   privacyPreferences: IPrivacyPreferences,
+  media: Array<{
+    image?: string,
+    video?: string,
+  }>,
 }
 
 export interface IUserStore {
@@ -91,6 +78,7 @@ const INITIAL_STATE: IUserStore = {
     privacyPreferences: {
       //
     },
+    media: [],
   },
 }
 

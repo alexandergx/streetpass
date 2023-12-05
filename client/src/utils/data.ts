@@ -1,4 +1,4 @@
-export const phonenumberPlaceholders: any = {
+export const phoneNumberPlaceholders: any = {
   'n': '1234567890',
   '1': '123 456 7890',    // North America
   '7': '123 456 7890',    // Russia

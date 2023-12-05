@@ -1,16 +1,19 @@
+import { IMatch } from '../state/reducers/MatchesReducer'
+import { IStreetPass } from '../state/reducers/StreetPassReducer'
 import { InputLimits } from './constants'
 
 const image1 = 'https://c.ndtvimg.com/2021-01/hgh0aplo_yael-shelbia_625x300_22_January_21.jpg'
 const image2 = 'https://www.lofficielbaltic.com/_next/image?url=https%3A%2F%2Fwww.datocms-assets.com%2F59774%2F1643351623-1571501184449345-captura-de-tela-2019-10-18-a-s-17-06-16.png%3Fauto%3Dformat%252Ccompress%26cs%3Dsrgb&w=3840&q=75'
 const image3 = 'https://images.unsplash.com/photo-1524502397800-2eeaad7c3fe5?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGJlYXV0aWZ1bCUyMHdvbWFufGVufDB8fDB8fHww'
 
-export const mockStreetPasses = [
+export const mockStreetPasses: Array<IStreetPass> = [
   {
     userId: '1',
     name: 'User one',
     bio: 'This is a bio',
     age: 19,
-    streetPassDate: new Date(),
+    sex: false,
+    date: new Date(),
     media: [
       { image: image1, },
       { image: image2, },
@@ -22,7 +25,8 @@ export const mockStreetPasses = [
     name: 'User two',
     bio: 'This is a bio',
     age: 19,
-    streetPassDate: new Date(),
+    sex: false,
+    date: new Date(),
     media: [
       { image: image2, },
       { image: image3, },
@@ -34,7 +38,8 @@ export const mockStreetPasses = [
     name: 'User three',
     bio: 'This is a bio',
     age: 19,
-    streetPassDate: new Date(),
+    sex: false,
+    date: new Date(),
     media: [
       { image: image3, },
       { image: image1, },
@@ -46,7 +51,8 @@ export const mockStreetPasses = [
     name: 'User four',
     bio: 'This is a bio',
     age: 19,
-    streetPassDate: new Date(),
+    sex: false,
+    date: new Date(),
     media: [
       { image: image1, },
       { image: image2, },
@@ -58,7 +64,8 @@ export const mockStreetPasses = [
     name: 'User five',
     bio: 'This is a bio',
     age: 19,
-    streetPassDate: new Date(),
+    sex: false,
+    date: new Date(),
     media: [
       { image: image2, },
       { image: image3, },
@@ -70,7 +77,8 @@ export const mockStreetPasses = [
     name: 'User six',
     bio: 'This is a bio',
     age: 19,
-    streetPassDate: new Date(),
+    sex: false,
+    date: new Date(),
     media: [
       { image: image3, },
       { image: image1, },
@@ -82,7 +90,8 @@ export const mockStreetPasses = [
     name: 'User seven',
     bio: 'This is a bio',
     age: 19,
-    streetPassDate: new Date(),
+    sex: false,
+    date: new Date(),
     media: [
       { image: image1, },
       { image: image2, },
@@ -91,14 +100,15 @@ export const mockStreetPasses = [
   },
 ]
 
-export const mockMatches = [
+export const mockMatches: Array<IMatch> = [
   {
     userId: '1',
     matchId: '1',
     name: 'User one',
-    bio: 'This is a bio',
     age: 19,
-    streetPassDate: new Date(),
+    sex: false,
+    bio: 'This is a bio',
+    date: new Date(),
     media: [
       { image: image1, },
       { image: image2, },
@@ -107,12 +117,13 @@ export const mockMatches = [
     seen: false,
   },
   {
-    userId: '2',
-    matchId: '2',
-    name: 'User two',
-    bio: 'This is a bio',
+    userId: '1',
+    matchId: '1',
+    name: 'User one',
     age: 19,
-    streetPassDate: new Date(),
+    sex: false,
+    bio: 'This is a bio',
+    date: new Date(),
     media: [
       { image: image2, },
       { image: image3, },
@@ -121,12 +132,13 @@ export const mockMatches = [
     seen: true,
   },
   {
-    userId: '3',
-    matchId: '3',
-    name: 'User three',
-    bio: 'This is a bio',
+    userId: '1',
+    matchId: '1',
+    name: 'User one',
     age: 19,
-    streetPassDate: new Date(),
+    sex: false,
+    bio: 'This is a bio',
+    date: new Date(),
     media: [
       { image: image3, },
       { image: image1, },
@@ -135,12 +147,13 @@ export const mockMatches = [
     seen: true,
   },
   {
-    userId: '4',
-    matchId: '4',
-    name: 'User four',
-    bio: 'This is a bio',
+    userId: '1',
+    matchId: '1',
+    name: 'User one',
     age: 19,
-    streetPassDate: new Date(),
+    sex: false,
+    bio: 'This is a bio',
+    date: new Date(),
     media: [
       { image: image1, },
       { image: image2, },
@@ -149,12 +162,13 @@ export const mockMatches = [
     seen: true,
   },
   {
-    userId: '5',
-    matchId: '5',
-    name: 'User five',
-    bio: 'This is a bio',
+    userId: '1',
+    matchId: '1',
+    name: 'User one',
     age: 19,
-    streetPassDate: new Date(),
+    sex: false,
+    bio: 'This is a bio',
+    date: new Date(),
     media: [
       { image: image2, },
       { image: image3, },
@@ -163,12 +177,13 @@ export const mockMatches = [
     seen: true,
   },
   {
-    userId: '6',
-    matchId: '6',
-    name: 'User six',
-    bio: 'This is a bio',
+    userId: '1',
+    matchId: '1',
+    name: 'User one',
     age: 19,
-    streetPassDate: new Date(),
+    sex: false,
+    bio: 'This is a bio',
+    date: new Date(),
     media: [
       { image: image3, },
       { image: image1, },
@@ -177,12 +192,13 @@ export const mockMatches = [
     seen: true,
   },
   {
-    userId: '7',
-    matchId: '7',
-    name: 'User seven',
-    bio: 'This is a bio',
+    userId: '1',
+    matchId: '1',
+    name: 'User one',
     age: 19,
-    streetPassDate: new Date(),
+    sex: false,
+    bio: 'This is a bio',
+    date: new Date(),
     media: [
       { image: image1, },
       { image: image2, },
@@ -199,7 +215,7 @@ export const mockChats = [
     name: 'User one',
     bio: 'This is a bio',
     age: 19,
-    streetPassDate: new Date(),
+    date: new Date(),
     media: [
       { image: image1, },
       { image: image2, },
@@ -215,7 +231,7 @@ export const mockChats = [
     name: 'User two',
     bio: 'This is a bio',
     age: 19,
-    streetPassDate: new Date(),
+    date: new Date(),
     media: [
       { image: image2, },
       { image: image3, },
@@ -231,7 +247,7 @@ export const mockChats = [
     name: 'User three',
     bio: 'This is a bio',
     age: 19,
-    streetPassDate: new Date(),
+    date: new Date(),
     media: [
       { image: image3, },
       { image: image1, },
@@ -247,7 +263,7 @@ export const mockChats = [
     name: 'User four',
     bio: 'This is a bio',
     age: 19,
-    streetPassDate: new Date(),
+    date: new Date(),
     media: [
       { image: image1, },
       { image: image2, },
@@ -263,7 +279,7 @@ export const mockChats = [
     name: 'User five',
     bio: 'This is a bio',
     age: 19,
-    streetPassDate: new Date(),
+    date: new Date(),
     media: [
       { image: image2, },
       { image: image3, },
@@ -279,7 +295,7 @@ export const mockChats = [
     name: 'User six',
     bio: 'This is a bio',
     age: 19,
-    streetPassDate: new Date(),
+    date: new Date(),
     media: [
       { image: image3, },
       { image: image1, },
@@ -295,7 +311,7 @@ export const mockChats = [
     name: 'User seven',
     bio: 'This is a bio',
     age: 19,
-    streetPassDate: new Date(),
+    date: new Date(),
     media: [
       { image: image1, },
       { image: image2, },

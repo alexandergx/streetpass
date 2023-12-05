@@ -1,14 +1,12 @@
 import { ApolloClient, gql, InMemoryCache, split, } from '@apollo/client'
 import { MMKVLoader, } from 'react-native-mmkv-storage'
-import { INotificationPreferences, IPrivacyPreferences, IStreetPassPreferences, } from '../state/reducers/UserReducer'
 import { createUploadLink as customLink, } from './utils'
-// import { createUploadLink as apolloLink, } from 'apollo-upload-client'
-import { GraphQLWsLink } from '@apollo/client/link/subscriptions'
-import { createClient } from 'graphql-ws'
-import { getMainDefinition } from '@apollo/client/utilities'
-import { AuthStore, Errors, LocalStorage } from '../utils/constants'
-import { formatMultiline } from '../utils/functions'
-import { Locales } from '../utils/locale'
+import { createUploadLink as apolloLink, } from 'apollo-upload-client'
+import { GraphQLWsLink, } from '@apollo/client/link/subscriptions'
+import { createClient, } from 'graphql-ws'
+import { getMainDefinition, } from '@apollo/client/utilities'
+import { AuthStore, Errors, LocalStorage, } from '../utils/constants'
+import { formatMultiline, } from '../utils/functions'
 
 const MMKV = new MMKVLoader().withEncryption().withInstanceID(LocalStorage.AuthStore).initialize()
 export const getAccessHeaders = () => { return { 'access-token': MMKV.getString(AuthStore.AccessToken), } }
@@ -34,23 +32,23 @@ const customSplitLink = split(({ query, }) => {
   wsLink,
   customLink({ uri: `${protocol[0]}${baseUrl}/graphql`, }),
 )
-// const apolloSplitLink = split(({ query, }) => {
-//     const definition = getMainDefinition(query)
-//     return definition.kind === 'OperationDefinition' && definition.operation === 'subscription'
-//   },
-//   wsLink,
-//   apolloLink({ uri: `${protocol[0]}${baseUrl}/graphql`, }),
-// )
+const apolloSplitLink = split(({ query, }) => {
+    const definition = getMainDefinition(query)
+    return definition.kind === 'OperationDefinition' && definition.operation === 'subscription'
+  },
+  wsLink,
+  apolloLink({ uri: `${protocol[0]}${baseUrl}/graphql`, }),
+)
 export const customClient = new ApolloClient({
   link: customSplitLink,
   cache: new InMemoryCache(),
   defaultOptions: { query: { fetchPolicy: 'no-cache', errorPolicy: 'all', }, },
 })
-// export const apolloClient = new ApolloClient({
-//   link: apolloSplitLink,
-//   cache: new InMemoryCache(),
-//   defaultOptions: { query: { fetchPolicy: 'no-cache', errorPolicy: 'all', }, },
-// })
+export const apolloClient = new ApolloClient({
+  link: apolloSplitLink,
+  cache: new InMemoryCache(),
+  defaultOptions: { query: { fetchPolicy: 'no-cache', errorPolicy: 'all', }, },
+})
 
 export const apiRequest = async (request: any = null, refresh: boolean = false): Promise<any> => {
   let client = customClient

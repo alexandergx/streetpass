@@ -14,6 +14,7 @@ export const InputLimits = {
   UploadBytesMax: 134217728,
   StreetPassAgeMin: 18,
   StreetPassAgeMax: 99,
+  PhoneNumberMax: 16,
 }
 
 export const Time = {

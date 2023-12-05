@@ -48,6 +48,7 @@ const Button: React.FC<IButtonProps> = ({ systemStore, Icon, title, color, loadi
               color: disabled ? Colors.light : Colors.lightest,
               fontWeight: Fonts.middleWeight as any,
               flexDirection: 'row', justifyContent: 'center', alignItems: 'center',
+              paddingHorizontal: 8,
             }}
           >
             {title || ''}

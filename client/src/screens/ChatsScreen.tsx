@@ -29,6 +29,8 @@ import SelectionModal from '../components/selectionModal'
 import DeleteIcon from '../assets/icons/delete.svg'
 import ExclamationIcon from '../assets/icons/exclamation-circled.svg'
 import GradientBackground from '../components/gradientBackground'
+import { Lit, } from '../utils/locale'
+import AnimatedBackground from '../components/animated/AnimatedBackground'
 
 const mapStateToProps = (state: IStores) => {
   const { systemStore, userStore, chatsStore, } = state
@@ -97,13 +99,13 @@ class ChatsScreen extends React.Component<IChatsScreenProps> {
 
     return (
       <>
-        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center',}}>
-          <GradientBackground systemStore={systemStore} />
-          {/* <AnimatedBackground systemStore={systemStore} /> */}
+        <GradientBackground systemStore={systemStore} />
+        <AnimatedBackground systemStore={systemStore} />
 
+        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center',}}>
           <KeyboardAvoidingView
             behavior={'padding'}
-            style={{flex: 1, display: 'flex',}}
+            style={{flex: 1,}}
           >            
             <ScrollView showsVerticalScrollIndicator={false} style={{flex: 1, width: '100%', height: '100%',}}>
               <View style={{flex: 1, width: '100%', marginTop: 72,}}>
@@ -127,20 +129,20 @@ class ChatsScreen extends React.Component<IChatsScreenProps> {
                               selectionModalConfig: {
                                 title: item.item.name,
                                 list: [
-                                  { Icon: DeleteIcon, title: 'Remove', noRight: true, onPress: () => null, },
-                                  { Icon: DeleteIcon, title: 'Block', noRight: true, onPress: () => null, },
-                                  { Icon: ExclamationIcon, title: 'Report', noRight: true, onPress: () => null, },
+                                  { Icon: DeleteIcon, title: Lit[systemStore.Locale].Button.Remove, noRight: true, onPress: () => null, },
+                                  { Icon: DeleteIcon, title: Lit[systemStore.Locale].Button.Block, noRight: true, onPress: () => null, },
+                                  { Icon: ExclamationIcon, title: Lit[systemStore.Locale].Button.Report, noRight: true, onPress: () => null, },
                                 ],
                               }
                             })}
                             activeOpacity={Colors.activeOpacity}
-                            style={{padding: 4, marginLeft: item.index === 0 ? 16 : 0, marginRight: item.index === matches.length - 1 ? 16 : 0, width: 112, aspectRatio: 1/1.2, borderRadius: 16, overflow: 'hidden',}}
+                            style={{marginLeft: item.index === 0 ? 16 : 0, marginRight: item.index === matches.length - 1 ? 16 : 8, width: 112, aspectRatio: 1/1.2, borderRadius: 16, overflow: 'hidden',}}
                           >
                             {(this.state.matchId || this.state.chatId) && this.state.matchId !== item.item.matchId &&
                               <BlurView
                                 blurType={Colors.darkestBlur as any}
                                 blurAmount={2}
-                                style={{position: 'absolute', zIndex: 1, alignSelf: 'center', top: 4, width: '100%', height: '100%', borderRadius: 16,}}
+                                style={{position: 'absolute', zIndex: 1, alignSelf: 'center', width: '100%', height: '100%', borderRadius: 16,}}
                               />
                             }
                             <FastImage key={item.index} source={{ uri: item.item.media[0].image, }} style={{width: '100%', height: '100%', borderRadius: 16, overflow: 'hidden',}} />
@@ -205,15 +207,15 @@ class ChatsScreen extends React.Component<IChatsScreenProps> {
                         <>
                           <TouchableOpacity
                             key={item.item.chatId}
-                            onPress={() => null}
+                            onPress={() => navigation.navigate(Screens.Chat, { match: item.item, })}
                             onLongPress={() => this.setState({
                               chatId: item.item.chatId,
                               selectionModalConfig: {
                                 title: item.item.name,
                                 list: [
-                                  { Icon: DeleteIcon, title: 'Remove', noRight: true, onPress: () => null, },
-                                  { Icon: DeleteIcon, title: 'Block', noRight: true, onPress: () => null, },
-                                  { Icon: ExclamationIcon, title: 'Report', noRight: true, onPress: () => null, },
+                                  { Icon: DeleteIcon, title: Lit[systemStore.Locale].Button.Remove, noRight: true, onPress: () => null, },
+                                  { Icon: DeleteIcon, title: Lit[systemStore.Locale].Button.Block, noRight: true, onPress: () => null, },
+                                  { Icon: ExclamationIcon, title: Lit[systemStore.Locale].Button.Report, noRight: true, onPress: () => null, },
                                 ],
                               }
                             })}

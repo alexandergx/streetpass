@@ -70,10 +70,10 @@ class StreetPassSettingsModal extends React.Component<IStreetPassSettingsModalPr
     const { Colors, } = systemStore
 
     const streetPassConfig: IListGroupConfig = {
-      title: 'Connect with others',
+      title: Lit[this.props.systemStore.Locale].Title.ConnectWithOthers,
       list: [
         {
-          title: 'StreetPass', toggleValue: this.state.streetPass, onToggle: async () => {
+          title: Lit[this.props.systemStore.Locale].Title.StreetPass, toggleValue: this.state.streetPass, onToggle: async () => {
             return null
             // if (!userStore.user.dob) {
             //   Alert.alert(Lit[this.props.systemStore.Locale].Copywrite.PersonalInfo[0], Lit[this.props.systemStore.Locale].Copywrite.PersonalInfo[1],
@@ -102,26 +102,26 @@ class StreetPassSettingsModal extends React.Component<IStreetPassSettingsModalPr
             //   })
             // } else this.setState({ streetPass: !this.state.streetPass, })
           },
-          description: 'Lorem ipsum',
+          description: Lit[this.props.systemStore.Locale].Copywrite.StreetPassDescription,
         },
       ],
     }
 
     const sexConfig: IListGroupConfig = {
-      title: 'Show me profiles of',
+      title: Lit[this.props.systemStore.Locale].Title.ShowMeOthers,
       list: [
-        { title: 'Men', color: this.state.sex == true ? Colors.lightBlue : undefined, blur: this.state.sex !== true, onPress: () => this.setState({ sex: true, }), noRight: true,  },
-        { title: 'Women', color: this.state.sex == false ? Colors.lightRed : undefined, blur: this.state.sex !== false, onPress: () => this.setState({ sex: false, }), noRight: true,  },
-        { title: 'Everybody', blur: this.state.sex !== null, onPress: () => this.setState({ sex: null, }), noRight: true,  },
+        { title: Lit[this.props.systemStore.Locale].Title.Men, color: this.state.sex == true ? Colors.lightBlue : undefined, blur: this.state.sex !== true, onPress: () => this.setState({ sex: true, }), noRight: true,  },
+        { title: Lit[this.props.systemStore.Locale].Title.Women, color: this.state.sex == false ? Colors.lightRed : undefined, blur: this.state.sex !== false, onPress: () => this.setState({ sex: false, }), noRight: true,  },
+        { title: Lit[this.props.systemStore.Locale].Title.Everybody, blur: this.state.sex !== null, onPress: () => this.setState({ sex: null, }), noRight: true,  },
       ],
     }
 
     const discoverableConfig: IListGroupConfig = {
-      title: 'Let others see me',
+      title: Lit[this.props.systemStore.Locale].Title.ShowOthersMe,
       list: [
         {
-          title: 'Discoverable', toggleValue: this.state.discoverable, onToggle: () => this.setState({ discoverable: !this.state.discoverable, }),
-          description: 'Lorem ipsum',
+          title: Lit[this.props.systemStore.Locale].Title.Discoverable, toggleValue: this.state.discoverable, onToggle: () => this.setState({ discoverable: !this.state.discoverable, }),
+          description: Lit[this.props.systemStore.Locale].Copywrite.DiscoverableDescription,
         },
       ],
     }
@@ -159,7 +159,7 @@ class StreetPassSettingsModal extends React.Component<IStreetPassSettingsModalPr
                       values={streetPassAges}
                       minValue={this.state.age[0]}
                       maxValue={this.state.age[1]}
-                      title={'Age preference'}
+                      title={Lit[this.props.systemStore.Locale].Title.AgePreference}
                       subtitle={`${this.state.age[0]}-${this.state.age[1] >= InputLimits.StreetPassAgeMax ? this.state.age[1] + '+' : this.state.age[1]}`}
                       setValues={(minValue, maxValue) => this.setState({ age: [minValue, maxValue], })}
                       onSlidingStart={() => this.setState({ scroll: false, })}
@@ -178,7 +178,7 @@ class StreetPassSettingsModal extends React.Component<IStreetPassSettingsModalPr
               <Button
                 systemStore={systemStore}
                 onPress={this.updateSettings}
-                // title={Lit[systemStore.Locale].Button.Save}
+                title={Lit[systemStore.Locale].Button.Save}
                 loading={this.state.loading}
               />
             </View>
