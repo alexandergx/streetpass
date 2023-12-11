@@ -9,6 +9,7 @@ import AppNavigation from './src/navigation'
 import { ApolloProvider, } from '@apollo/client'
 import { customClient, } from './src/api'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import 'react-native-reanimated'
 
 const store = configureStore()
 

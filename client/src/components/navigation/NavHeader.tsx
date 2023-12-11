@@ -24,6 +24,7 @@ interface INavHeaderProps {
   StartIcon?: React.FC<SvgProps>,
   EndIcon?: React.FC<SvgProps>,
   shorten?: boolean,
+  disableBack?: boolean,
   onPress?: () => void,
   onPressEnd?: () => void,
   onPressTitle?: () => void,
@@ -31,7 +32,7 @@ interface INavHeaderProps {
   onPressBanner?: () => void,
 }
 const NavHeader: React.FC<INavHeaderProps> = ({
-  systemStore, navigation, title, subtitle, bannerTitle, thumbnail, thumbnailRight, thumbnailSquare, color, bannerColor, StartIcon, EndIcon, shorten,
+  systemStore, navigation, title, subtitle, bannerTitle, thumbnail, thumbnailRight, thumbnailSquare, color, bannerColor, StartIcon, EndIcon, shorten, disableBack,
   onPress, onPressEnd, onPressTitle, onPressThumbnail, onPressBanner, }) => {
   const { Colors, Fonts, } = systemStore
 
@@ -51,7 +52,7 @@ const NavHeader: React.FC<INavHeaderProps> = ({
           style={{position: 'absolute', zIndex: -1, width: '100%', height: '100%',}}
         />
 
-        {(navigation || onPress) &&
+        {(navigation || onPress) && !disableBack &&
           <TouchableOpacity
             onPress={() => onPress ? onPress() : navigation ? navigation.goBack() : null}
             style={{flex: 0, padding: 16, paddingRight: 24,}}
@@ -82,7 +83,7 @@ const NavHeader: React.FC<INavHeaderProps> = ({
             padding: 16, top: subtitle ? 8 : 0,
           }}
         >
-          <Text numberOfLines={1} style={{color: color ? color : Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.heavyWeight as any,}}>{title && title}</Text>
+          <Text numberOfLines={1} style={{color: color ? color : Colors.lightest, fontSize: Fonts.lg, fontWeight: Fonts.heavyWeight as any,}}>{title && title}</Text>
           {subtitle && <Text numberOfLines={1} style={{color: color ? color : Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.welterWeight as any,}}>{subtitle}</Text>}
         </TouchableOpacity>
 

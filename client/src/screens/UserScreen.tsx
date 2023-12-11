@@ -14,7 +14,6 @@ import { bindActionCreators, Dispatch, AnyAction, } from 'redux'
 import { IStores, } from '../state/store'
 import { IUserStore, } from '../state/reducers/UserReducer'
 import { ISystemStore, } from '../state/reducers/SystemReducer'
-import { IChatsStore, } from '../state/reducers/ChatsReducer'
 import GradientBackground from '../components/gradientBackground'
 import NavHeader from '../components/navigation/NavHeader'
 import GearIcon from '../assets/icons/gear.svg'
@@ -29,6 +28,7 @@ import { timePassedSince } from '../utils/functions'
 import EditProfileModal from '../components/editProfileModal'
 import UserSettingsModal from '../components/userSettingsModal'
 import AnimatedBackground from '../components/animated/AnimatedBackground'
+import { ISetUpdateUser, setUpdateUser } from '../state/actions/UserActions'
 
 const mapStateToProps = (state: IStores) => {
   const { systemStore, userStore, } = state
@@ -37,7 +37,7 @@ const mapStateToProps = (state: IStores) => {
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => ({
   actions: bindActionCreators(Object.assign(
     {
-      //
+      setUpdateUser,
     }
   ), dispatch),
 })
@@ -47,7 +47,7 @@ interface IUserScreenProps {
   systemStore: ISystemStore,
   userStore: IUserStore,
   actions: {
-    //
+    setUpdateUser: (params: ISetUpdateUser) => void,
   },
 }
 interface IUserScreenState {
@@ -86,7 +86,7 @@ class UserScreen extends React.Component<IUserScreenProps> {
             userStore={userStore}
             toggleModal={() => this.setState({ editProfile: false, })}
             actions={{
-              //
+              setUpdateUser: this.props.actions.setUpdateUser,
             }}
           />
         }

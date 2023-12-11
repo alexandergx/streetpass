@@ -2,7 +2,6 @@ import React from 'react'
 import {
   Keyboard,
   KeyboardAvoidingView,
-  Text,
   View,
 } from 'react-native'
 import { connect, } from 'react-redux'
@@ -11,7 +10,6 @@ import { IStores, } from '../../state/store'
 import { IUserStore, } from '../../state/reducers/UserReducer'
 import { ISystemStore, } from '../../state/reducers/SystemReducer'
 import Button from '../../components/button'
-import AppleIcon from '../../assets/icons/apple.svg'
 import AnimatedBackground from '../../components/animated/AnimatedBackground'
 import GradientBackground from '../../components/gradientBackground'
 import NavHeader from '../../components/navigation/NavHeader'
@@ -23,6 +21,9 @@ import { InputLimits } from '../../utils/constants'
 import PickerModal from '../../components/pickerModal'
 import { IListGroupConfig } from '../../components/listGroup'
 import { Screens } from '../../navigation'
+import { validatePhoneNumber, } from '../../utils/functions'
+import { verifyPhoneNumber, } from '../../api/user'
+import { ISetPhoneNumber, setPhoneNumber } from '../../state/actions/UserActions'
 
 const mapStateToProps = (state: IStores) => {
   const { systemStore, userStore, } = state
@@ -31,7 +32,7 @@ const mapStateToProps = (state: IStores) => {
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => ({
   actions: bindActionCreators(Object.assign(
     {
-      //
+      setPhoneNumber,
     }
   ), dispatch),
 })
@@ -41,13 +42,17 @@ interface IVerifyPhoneScreenProps {
   systemStore: ISystemStore,
   userStore: IUserStore,
   actions: {
-    //
+    setPhoneNumber: (params: ISetPhoneNumber) => void,
   },
 }
 interface IVerifyPhoneScreenState {
   countryCode: string,
   phoneNumber: string,
+  validPhoneNumber: boolean,
   securityPin: string,
+  loadingPin: boolean,
+  pinSent: boolean,
+  loading: boolean,
   keyboard: boolean,
   pickerModalConfig: IListGroupConfig | null,
 }
@@ -62,7 +67,11 @@ class VerifyPhoneScreen extends React.Component<IVerifyPhoneScreenProps> {
   state: IVerifyPhoneScreenState = {
     countryCode: '1',
     phoneNumber: '',
+    validPhoneNumber: false,
     securityPin: '',
+    loadingPin: false,
+    pinSent: false,
+    loading: false,
     keyboard: false,
     pickerModalConfig: null,
   }
@@ -84,6 +93,27 @@ class VerifyPhoneScreen extends React.Component<IVerifyPhoneScreenProps> {
     this.setState({ keyboard: false, })
   }
 
+  handleSendPin = async () => {
+    try {
+      this.setState({ loadingPin: true, })
+      await this.props.actions.setPhoneNumber({ phoneNumber: this.state.phoneNumber, countryCode: this.state.countryCode, })
+      this.setState({ loadingPin: false, pinSent: true, })
+    } catch {
+      this.setState({ loadingPin: false, })
+    }
+  }
+
+  handleVerifyPhoneNumber = async () => {
+    try {
+      this.setState({ loading: true, })
+      const result = await verifyPhoneNumber({ securityPin: this.state.securityPin, })
+      this.setState({ loading: false, pinSent: true, })
+      if (result) this.props.navigation.navigate(Screens.PersonalInfo)
+    } catch {
+      this.setState({ loading: false, })
+    }
+  }
+
   render() {
     const { navigation, systemStore, }: IVerifyPhoneScreenProps = this.props
     const { Colors, Fonts, } = systemStore
@@ -99,8 +129,6 @@ class VerifyPhoneScreen extends React.Component<IVerifyPhoneScreenProps> {
             color={Colors.lightest}
             title={Lit[systemStore.Locale].ScreenTitle.VerifyPhoneScreen}
             onPress={() => navigation.goBack()}
-            // onPressTitle={() => null}
-            // onPressEnd={() => this.setState({ streetPassSettings: true, })}
           />
 
           {/* <View style={{flex: 1, padding: 16,}}>
@@ -141,21 +169,27 @@ class VerifyPhoneScreen extends React.Component<IVerifyPhoneScreenProps> {
                   const config = { list: configList, }
                   this.setState({ pickerModalConfig: config, })
                 }}
-                onChangeText={(text: string) => this.setState({ phoneNumber: formatPhonenumber(this.state.countryCode, text.slice(0, InputLimits.PhoneNumberMax)), })}
+                onChangeText={(text: string) => {
+                  this.setState({
+                    phoneNumber: formatPhonenumber(this.state.countryCode, text.slice(0, InputLimits.PhoneNumberMax)),
+                    validPhoneNumber: validatePhoneNumber(text),
+                  })
+                }}
               />
 
               <Button
                 systemStore={systemStore}
-                title={Lit[systemStore.Locale].Button.SendPin}
-                disabled={true}
-                onPress={() => null}
+                title={this.state.pinSent ? Lit[systemStore.Locale].Button.PinSent : Lit[systemStore.Locale].Button.SendPin}
+                disabled={!this.state.validPhoneNumber || this.state.pinSent}
+                loading={this.state.loadingPin}
+                onPress={this.handleSendPin}
               />
 
               <View style={{height: 32,}} />
 
               <CodeInput
                 systemStore={systemStore}
-                disabled={true}
+                disabled={!this.state.pinSent}
                 onChangeText={text => this.setState({ securityPin: text, })}
               />
             </View>
@@ -186,8 +220,9 @@ class VerifyPhoneScreen extends React.Component<IVerifyPhoneScreenProps> {
               <Button
                 systemStore={systemStore}
                 title={Lit[systemStore.Locale].Button.Continue}
-                // disabled={true}
-                onPress={() => navigation.navigate(Screens.PersonalInfo)}
+                disabled={this.state.securityPin.length !== 6}
+                loading={this.state.loading}
+                onPress={this.handleVerifyPhoneNumber}
               />
             </View>
           </KeyboardAvoidingView>

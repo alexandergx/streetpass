@@ -13,7 +13,7 @@ import { bindActionCreators, Dispatch, AnyAction, } from 'redux'
 import { IStores, } from '../state/store'
 import { IUserStore, } from '../state/reducers/UserReducer'
 import { ISystemStore, } from '../state/reducers/SystemReducer'
-import { IChatsStore, } from '../state/reducers/ChatsReducer'
+// import { IChatsStore, } from '../state/reducers/ChatsReducer'
 import { FlashList, } from '@shopify/flash-list'
 import { mockChats, mockMatches, } from '../utils/MockData'
 import { ScrollView } from 'react-native-gesture-handler'
@@ -33,8 +33,8 @@ import { Lit, } from '../utils/locale'
 import AnimatedBackground from '../components/animated/AnimatedBackground'
 
 const mapStateToProps = (state: IStores) => {
-  const { systemStore, userStore, chatsStore, } = state
-  return { systemStore, userStore, chatsStore, }
+  const { systemStore, userStore, } = state
+  return { systemStore, userStore, }
 }
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => ({
   actions: bindActionCreators(Object.assign(
@@ -48,7 +48,7 @@ interface IChatsScreenProps {
   navigation: any,
   systemStore: ISystemStore,
   userStore: IUserStore,
-  chatsStore: IChatsStore,
+  // chatsStore: IChatsStore,
   actions: {
     //
   },
@@ -91,7 +91,7 @@ class ChatsScreen extends React.Component<IChatsScreenProps> {
   }
 
   render() {
-    const { navigation, systemStore, userStore, chatsStore, actions, }: IChatsScreenProps = this.props
+    const { navigation, systemStore, userStore, actions, }: IChatsScreenProps = this.props
     const { Colors, Fonts, } = systemStore
 
     const matches = mockMatches
@@ -109,7 +109,7 @@ class ChatsScreen extends React.Component<IChatsScreenProps> {
           >            
             <ScrollView showsVerticalScrollIndicator={false} style={{flex: 1, width: '100%', height: '100%',}}>
               <View style={{flex: 1, width: '100%', marginTop: 72,}}>
-                <Text style={{paddingHorizontal: 16, marginBottom: 8, color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.cruiserWeight,}}>Streetpass matches</Text>
+                <Text style={{paddingHorizontal: 16, marginBottom: 8, color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.cruiserWeight,}}>{Lit[systemStore.Locale].Title.Matches}</Text>
 
                 <View style={{minWidth: 112,}}>
                   <FlashList
@@ -123,14 +123,13 @@ class ChatsScreen extends React.Component<IChatsScreenProps> {
                         <>
                           <TouchableOpacity
                             key={item.item.matchId}
-                            onPress={() => null}
+                            onPress={() => navigation.navigate(Screens.Chat, { match: item.item, })}
                             onLongPress={() => this.setState({
                               matchId: item.item.matchId,
                               selectionModalConfig: {
                                 title: item.item.name,
                                 list: [
                                   { Icon: DeleteIcon, title: Lit[systemStore.Locale].Button.Remove, noRight: true, onPress: () => null, },
-                                  { Icon: DeleteIcon, title: Lit[systemStore.Locale].Button.Block, noRight: true, onPress: () => null, },
                                   { Icon: ExclamationIcon, title: Lit[systemStore.Locale].Button.Report, noRight: true, onPress: () => null, },
                                 ],
                               }
@@ -182,7 +181,7 @@ class ChatsScreen extends React.Component<IChatsScreenProps> {
                     placeholder={'Search chats'}
                     StartIcon={SearchIcon}
                     // onPressStart={() => this.childInputRef.focus()}
-                    EndIcon={this.state.search.length > 0 || this.props.chatsStore.chatsSearch ? CrossIcon : undefined}
+                    // EndIcon={this.state.search.length > 0 || this.props.chatsStore.chatsSearch ? CrossIcon : undefined}
                     onPressEnd={() => null}
                   />
                   {/* {this.state.search.length > 0 &&
@@ -214,7 +213,6 @@ class ChatsScreen extends React.Component<IChatsScreenProps> {
                                 title: item.item.name,
                                 list: [
                                   { Icon: DeleteIcon, title: Lit[systemStore.Locale].Button.Remove, noRight: true, onPress: () => null, },
-                                  { Icon: DeleteIcon, title: Lit[systemStore.Locale].Button.Block, noRight: true, onPress: () => null, },
                                   { Icon: ExclamationIcon, title: Lit[systemStore.Locale].Button.Report, noRight: true, onPress: () => null, },
                                 ],
                               }

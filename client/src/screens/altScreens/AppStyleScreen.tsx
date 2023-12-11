@@ -97,10 +97,7 @@ class AppStyleScreen extends React.Component<IAppStyleScreenProps> {
                 return (
                   <View
                     key={index}
-                    style={{
-                      width: '100%',
-                      borderTopWidth: index ? 0.3 : 0, borderColor: Colors.lightest,
-                    }}
+                    style={{width: '100%', borderTopWidth: index ? 0.3 : 0, borderColor: Colors.light,}}
                   >
                     <TouchableOpacity
                       onPress={() => this.handleSetTheme(theme as keyof typeof Themes)}

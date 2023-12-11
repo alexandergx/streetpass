@@ -71,7 +71,7 @@ const INITIAL_STATE: ISystemStore = {
     xs: 8,
     sm: 12,
     md: 15,
-    lg: 20,
+    lg: 18,
     xl: 24,
     xxl: 28,
     featherWeight: '200',

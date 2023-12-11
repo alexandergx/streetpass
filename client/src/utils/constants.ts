@@ -4,7 +4,7 @@ export const AppVersion = PackageJson.version
 export const Domain = 'https://streetpass.app'
 
 export const InputLimits = {
-  NameMin: 1,
+  NameMin: 3,
   NameMax: 32,
   DescriptionMin: 0,
   DescriptionMax: 256,
@@ -71,6 +71,13 @@ export enum Errors {
   ForceRefresh = 'force refresh',
   InvalidSignature = 'invalid signature',
   NetworkFailure = 'Network request failed',
+}
+
+export enum ISignInErrors {
+  VerifyPhoneNumber = 'verify phone number',
+  IncompleteAccount = 'incomplete account',
+  IncompletePreferences = 'incomplete preferences',
+  IncompleteProfile = 'incomplete profile',
 }
 
 export enum LocalStorage {

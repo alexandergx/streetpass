@@ -10,7 +10,7 @@ const GradientBackground: React.FC<IGradientBackgroundProps> = ({ systemStore, }
   return (
     <LinearGradient
       style={{position: 'absolute', zIndex: -1, width: '100%', height: '100%',}}
-      colors={Colors.gradient} start={{ x: 1, y: 1 }} end={{ x: 1, y: 0 }}
+      colors={Colors.gradient} start={{ x: 1, y: 1, }} end={{ x: 1, y: 0, }}
     />
   )
 }

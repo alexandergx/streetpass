@@ -14,6 +14,8 @@ import Slider from '../slider'
 // import { requestLocationAlways } from '../../utils/services'
 // import { Screens } from '../../navigation'
 // import { getAge } from '../../utils/functions'
+import MaleIcon from '../../assets/icons/male.svg'
+import FemaleIcon from '../../assets/icons/female.svg'
 
 interface IStreetPassSettingsModalProps {
   navigation: any,
@@ -110,8 +112,8 @@ class StreetPassSettingsModal extends React.Component<IStreetPassSettingsModalPr
     const sexConfig: IListGroupConfig = {
       title: Lit[this.props.systemStore.Locale].Title.ShowMeOthers,
       list: [
-        { title: Lit[this.props.systemStore.Locale].Title.Men, color: this.state.sex == true ? Colors.lightBlue : undefined, blur: this.state.sex !== true, onPress: () => this.setState({ sex: true, }), noRight: true,  },
-        { title: Lit[this.props.systemStore.Locale].Title.Women, color: this.state.sex == false ? Colors.lightRed : undefined, blur: this.state.sex !== false, onPress: () => this.setState({ sex: false, }), noRight: true,  },
+        { title: Lit[this.props.systemStore.Locale].Title.Men, Icon: MaleIcon, iconColor: this.state.sex == true ? Colors.lightBlue : Colors.light, color: this.state.sex == true ? Colors.lightBlue : undefined, blur: this.state.sex !== true, onPress: () => this.setState({ sex: true, }), noRight: true,  },
+        { title: Lit[this.props.systemStore.Locale].Title.Women, Icon: FemaleIcon, iconColor: this.state.sex == false ? Colors.lightRed : Colors.light, color: this.state.sex == false ? Colors.lightRed : undefined, blur: this.state.sex !== false, onPress: () => this.setState({ sex: false, }), noRight: true,  },
         { title: Lit[this.props.systemStore.Locale].Title.Everybody, blur: this.state.sex !== null, onPress: () => this.setState({ sex: null, }), noRight: true,  },
       ],
     }
@@ -126,15 +128,15 @@ class StreetPassSettingsModal extends React.Component<IStreetPassSettingsModalPr
       ],
     }
 
-    // const locationConfig: IListGroupConfig = {
-    //   title: Lit[systemStore.Locale].Title.VisibleOnMap,
-    //   list: [
-    //     {
-    //       title: Lit[systemStore.Locale].Title.StreetPassLocation, toggleValue: this.state.location, onToggle: () => this.setState({ location: !this.state.location, }),
-    //       description: Lit[systemStore.Locale].Title.StreetPassLocationDescription,
-    //     },
-    //   ],
-    // }
+    const locationConfig: IListGroupConfig = {
+      title: Lit[systemStore.Locale].Title.VisibleOnMap,
+      list: [
+        {
+          title: Lit[systemStore.Locale].Title.StreetPassLocation, toggleValue: this.state.location, onToggle: () => this.setState({ location: !this.state.location, }),
+          description: Lit[systemStore.Locale].Copywrite.StreetPassLocationDescription,
+        },
+      ],
+    }
 
     return (
       <>
@@ -166,7 +168,7 @@ class StreetPassSettingsModal extends React.Component<IStreetPassSettingsModalPr
                       onSlidingEnd={() => this.setState({ scroll: true, })}
                     />
                     <ListGroup systemStore={systemStore} config={discoverableConfig} />
-                    {/* <ListGroup systemStore={systemStore} config={locationConfig} /> */}
+                    <ListGroup systemStore={systemStore} config={locationConfig} />
 
                     <View style={{height: 32,}} />
                   </>

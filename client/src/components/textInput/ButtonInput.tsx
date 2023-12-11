@@ -70,7 +70,7 @@ class ButtonInput extends React.Component<IButtonInputProps> {
               marginRight: 8, backgroundColor: Colors.darkBackground,
             }}
           >
-            <Text style={{color: Colors.lightest, fontWeight: Fonts.middleWeight as any,}}>
+            <Text style={{color: Colors.lightest, fontWeight: Fonts.middleWeight as any, fontSize: Fonts.lg,}}>
               {this.props.buttonTitle}
             </Text>
           </TouchableOpacity>
@@ -121,16 +121,12 @@ class ButtonInput extends React.Component<IButtonInputProps> {
               editable={!this.props.disabled}
               selectTextOnFocus={!this.props.disabled}
               contextMenuHidden={this.props.disabled}
-              placeholderTextColor={this.props.placeholderColor
-                ? this.props.placeholderColor
-                : this.props.disabled
-                  ? Colors.light
-                  : Colors.lighter
-              }
+              placeholderTextColor={this.props.placeholderColor ? this.props.placeholderColor : Colors.light}
               autoCapitalize={'none'}
               style={{
                 color: this.props.textColor !== undefined ? this.props.textColor : Colors.lightest,
                 fontWeight: this.props.disabled ? Fonts.welterWeight : Fonts.middleWeight as any,
+                fontSize: Fonts.lg,
                 width: '100%', height: '100%', opacity: this.props.editable === false ? 0.4 : 1,
                 ...this.props.style,
               }}

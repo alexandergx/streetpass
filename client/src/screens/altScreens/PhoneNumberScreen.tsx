@@ -20,6 +20,7 @@ import { ISystemStore } from '../../state/reducers/SystemReducer'
 import { IListGroupConfig } from '../../components/listGroup'
 import { Lit } from '../../utils/locale'
 import AnimatedBackground from '../../components/animated/AnimatedBackground'
+import CodeInput from '../../components/textInput/CodeInput'
 
 const mapStateToProps = (state: IStores) => {
   const { systemStore, userStore: { user: { countryCode, phoneNumber, }, }, } = state
@@ -118,7 +119,7 @@ class PhoneNumberScreen extends React.Component<IPhoneNumberScreenProps> {
             justifyContent: 'center', alignItems: 'center', paddingHorizontal: 16,
           }}
         >
-          <View style={{flex: 1, width: '100%', marginTop: 8,}}>
+          <View style={{flex: 1, marginTop: 8,}}>
             <ButtonInput
               systemStore={systemStore}
               inputRef={this.inputRef}
@@ -144,6 +145,21 @@ class PhoneNumberScreen extends React.Component<IPhoneNumberScreenProps> {
                 this.setState({ pickerModalConfig: config, })
               }}
               onChangeText={(text: string) => this.setState({ phonenumber: formatPhonenumber(this.state.countryCode, text), })}
+            />
+
+            <Button
+              systemStore={systemStore}
+              title={Lit[systemStore.Locale].Button.SendPin}
+              disabled={true}
+              onPress={() => null}
+            />
+
+            <View style={{height: 32,}} />
+
+            <CodeInput
+              systemStore={systemStore}
+              disabled={true}
+              onChangeText={text => this.setState({ securityPin: text, })}
             />
           </View>
 

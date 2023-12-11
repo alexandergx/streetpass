@@ -26,7 +26,7 @@ const Button: React.FC<IButtonProps> = ({ systemStore, Icon, title, color, loadi
       onPress={() => !disabled && !loading ? onPress() : null}
       activeOpacity={disabled || loading ? 1 : Colors.activeOpacity}
       style={{
-        width: '100%', marginVertical: 8, alignItems: 'center', justifyContent: 'center',
+        width: '100%', minWidth: 64, marginVertical: 8, alignItems: 'center', justifyContent: 'center',
         borderRadius: 12, height: 40, overflow: 'hidden',
       }}
     >
@@ -47,6 +47,7 @@ const Button: React.FC<IButtonProps> = ({ systemStore, Icon, title, color, loadi
             style={{
               color: disabled ? Colors.light : Colors.lightest,
               fontWeight: Fonts.middleWeight as any,
+              fontSize: Fonts.lg,
               flexDirection: 'row', justifyContent: 'center', alignItems: 'center',
               paddingHorizontal: 8,
             }}

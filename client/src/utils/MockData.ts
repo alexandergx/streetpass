@@ -2,7 +2,7 @@ import { IMatch } from '../state/reducers/MatchesReducer'
 import { IStreetPass } from '../state/reducers/StreetPassReducer'
 import { InputLimits } from './constants'
 
-const image1 = 'https://c.ndtvimg.com/2021-01/hgh0aplo_yael-shelbia_625x300_22_January_21.jpg'
+const image1 = 'https://e00-marca.uecdn.es/assets/multimedia/imagenes/2023/04/20/16819946402834.jpg'
 const image2 = 'https://www.lofficielbaltic.com/_next/image?url=https%3A%2F%2Fwww.datocms-assets.com%2F59774%2F1643351623-1571501184449345-captura-de-tela-2019-10-18-a-s-17-06-16.png%3Fauto%3Dformat%252Ccompress%26cs%3Dsrgb&w=3840&q=75'
 const image3 = 'https://images.unsplash.com/photo-1524502397800-2eeaad7c3fe5?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGJlYXV0aWZ1bCUyMHdvbWFufGVufDB8fDB8fHww'
 
@@ -118,7 +118,7 @@ export const mockMatches: Array<IMatch> = [
   },
   {
     userId: '1',
-    matchId: '1',
+    matchId: '2',
     name: 'User one',
     age: 19,
     sex: false,
@@ -133,7 +133,7 @@ export const mockMatches: Array<IMatch> = [
   },
   {
     userId: '1',
-    matchId: '1',
+    matchId: '3',
     name: 'User one',
     age: 19,
     sex: false,
@@ -148,7 +148,7 @@ export const mockMatches: Array<IMatch> = [
   },
   {
     userId: '1',
-    matchId: '1',
+    matchId: '4',
     name: 'User one',
     age: 19,
     sex: false,
@@ -163,7 +163,7 @@ export const mockMatches: Array<IMatch> = [
   },
   {
     userId: '1',
-    matchId: '1',
+    matchId: '5',
     name: 'User one',
     age: 19,
     sex: false,
@@ -178,7 +178,7 @@ export const mockMatches: Array<IMatch> = [
   },
   {
     userId: '1',
-    matchId: '1',
+    matchId: '6',
     name: 'User one',
     age: 19,
     sex: false,
@@ -193,7 +193,7 @@ export const mockMatches: Array<IMatch> = [
   },
   {
     userId: '1',
-    matchId: '1',
+    matchId: '7',
     name: 'User one',
     age: 19,
     sex: false,

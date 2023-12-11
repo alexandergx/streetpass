@@ -1,6 +1,6 @@
 import { useEffect, useState, } from 'react'
 import { Platform, View, } from 'react-native'
-import { NavigationContainer } from '@react-navigation/native'
+import { NavigationContainer, createNavigationContainerRef, } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { connect } from 'react-redux'
 import { bindActionCreators, Dispatch, AnyAction, } from 'redux'
@@ -11,7 +11,7 @@ import { AppVersion, AuthStore, LocalStorage, OS, } from '../utils/constants'
 import { getDeviceId, getCarrier, } from 'react-native-device-info'
 import { IUserStore } from '../state/reducers/UserReducer'
 import { ISystemStore } from '../state/reducers/SystemReducer'
-import { getIP, getLocation, requestPushNotifications } from '../utils/services'
+// import { getIP, getLocation, requestPushNotifications } from '../utils/services'
 // import { registerDevice } from '../api/user'
 
 // MAIN ROUTES
@@ -22,6 +22,7 @@ import UserScreen from '../screens/UserScreen'
 import SignInScreen from '../screens/subScreens/SignInScreen'
 import VerifyPhoneScreen from '../screens/subScreens/VerifyPhoneScreen'
 import PersonalInfoScreen from '../screens/subScreens/PersonalInfoScreen'
+import SexScreen from '../screens/subScreens/SexScreen'
 import ChatScreen from '../screens/subScreens/ChatScreen'
 // ALT ROUTES
 import AppStyleScreen from '../screens/altScreens/AppStyleScreen'
@@ -30,6 +31,10 @@ import BlockingScreen from '../screens/altScreens/BlockingScreen'
 import EmailScreen from '../screens/altScreens/EmailScreen'
 import PhoneNumberScreen from '../screens/altScreens/PhoneNumberScreen'
 import DeleteAccountScreen from '../screens/altScreens/DeleteAccountScreen'
+import { ISetSignIn, setSignIn, } from '../state/actions/UserActions'
+import { signInCallback } from '../utils/services'
+
+export const navigationRef = createNavigationContainerRef()
 
 const MMKV = new MMKVLoader().withEncryption().withInstanceID(LocalStorage.AuthStore).initialize()
 
@@ -40,7 +45,7 @@ const mapStateToProps = (state: IStores) => {
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => ({
   actions: bindActionCreators(Object.assign(
     {
-      //
+      setSignIn,
     }
   ), dispatch),
 })
@@ -56,6 +61,7 @@ export enum Screens {
   SignIn = 'SIGN_IN',
   VerifyPhone = 'VERIFY_PHONE',
   PersonalInfo = 'PERSONAL_INFO',
+  Sex = 'SEX',
   Chat = 'CHAT',
   // ALT ROUTES
   AppStyle = 'APP_STYLE',
@@ -70,7 +76,7 @@ interface IMapScreenProps {
   userStore: IUserStore,
   systemStore: ISystemStore,
   actions: {
-    // loginUser: (params: ILoginUser) => Promise<any>,
+    setSignIn: (params: ISetSignIn) => Promise<any>,
   },
 }
 
@@ -78,53 +84,44 @@ function AppNavigation({ userStore, systemStore, actions, }: IMapScreenProps) {
   const [initialized, setInitialized] = useState<boolean>(false)
   const accessToken = MMKV.getString(AuthStore.AccessToken)
   useEffect(() => {
-  //   const autoLogin = async () => {
-  //     let lat, lon = undefined
-  //     await new Promise<{ lat: number, lon: number, }>((resolve) => getLocation(resolve))
-  //       .then(location => {
-  //         lat = location.lat
-  //         lon = location.lon
-  //       }).catch(e => console.log(e))
-  //     await actions.loginUser({
-  //       login: '',
-  //       password: '',
-  //       locale: systemStore.Locale,
-  //       lat, lon,
-  //       appVersion: AppVersion,
-  //       IP: await new Promise<any>((resolve) => getIP(resolve)),
-  //       deviceId: getDeviceId() || undefined,
-  //       carrier: await getCarrier() || undefined,
-  //     }).then(async () => {
-  //       setInitialized(true)
-  //       await actions.setChats({ chatsPage: null, })
-  //       await requestPushNotifications(async (deviceToken: string) => {
-  //         await registerDevice({ manufacturer: OS[Platform.OS], deviceToken, })
-  //       }, async (result) => {
-  //         !result && await actions.setUpdateNotificationPreferences({
-  //           follows: false,
-  //           followRequests: false,
-  //           likes: false,
-  //           comments: false,
-  //           replies: false,
-  //           subscribedPosts: false,
-  //           messages: false,
-  //           streetPasses: false,
-  //           emails: userStore.user.notificationPreferences.emails,
-  //           newsletters: userStore.user.notificationPreferences.newsletters,
-  //         })
-  //       })
-  //     }).catch((e: any) => {
-  //       setInitialized(true)
-  //       console.log('[AUTOLOGIN ERROR]', e)
-  //     })
-  //   }
-  //   if (!userStore.loggedIn && accessToken) autoLogin()
-  //   else setInitialized(true)
-  setInitialized(true)
-  }, [userStore.signedIn, accessToken])
+    const autoSignIn = async () => {
+      // let lat, lon = undefined
+      // await new Promise<{ lat: number, lon: number, }>((resolve) => getLocation(resolve))
+      //   .then(location => {
+      //     lat = location.lat
+      //     lon = location.lon
+      //   }).catch(e => console.log(e))
+      await actions.setSignIn({
+        input: { appleAuth: '', }, callback: (code) => signInCallback(navigationRef, code),
+      }).then(async () => {
+        setInitialized(true)
+        // await requestPushNotifications(async (deviceToken: string) => {
+        //   await registerDevice({ manufacturer: OS[Platform.OS], deviceToken, })
+        // }, async (result) => {
+        //   !result && await actions.setUpdateNotificationPreferences({
+        //     follows: false,
+        //     followRequests: false,
+        //     likes: false,
+        //     comments: false,
+        //     replies: false,
+        //     subscribedPosts: false,
+        //     messages: false,
+        //     streetPasses: false,
+        //     emails: userStore.user.notificationPreferences.emails,
+        //     newsletters: userStore.user.notificationPreferences.newsletters,
+        //   })
+        // })
+      }).catch((e: any) => {
+        setInitialized(true)
+        console.log('[AUTOSIGNIN ERROR]', e)
+      })
+    }
+    if (!userStore.signedIn && accessToken) autoSignIn()
+    else setInitialized(true)
+  }, [userStore.signedIn, accessToken, navigationRef])
 
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       {initialized ?
         <App.Navigator
           initialRouteName={userStore.signedIn ? Screens.StreetPass : Screens.SignIn}
@@ -152,7 +149,8 @@ function AppNavigation({ userStore, systemStore, actions, }: IMapScreenProps) {
           {/* SUB ROUTES */}
           <App.Screen name={Screens.SignIn} component={SignInScreen}
             options={{
-              animation: 'fade_from_bottom',
+              animation: 'none',
+              gestureEnabled: false,
             }}
           />
           <App.Screen name={Screens.VerifyPhone} component={VerifyPhoneScreen}
@@ -161,6 +159,11 @@ function AppNavigation({ userStore, systemStore, actions, }: IMapScreenProps) {
             }}
           />
           <App.Screen name={Screens.PersonalInfo} component={PersonalInfoScreen}
+            options={{
+              animation: 'fade_from_bottom',
+            }}
+          />
+          <App.Screen name={Screens.Sex} component={SexScreen}
             options={{
               animation: 'fade_from_bottom',
             }}

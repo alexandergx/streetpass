@@ -3,7 +3,7 @@ import { Lit, Locales } from './locale'
 export const validateUsername = (text: string) => !/[^A-Za-z0-9_]/g.test(text)
 export const validatePassword = (text: string) => !/^(?=.*[0-9])(?=.*[a-zA-Z])(?=\S+$).{8,64}$/i.test(text)
 export const validateEmail = (text: string) => text.toLowerCase().match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)
-export const validatePhonenumber = (text: string) => /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im.test(text)
+export const validatePhoneNumber = (text: string) => /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im.test(text)
 
 export const truncateString = (str: string, length: number, subLength: number) => {
   if (str.length > length) return str.substring(0, subLength) + '...'

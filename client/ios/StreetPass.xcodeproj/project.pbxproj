@@ -30,6 +30,7 @@
 		00E356EE1AD99517003FC87E /* StreetPassTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StreetPassTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* StreetPassTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = StreetPassTests.m; sourceTree = "<group>"; };
+		111F411F2B2644C100921628 /* StreetPass.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = StreetPass.entitlements; path = StreetPass/StreetPass.entitlements; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* StreetPass.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StreetPass.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = StreetPass/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = StreetPass/AppDelegate.mm; sourceTree = "<group>"; };
@@ -86,6 +87,7 @@
 		13B07FAE1A68108700A75B9A /* StreetPass */ = {
 			isa = PBXGroup;
 			children = (
+				111F411F2B2644C100921628 /* StreetPass.entitlements */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -485,7 +487,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = StreetPass/StreetPass.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = VC9N84N34T;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = StreetPass/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -497,7 +501,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = org.StreetPass;
 				PRODUCT_NAME = StreetPass;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -511,7 +515,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = StreetPass/StreetPass.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = VC9N84N34T;
 				INFOPLIST_FILE = StreetPass/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -522,7 +528,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = org.StreetPass;
 				PRODUCT_NAME = StreetPass;
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
