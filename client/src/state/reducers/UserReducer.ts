@@ -1,5 +1,6 @@
+import { IGetUserRes } from '../../api/user'
 import { ISignInErrors, InputLimits, } from '../../utils/constants'
-import { ISetPhoneNumber, ISetUpdateUser, } from '../actions/UserActions'
+import { ISetPhoneNumber, ISetSortMedia, ISetUpdateUser, } from '../actions/UserActions'
 
 export interface IStreetPassPreferences {
   discoverable?: boolean,
@@ -17,9 +18,21 @@ export interface INotificationPreferences {
 }
 
 export interface IMedia {
+  mediaId: string,
   image?: string,
   video?: string,
   thumbnail: string,
+}
+
+export interface IUserProfile {
+  userId: string,
+  name: string,
+  bio: string,
+  work: string,
+  school: string,
+  sex: boolean,
+  age: number,
+  media: Array<IMedia>,
 }
 
 export interface IUser {
@@ -29,6 +42,8 @@ export interface IUser {
   email: string,
   name: string,
   bio: string | null,
+  work: string | null,
+  school: string | null,
   dob: Date | null,
   sex: boolean | null,
   streetPass: boolean,
@@ -47,15 +62,19 @@ export enum UserActions {
   Init = 'INIT',
   SignIn = 'SIGN_IN',
   SetPhoneNumber = 'SET_PHONE_NUMBER',
+  SetUser = 'SET_USER',
   SetUpdateUser = 'SET_UPDATE_USER',
+  SetSortMedia = 'SET_SORT_MEDIA',
   UserError = 'USER_ERROR',
 }
 
 type UserAction =
   | { type: UserActions.Init, }
-  | { type: UserActions.SignIn, payload: IUser, }
+  | { type: UserActions.SignIn, payload: { user: IUser, code: ISignInErrors | null, }, }
   | { type: UserActions.SetPhoneNumber, payload: ISetPhoneNumber, }
+  | { type: UserActions.SetUser, payload: IGetUserRes, }
   | { type: UserActions.SetUpdateUser, payload: ISetUpdateUser, }
+  | { type: UserActions.SetSortMedia, payload: ISetSortMedia, }
   | { type: UserActions.UserError, }
 
 const INITIAL_STATE: IUserStore = {
@@ -67,6 +86,8 @@ const INITIAL_STATE: IUserStore = {
     email: '',
     name: '',
     bio: '',
+    work: '',
+    school: '',
     dob: null,
     sex: null,
     streetPass: true,
@@ -95,7 +116,8 @@ const userStore = (state = INITIAL_STATE as IUserStore, action: UserAction) => {
     case UserActions.SignIn:
       return {
         ...state,
-        user: action.payload,
+        signedIn: !action.payload.code ? true : state.signedIn,
+        user: action.payload.user,
       }
     case UserActions.SetPhoneNumber:
       return {
@@ -105,6 +127,15 @@ const userStore = (state = INITIAL_STATE as IUserStore, action: UserAction) => {
           phoneNumber: action.payload.phoneNumber,
           countryCode: action.payload.countryCode,
         },
+      }
+    case UserActions.SetUser:
+      return {
+        ...state,
+        signedIn: true,
+        user: {
+          ...state.user,
+          ...action.payload,
+        }
       }
     case UserActions.SetUpdateUser:
       return {
@@ -120,6 +151,14 @@ const userStore = (state = INITIAL_STATE as IUserStore, action: UserAction) => {
             ...state.user.notificationPreferences,
             ...action.payload.notificationPreferences,
           },
+        }
+      }
+    case UserActions.SetSortMedia:
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          media: action.payload,
         }
       }
     case UserActions.UserError:

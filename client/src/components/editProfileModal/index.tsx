@@ -15,42 +15,62 @@ import FastImage from 'react-native-fast-image'
 import TextInput from '../textInput'
 import { InputLimits, } from '../../utils/constants'
 import { Lit, } from '../../utils/locale'
-import { ISetUpdateUser } from '../../state/actions/UserActions'
+import { ISetSortMedia, ISetUpdateUser, } from '../../state/actions/UserActions'
+import ProfileMedia, { ProfileMediaMethods } from './profileMedia'
+import SelectionModal from '../selectionModal'
+import { IListGroupConfig } from '../listGroup'
+import { Screens } from '../../navigation'
 
-interface IEditProfileModalProps {
+export interface IUploadMedia {
+  key: number | null,
+  mediaId: string | null,
+  image?: string,
+  video?: string,
+  new: boolean,
+}
+
+export interface IEditProfileModalProps {
   navigation: any,
   systemStore: ISystemStore,
   userStore: IUserStore,
   toggleModal: () => void,
   onPress?: () => void,
   actions: {
+    setUser: () => void,
     setUpdateUser: (params: ISetUpdateUser) => void,
+    setSortMedia: (params: ISetSortMedia) => void,
   }
 }
 export interface IEditProfileModalState {
-  media: Array<IMedia> | any,
+  media: Array<IUploadMedia>,
+  deletedMedia: Array<IUploadMedia>,
   scroll: boolean,
   keyboard: boolean,
   loading: boolean,
   bio: string,
   work: string,
   school: string,
+  selectionModalConfig: IListGroupConfig | null,
 }
 class EditProfileModal extends React.Component<IEditProfileModalProps> {
   constructor(props: IEditProfileModalProps) {
     super(props)
     this.scrollRef = React.createRef()
+    this.profileMediaRef = React.createRef()
   }
   scrollRef: RefObject<ScrollView>
+  profileMediaRef: RefObject<ProfileMediaMethods>
 
   state: IEditProfileModalState = {
-    media: [...(this.props.userStore.user.media || []).map((item, index) => { return { ...item, key: index, } }), { key: null, }].slice(0, 9),
+    media: [...(this.props.userStore.user.media || []).map((item, index) => { return { key: index, mediaId: item.mediaId, image: item.image, video: item.video, new: false, } }), { key: null, mediaId: null, new: false, }].slice(0, 9),
+    deletedMedia: [],
     scroll: true,
     keyboard: false,
     loading: false,
-    bio: '',
-    work: '',
-    school: '',
+    bio: this.props.userStore.user.bio || '',
+    work: this.props.userStore.user.work || '',
+    school: this.props.userStore.user.school || '',
+    selectionModalConfig: null,
   }
 
   private keyboardWillShowListener: any
@@ -71,7 +91,19 @@ class EditProfileModal extends React.Component<IEditProfileModalProps> {
   }
 
   handleUpdateProfile = async () => {
-
+    this.setState({ loading: true, })
+    if (this.profileMediaRef.current) {
+      const result = await this.profileMediaRef.current.save()
+      if (result && (
+        this.state.bio !== this.props.userStore.user.bio
+        || this.state.work !== this.props.userStore.user.work
+        || this.state.school !== this.props.userStore.user.school
+      )) await this.props.actions.setUpdateUser({ bio: this.state.bio, work: this.state.work, school: this.state.school, })
+      await this.props.actions.setUser()
+      this.props.navigation.navigate(Screens.StreetPass)
+      // TODO - conditionally toggleModal()
+    }
+    this.setState({ loading: false, editProfile: true, })
   }
 
   render() {
@@ -83,7 +115,7 @@ class EditProfileModal extends React.Component<IEditProfileModalProps> {
         <BlurView blurType={Colors.darkBlur as any} style={{position: 'absolute', zIndex: 3, width: '100%', height: '100%',}}>
           <NavHeader
             systemStore={systemStore}
-            title={`${this.props.userStore.user.name}`}
+            title={`${userStore.user.name}`}
             color={Colors.lightest}
             StartIcon={onPress ? undefined : CrossIcon}
             onPress={toggleModal}
@@ -95,53 +127,17 @@ class EditProfileModal extends React.Component<IEditProfileModalProps> {
           >
             <View style={{flex: 1, width: '100%',}}>
               <ScrollView ref={this.scrollRef} scrollEnabled={this.state.scroll} showsVerticalScrollIndicator={false} style={{width: '100%', height: 500,}}>
-                <DraggableGrid
-                  numColumns={3}
-                  itemHeight={Dimensions.get('window').width * 0.36}
-                  renderItem={(item: any, index) => {
-                    return (item.key !== null ?
-                      <View
-                        key={item.key}
-                        style={{width: Dimensions.get('window').width * 0.32, aspectRatio: 1/1.2, justifyContent: 'center', alignItems: 'center', padding: 4,}}
-                      >
-                        <FastImage
-                          key={item.key}
-                          source={{ uri: item.image, }}
-                          style={{width: '100%', height: '100%', borderRadius: 8, overflow: 'hidden',}}
-                        />
-
-                        <TouchableOpacity activeOpacity={Colors.activeOpacity} style={{position: 'absolute', bottom: -2, right: -4,}}>
-                          <CrossCircledIcon fill={Colors.safeLightest} width={32} height={32} />
-                        </TouchableOpacity>
-
-                        {index === 0 &&
-                          <View style={{position: 'absolute', top: 8, right: 8,}}>
-                            <ProfileIcon fill={Colors.safeLightest} width={16} height={16} />
-                          </View>
-                        }
-                      </View>
-                      : <TouchableOpacity
-                        key={item.key}
-                        activeOpacity={Colors.activeOpacity}
-                        style={{width: Dimensions.get('window').width * 0.32, aspectRatio: 1/1.2, justifyContent: 'center', alignItems: 'center', padding: 4,}}
-                      >
-                        <BlurView
-                          blurType={Colors.darkestBlur as any}
-                          style={{position: 'absolute', zIndex: -1, width: '100%', height: '100%', backgroundColor: Colors.darkBackground, borderRadius: 8, overflow: 'hidden',}}
-                        />
-
-                        <PhotoIcon style={{position: 'absolute', zIndex: -1,}} fill={Colors.dark} width={64} height={64} />
-                        <PlusIcon fill={Colors.lightBlue} width={16} height={16} />
-                      </TouchableOpacity>
-                    )
+                <ProfileMedia
+                  ref={this.profileMediaRef}
+                  systemStore={systemStore}
+                  state={this.state}
+                  setState={(params) => this.setState({ ...params, })}
+                  actions={{
+                    setSortMedia: this.props.actions.setSortMedia,
                   }}
-                  data={this.state.media}
-                  onDragStart={() => this.setState({ scroll: false, })}
-                  onDragRelease={(data) => this.setState({ media: [...data.filter(i => i.key !== null), { key: null, }].slice(0, 9), scroll: true, })}
-                  style={{marginVertical: 16,}}
                 />
 
-                <View style={{width: '100%', borderRadius: 16, overflow: 'hidden',}}>
+                <View style={{zIndex: -1, width: '100%', borderRadius: 16, overflow: 'hidden',}}>
                   <BlurView
                     blurType={Colors.darkestBlur as any}
                     style={{position: 'absolute', zIndex: -1, width: '100%', height: '100%', backgroundColor: Colors.darkBackground,}}
@@ -206,14 +202,18 @@ class EditProfileModal extends React.Component<IEditProfileModalProps> {
             <View style={{flex: 0, width: '100%', marginBottom: this.state.keyboard ? 0 : 32,}}>
               <Button
                 systemStore={systemStore}
-                onPress={() => onPress ? onPress() : toggleModal()}
+                onPress={this.handleUpdateProfile}
                 title={Lit[systemStore.Locale].Button.Save}
-                disabled={false}
+                disabled={this.state.media.filter((i: any) => i.key !== null).length === 0}
                 loading={this.state.loading}
               />
             </View>
           </KeyboardAvoidingView>
         </BlurView>
+
+        {this.state.selectionModalConfig &&
+          <SelectionModal systemStore={systemStore} config={this.state.selectionModalConfig} toggleModal={() => this.setState({ selectionModalConfig: null, })} />
+        }
       </>
     )
   }

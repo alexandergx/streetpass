@@ -32,7 +32,7 @@ class SelectionModal extends React.Component<ISelectionModalProps> {
       <TouchableOpacity
         onPress={this.props.toggleModal}
         activeOpacity={1}
-        style={{position: 'absolute', zIndex: 2, width: '100%', height: '100%',}}
+        style={{position: 'absolute', zIndex: 3, width: '100%', height: '100%',}}
       >
         {!clear && <BlurView blurAmount={2} style={{position: 'absolute', zIndex: -1, width: '100%', height: '100%', display: 'flex',}} />}
 

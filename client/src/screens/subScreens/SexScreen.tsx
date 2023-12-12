@@ -18,7 +18,7 @@ import AnimatedBackground from '../../components/animated/AnimatedBackground'
 import EditProfileModal from '../../components/editProfileModal'
 import MaleIcon from '../../assets/icons/male.svg'
 import FemaleIcon from '../../assets/icons/female.svg'
-import { ISetUpdateUser, setUpdateUser } from '../../state/actions/UserActions'
+import { ISetSortMedia, ISetUpdateUser, setSortMedia, setUpdateUser, setUser } from '../../state/actions/UserActions'
 
 const mapStateToProps = (state: IStores) => {
   const { systemStore, userStore, } = state
@@ -28,7 +28,9 @@ const mapStateToProps = (state: IStores) => {
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => ({
   actions: bindActionCreators(Object.assign(
     {
+      setUser,
       setUpdateUser,
+      setSortMedia,
     }
   ), dispatch),
 })
@@ -39,7 +41,9 @@ interface IDOBScreenProps {
   systemStore: ISystemStore,
   userStore: IUserStore,
   actions: {
+    setUser: () => void,
     setUpdateUser: (params: ISetUpdateUser) => void,
+    setSortMedia: (params: ISetSortMedia) => void,
   }
 }
 interface IDOBScreenState {
@@ -97,7 +101,9 @@ class DOBScreen extends React.Component<IDOBScreenProps> {
             toggleModal={() => this.props.route?.params?.editProfile ? navigation.goBack() : this.setState({ editProfile: false, })}
             onPress={() => navigation.navigate(Screens.StreetPass)}
             actions={{
+              setUser: this.props.actions.setUser,
               setUpdateUser: this.props.actions.setUpdateUser,
+              setSortMedia: this.props.actions.setSortMedia,
             }}
           />
         }

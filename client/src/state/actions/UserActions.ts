@@ -1,7 +1,8 @@
 import { MMKVLoader } from 'react-native-mmkv-storage'
-import { ISendPinReq, ISignInReq, IUpdateUserReq, sendPin, signIn, updateUser, } from '../../api/user'
+import { IGetUserReq, IGetUserRes, ISendPinReq, ISignInReq, IUpdateUserReq, getUser, sendPin, signIn, sortMedia, updateUser, } from '../../api/user'
 import { AuthStore, ISignInErrors, LocalStorage } from '../../utils/constants'
 import { IUser, UserActions } from '../reducers/UserReducer'
+import { IUploadMedia } from '../../components/editProfileModal'
 
 const MMKV = new MMKVLoader().withEncryption().withInstanceID(LocalStorage.AuthStore).initialize()
 
@@ -24,7 +25,7 @@ export function setSignIn({ input, callback, }: ISetSignIn) {
       callback(code)
       return dispatch({
         type: UserActions.SignIn,
-        payload: user as IUser,
+        payload: { user: user as IUser, code: code as ISignInErrors, },
       })
     } catch (e) {
       return dispatch({
@@ -51,11 +52,44 @@ export function setPhoneNumber(input: ISetPhoneNumber) {
   }
 }
 
+export function setUser() {
+  return async (dispatch: any) => {
+    try {
+      const getUserResult = await getUser({})
+      return dispatch({
+        type: UserActions.SetUser,
+        payload: getUserResult as IGetUserRes,
+      })
+    } catch (e) {
+      return dispatch({
+        type: UserActions.UserError,
+      })
+    }
+  }
+}
+
 export type ISetUpdateUser = IUpdateUserReq
 export function setUpdateUser(input: ISetUpdateUser) {
   return async (dispatch: any) => {
     try {
-      const updateUserReults = await updateUser(input)
+      const updateUserResult = await updateUser(input)
+      return dispatch({
+        type: UserActions.SetUpdateUser,
+        payload: input,
+      })
+    } catch (e) {
+      return dispatch({
+        type: UserActions.UserError,
+      })
+    }
+  }
+}
+
+export type ISetSortMedia = Array<IUploadMedia>
+export function setSortMedia(input: ISetSortMedia) {
+  return async (dispatch: any) => {
+    try {
+      const sortMediaResult = await sortMedia({ mediaIds: input.map(media => media.mediaId), })
       return dispatch({
         type: UserActions.SetUpdateUser,
         payload: input,

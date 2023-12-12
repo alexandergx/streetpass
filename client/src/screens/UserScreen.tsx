@@ -24,11 +24,11 @@ import Carousel, { ICarouselInstance } from 'react-native-reanimated-carousel'
 import { mockUserProfile } from '../utils/MockData'
 import FastImage from 'react-native-fast-image'
 import LinearGradient from 'react-native-linear-gradient'
-import { timePassedSince } from '../utils/functions'
+import { getAge, timePassedSince } from '../utils/functions'
 import EditProfileModal from '../components/editProfileModal'
 import UserSettingsModal from '../components/userSettingsModal'
 import AnimatedBackground from '../components/animated/AnimatedBackground'
-import { ISetUpdateUser, setUpdateUser } from '../state/actions/UserActions'
+import { ISetSortMedia, ISetUpdateUser, setSortMedia, setUpdateUser, setUser } from '../state/actions/UserActions'
 
 const mapStateToProps = (state: IStores) => {
   const { systemStore, userStore, } = state
@@ -37,7 +37,9 @@ const mapStateToProps = (state: IStores) => {
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => ({
   actions: bindActionCreators(Object.assign(
     {
+      setUser,
       setUpdateUser,
+      setSortMedia,
     }
   ), dispatch),
 })
@@ -47,7 +49,9 @@ interface IUserScreenProps {
   systemStore: ISystemStore,
   userStore: IUserStore,
   actions: {
+    setUser: () => void,
     setUpdateUser: (params: ISetUpdateUser) => void,
+    setSortMedia: (params: ISetSortMedia) => void,
   },
 }
 interface IUserScreenState {
@@ -69,10 +73,7 @@ class UserScreen extends React.Component<IUserScreenProps> {
   render() {
     const { navigation, systemStore, userStore, actions, }: IUserScreenProps = this.props
     const { Colors, Fonts, } = systemStore
-
     const userProfileCarouselRef: RefObject<ICarouselInstance> = React.createRef()
-
-    const userProfile = mockUserProfile
 
     return (
       <>
@@ -86,7 +87,9 @@ class UserScreen extends React.Component<IUserScreenProps> {
             userStore={userStore}
             toggleModal={() => this.setState({ editProfile: false, })}
             actions={{
+              setUser: this.props.actions.setUser,
               setUpdateUser: this.props.actions.setUpdateUser,
+              setSortMedia: this.props.actions.setSortMedia,
             }}
           />
         }
@@ -119,7 +122,7 @@ class UserScreen extends React.Component<IUserScreenProps> {
                   loop={false}
                   width={Dimensions.get('window').width}
                   height={Dimensions.get('window').height * 0.60}
-                  data={userProfile.media}
+                  data={userStore.user.media}
                   onSnapToItem={index => this.setState({ imageIndex: index, })}
                   renderItem={(item: any) => (
                     <>
@@ -148,7 +151,7 @@ class UserScreen extends React.Component<IUserScreenProps> {
                   />
 
                   <View style={{flexDirection: 'row', width: '100%', justifyContent: 'center',}}>
-                    {Array.from({ length: userProfile.media.length, }, (v, i) => {
+                    {Array.from({ length: userStore.user.media.length, }, (v, i) => {
                       return this.state.imageIndex === i
                         ? <DotFillIcon key={i} fill={Colors.safeLightest} width={24} height={24} />
                         : <DotIcon key={i} fill={Colors.safeLightest} width={24} height={24} />
@@ -170,13 +173,13 @@ class UserScreen extends React.Component<IUserScreenProps> {
               
               <View style={{flex: 1, flexDirection: 'row', paddingHorizontal: 16, paddingTop: 24, marginBottom: 8,}}>
                 <View style={{flex: 1,}}>
-                  <Text style={{color: Colors.lightest, fontSize: Fonts.lg, fontWeight: Fonts.heavyWeight, textShadowColor: Colors.darkest, textShadowRadius: 2,}}>{userProfile.name} <Text style={{fontWeight: Fonts.lightWeight,}}>{userProfile.age}</Text></Text>
-                  <Text numberOfLines={1} style={{color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.featherWeight, textShadowColor: Colors.darkest, textShadowRadius: 2}}>Joined {timePassedSince(userProfile.joinDate, systemStore.Locale)}</Text>
+                  <Text style={{color: Colors.lightest, fontSize: Fonts.lg, fontWeight: Fonts.heavyWeight, textShadowColor: Colors.darkest, textShadowRadius: 2,}}>{userStore.user.name} <Text style={{fontWeight: Fonts.lightWeight,}}> {getAge(userStore.user.dob)}</Text></Text>
+                  {/* <Text numberOfLines={1} style={{color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.featherWeight, textShadowColor: Colors.darkest, textShadowRadius: 2}}>Joined {timePassedSince(userStore.user.joinDate, systemStore.Locale)}</Text> */}
                 </View>
               </View>
 
               <View style={{flex: 1, paddingHorizontal: 16,}}>
-                <Text style={{marginTop: 16, color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.lightWeight, textShadowColor: Colors.darkest, textShadowRadius: 2}}>{userProfile.bio}</Text>
+                <Text style={{marginTop: 16, color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.lightWeight, textShadowColor: Colors.darkest, textShadowRadius: 2}}>{userStore.user.bio}</Text>
               </View>
 
               <View style={{height: 80,}} />

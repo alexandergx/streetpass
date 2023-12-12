@@ -64,7 +64,8 @@ export const timePassedSince = (dateString: string | Date, locale: Locales) => {
   }
 }
 
-export const getAge = (inputDate: Date | string) => {
+export const getAge = (inputDate: Date | string | null) => {
+  if (!inputDate) return null
   const dob = new Date(inputDate)
   const currentDate = new Date()
   const currentYear = currentDate.getFullYear()

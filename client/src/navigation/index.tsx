@@ -73,44 +73,22 @@ export enum Screens {
 }
 
 interface IMapScreenProps {
-  userStore: IUserStore,
   systemStore: ISystemStore,
+  userStore: IUserStore,
   actions: {
     setSignIn: (params: ISetSignIn) => Promise<any>,
   },
 }
 
-function AppNavigation({ userStore, systemStore, actions, }: IMapScreenProps) {
+function AppNavigation({ systemStore, userStore, actions, }: IMapScreenProps) {
   const [initialized, setInitialized] = useState<boolean>(false)
   const accessToken = MMKV.getString(AuthStore.AccessToken)
   useEffect(() => {
     const autoSignIn = async () => {
-      // let lat, lon = undefined
-      // await new Promise<{ lat: number, lon: number, }>((resolve) => getLocation(resolve))
-      //   .then(location => {
-      //     lat = location.lat
-      //     lon = location.lon
-      //   }).catch(e => console.log(e))
       await actions.setSignIn({
         input: { appleAuth: '', }, callback: (code) => signInCallback(navigationRef, code),
       }).then(async () => {
         setInitialized(true)
-        // await requestPushNotifications(async (deviceToken: string) => {
-        //   await registerDevice({ manufacturer: OS[Platform.OS], deviceToken, })
-        // }, async (result) => {
-        //   !result && await actions.setUpdateNotificationPreferences({
-        //     follows: false,
-        //     followRequests: false,
-        //     likes: false,
-        //     comments: false,
-        //     replies: false,
-        //     subscribedPosts: false,
-        //     messages: false,
-        //     streetPasses: false,
-        //     emails: userStore.user.notificationPreferences.emails,
-        //     newsletters: userStore.user.notificationPreferences.newsletters,
-        //   })
-        // })
       }).catch((e: any) => {
         setInitialized(true)
         console.log('[AUTOSIGNIN ERROR]', e)

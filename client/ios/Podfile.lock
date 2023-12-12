@@ -327,6 +327,8 @@ PODS:
     - React
   - react-native-blur (4.3.2):
     - React-Core
+  - react-native-cameraroll (7.2.0):
+    - React-Core
   - react-native-date-picker (4.3.3):
     - React-Core
   - react-native-mmkv-storage (0.9.1):
@@ -414,6 +416,15 @@ PODS:
     - React-Core
   - RNGestureHandler (2.14.0):
     - React-Core
+  - RNImageCropPicker (0.40.2):
+    - React-Core
+    - React-RCTImage
+    - RNImageCropPicker/QBImagePickerController (= 0.40.2)
+    - TOCropViewController
+  - RNImageCropPicker/QBImagePickerController (0.40.2):
+    - React-Core
+    - React-RCTImage
+    - TOCropViewController
   - RNReactNativeHapticFeedback (2.2.0):
     - React-Core
   - RNReanimated (3.4.2):
@@ -457,6 +468,7 @@ PODS:
     - libwebp (~> 1.0)
     - SDWebImage/Core (~> 5.10)
   - SocketRocket (0.6.1)
+  - TOCropViewController (2.6.1)
   - Yoga (1.14.0)
   - YogaKit (1.18.1):
     - Yoga (~> 1.14)
@@ -512,6 +524,7 @@ DEPENDENCIES:
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - react-native-background-upload (from `../node_modules/react-native-background-upload`)
   - "react-native-blur (from `../node_modules/@react-native-community/blur`)"
+  - "react-native-cameraroll (from `../node_modules/@react-native-camera-roll/camera-roll`)"
   - react-native-date-picker (from `../node_modules/react-native-date-picker`)
   - react-native-mmkv-storage (from `../node_modules/react-native-mmkv-storage`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
@@ -533,6 +546,7 @@ DEPENDENCIES:
   - RNFastImage (from `../node_modules/react-native-fast-image`)
   - "RNFlashList (from `../node_modules/@shopify/flash-list`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
+  - RNImageCropPicker (from `../node_modules/react-native-image-crop-picker`)
   - RNReactNativeHapticFeedback (from `../node_modules/react-native-haptic-feedback`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
@@ -561,6 +575,7 @@ SPEC REPOS:
     - SDWebImage
     - SDWebImageWebPCoder
     - SocketRocket
+    - TOCropViewController
     - YogaKit
 
 EXTERNAL SOURCES:
@@ -614,6 +629,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-background-upload"
   react-native-blur:
     :path: "../node_modules/@react-native-community/blur"
+  react-native-cameraroll:
+    :path: "../node_modules/@react-native-camera-roll/camera-roll"
   react-native-date-picker:
     :path: "../node_modules/react-native-date-picker"
   react-native-mmkv-storage:
@@ -656,6 +673,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@shopify/flash-list"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
+  RNImageCropPicker:
+    :path: "../node_modules/react-native-image-crop-picker"
   RNReactNativeHapticFeedback:
     :path: "../node_modules/react-native-haptic-feedback"
   RNReanimated:
@@ -710,6 +729,7 @@ SPEC CHECKSUMS:
   React-logger: 7fbdc3576b2ed3834360c8ea3c1c2ec54ac3043a
   react-native-background-upload: 7c608537f87106c93530a3a19a853afd55466823
   react-native-blur: cfdad7b3c01d725ab62a8a729f42ea463998afa2
+  react-native-cameraroll: 2a198b0eb86c7ccf3303fb57702b2465cc292c94
   react-native-date-picker: 1d61c76315098a6ad4c643a356f005916c7d4875
   react-native-mmkv-storage: cfb6854594cfdc5f7383a9e464bb025417d1721c
   react-native-netinfo: b0ae7d0f76302eaf249de7b2b7add297e155b1d0
@@ -731,6 +751,7 @@ SPEC CHECKSUMS:
   RNFastImage: 5c9c9fed9c076e521b3f509fe79e790418a544e8
   RNFlashList: 4b4b6b093afc0df60ae08f9cbf6ccd4c836c667a
   RNGestureHandler: 4279931048471f17faf46d912b2e96e10f1da99b
+  RNImageCropPicker: d9616a0cb9b72e8551ff94a7a5021fbd29050aa5
   RNReactNativeHapticFeedback: ec56a5f81c3941206fd85625fa669ffc7b4545f9
   RNReanimated: aa8bda648be0174b2b83246ab9cd2644b46ca3c1
   RNScreens: 2b19e2471db8a581c83f381f4ea5d43071c9a3bf
@@ -738,6 +759,7 @@ SPEC CHECKSUMS:
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
+  TOCropViewController: edfd4f25713d56905ad1e0b9f5be3fbe0f59c863
   Yoga: 0518155cfbcc68c56223422f6a20a71b82e307d2
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 

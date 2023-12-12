@@ -35,8 +35,30 @@
 			</dict>
 		</dict>
 	</dict>
+
+	<key>NSCameraUsageDescription</key>
+	<string>$(PRODUCT_NAME) uses your camera for taking pictures and recording videos to show on your profile.</string>
+	<key>NSContactsUsageDescription</key>
+	<string>Invite friends to $(PRODUCT_NAME) from you contacts list.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>$(PRODUCT_NAME) uses your location to connect you with others nearby.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string>$(PRODUCT_NAME) uses your location to connect you with others nearby.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>$(PRODUCT_NAME) uses your microphone when recording videos and audio messages.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>$(PRODUCT_NAME) uses your gallery for uploading pictures and videos to show on your profile.</string>
+	<key>NSMotionUsageDescription</key>
+	<string>$(PRODUCT_NAME) only updates your location when you're in motion to save battery life.</string>
+
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>location</string>
+		<string>processing</string>
+		<string>remote-notification</string>
+	</array>
+
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>

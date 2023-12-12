@@ -147,6 +147,8 @@ export const SIGN_IN = (input: ISignInMutation) => {
           dob
           sex
           bio
+          work
+          school
           streetPassPreferences {
             discoverable
             location
@@ -159,6 +161,12 @@ export const SIGN_IN = (input: ISignInMutation) => {
             streetPasses
             emails
             newsletters
+          }
+          media {
+            mediaId
+            image
+            video
+            thumbnail
           }
         }
         code
@@ -201,13 +209,43 @@ export const VERIFY_PHONE_NUMBER = (input: IVerifyPhoneNumberMutation) => {
   return gql(mutation)
 }
 
+export interface IGetUserQuery {
+  userId?: string,
+}
+export const GET_USER = (input: IGetUserQuery) => {
+  let query = `
+    query {
+      getUser(input: {
+  `
+  query = query + inputConstructor(input)
+  query = query + `
+      }) {
+        userId
+        name
+        bio
+        work
+        school
+        sex
+        age
+        media {
+          mediaId
+          image
+          video
+          thumbnail
+        }
+      }
+    }
+  `
+  return gql(query)
+}
+
 export interface IUpdateUserMutation {
   email?: string,
   name?: string,
   dob?: Date,
   sex?: boolean | null,
   bio?: string,
-  job?: string,
+  work?: string,
   school?: string,
   streetPass?: boolean,
   streetPassPreferences?: IStreetPassPreferences,
@@ -234,6 +272,22 @@ export const UPLOAD_IMAGE = () => gql`
 
 export const UPLOAD_VIDEO = () => gql`
   mutation($file: Upload) {
-    uploadMedia(input: { image: $file })
+    uploadMedia(input: { video: $file })
   }
 `
+
+export interface ISortMediaMutation {
+  mediaIds: Array<string | null>,
+}
+export const SORT_MEDIA = (input: ISortMediaMutation) => {
+  let mutation = `
+    mutation {
+      sortMedia(input: {
+  `
+  mutation = mutation + inputConstructor(input)
+  mutation = mutation + `
+      })
+    }
+  `
+  return gql(mutation)
+}

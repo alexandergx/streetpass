@@ -27,7 +27,7 @@ export const signInCallback = (navigation: any, code: ISignInErrors | null) => {
       navigation.navigate(Screens.Sex, { editProfile: true, })
       break
     default:
-      navigation.navigate(Screens.StreetPass)
+      return
   }
 }
 
