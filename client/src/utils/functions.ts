@@ -37,7 +37,8 @@ export const formatDate = (dateString: string, time = false) => {
   return `${month}/${day}/${year}`
 }
 
-export const timePassedSince = (dateString: string | Date, locale: Locales) => {
+export const timePassedSince = (dateString: string | Date | null, locale: Locales) => {
+  if (!dateString) return null
   const date: any = new Date(dateString)
   const now: any = new Date()
   const milliseconds = now - date

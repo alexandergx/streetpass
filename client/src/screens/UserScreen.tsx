@@ -20,6 +20,8 @@ import GearIcon from '../assets/icons/gear.svg'
 import PencilIcon from '../assets/icons/pencil.svg'
 import DotIcon from '../assets/icons/dot.svg'
 import DotFillIcon from '../assets/icons/dot-fill.svg'
+import WorkIcon from '../assets/icons/work.svg'
+import SchoolIcon from '../assets/icons/school.svg'
 import Carousel, { ICarouselInstance } from 'react-native-reanimated-carousel'
 import { mockUserProfile } from '../utils/MockData'
 import FastImage from 'react-native-fast-image'
@@ -29,6 +31,8 @@ import EditProfileModal from '../components/editProfileModal'
 import UserSettingsModal from '../components/userSettingsModal'
 import AnimatedBackground from '../components/animated/AnimatedBackground'
 import { ISetSortMedia, ISetUpdateUser, setSortMedia, setUpdateUser, setUser } from '../state/actions/UserActions'
+import Video from 'react-native-video'
+import convertToProxyURL from 'react-native-video-cache'
 
 const mapStateToProps = (state: IStores) => {
   const { systemStore, userStore, } = state
@@ -118,6 +122,7 @@ class UserScreen extends React.Component<IUserScreenProps> {
               <View>
                 <Carousel
                   ref={userProfileCarouselRef}
+                  enabled={userStore.user.media.length > 1}
                   panGestureHandlerProps={{ activeOffsetX: [-10, 10], }}
                   loop={false}
                   width={Dimensions.get('window').width}
@@ -126,7 +131,34 @@ class UserScreen extends React.Component<IUserScreenProps> {
                   onSnapToItem={index => this.setState({ imageIndex: index, })}
                   renderItem={(item: any) => (
                     <>
-                      <FastImage key={item.index} source={{ uri: item.item.image, }} style={{width: '100%', height: '100%',}} />
+                      {item.item.thumbnail &&
+                        <FastImage source={{ uri: item.item.thumbnail, }} style={{position: 'absolute', zIndex: -1, width: '100%', height: '100%',}} />
+                      }
+
+                      {item.item.image &&
+                        <FastImage source={{ uri: item.item.image, }} style={{width: '100%', height: '100%',}} />
+                      }
+
+                      {item.item.video &&
+                        <Video
+                          source={{ uri: convertToProxyURL(item.item.video), }}
+                          paused={false}
+                          repeat={true}
+                          playInBackground={false}
+                          playWhenInactive={false}
+                          mixWithOthers={'mix'}
+                          ignoreSilentSwitch={'ignore'}
+                          muted={true}
+                          bufferConfig={{
+                            minBufferMs: 500,
+                            maxBufferMs: 30000,
+                            bufferForPlaybackMs: 500,
+                            bufferForPlaybackAfterRebufferMs: 1000,
+                          }}
+                          resizeMode={'cover'}
+                          style={{width: '100%', height: '100%',}}
+                        />
+                      }
                       <View style={{position: 'absolute', zIndex: 1, width: '100%', height: '100%', flexDirection: 'row',}}>
                         <TouchableWithoutFeedback onPress={() => {
                           userProfileCarouselRef?.current?.prev()
@@ -151,7 +183,7 @@ class UserScreen extends React.Component<IUserScreenProps> {
                   />
 
                   <View style={{flexDirection: 'row', width: '100%', justifyContent: 'center',}}>
-                    {Array.from({ length: userStore.user.media.length, }, (v, i) => {
+                    {userStore.user.media.length > 1 && Array.from({ length: userStore.user.media.length, }, (v, i) => {
                       return this.state.imageIndex === i
                         ? <DotFillIcon key={i} fill={Colors.safeLightest} width={24} height={24} />
                         : <DotIcon key={i} fill={Colors.safeLightest} width={24} height={24} />
@@ -174,15 +206,29 @@ class UserScreen extends React.Component<IUserScreenProps> {
               <View style={{flex: 1, flexDirection: 'row', paddingHorizontal: 16, paddingTop: 24, marginBottom: 8,}}>
                 <View style={{flex: 1,}}>
                   <Text style={{color: Colors.lightest, fontSize: Fonts.lg, fontWeight: Fonts.heavyWeight, textShadowColor: Colors.darkest, textShadowRadius: 2,}}>{userStore.user.name} <Text style={{fontWeight: Fonts.lightWeight,}}> {getAge(userStore.user.dob)}</Text></Text>
-                  {/* <Text numberOfLines={1} style={{color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.featherWeight, textShadowColor: Colors.darkest, textShadowRadius: 2}}>Joined {timePassedSince(userStore.user.joinDate, systemStore.Locale)}</Text> */}
+                  <Text numberOfLines={1} style={{color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.featherWeight, textShadowColor: Colors.darkest, textShadowRadius: 2}}>Joined {timePassedSince(userStore.user.joinDate, systemStore.Locale)}</Text>
                 </View>
               </View>
 
-              <View style={{flex: 1, paddingHorizontal: 16,}}>
-                <Text style={{marginTop: 16, color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.lightWeight, textShadowColor: Colors.darkest, textShadowRadius: 2}}>{userStore.user.bio}</Text>
+              {userStore.user.work &&
+                <View style={{flex: 1, flexDirection: 'row', paddingHorizontal: 16,}}>
+                  <WorkIcon fill={Colors.lightest} width={16} height={16} />
+                  <Text style={{color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.welterWeight, marginLeft: 8,}}>{userStore.user.work}</Text>
+                </View>
+              }
+
+              {userStore.user.school &&
+                <View style={{flex: 1, flexDirection: 'row', paddingHorizontal: 16, marginBottom: 8,}}>
+                  <SchoolIcon fill={Colors.lightest} width={16} height={16} />
+                  <Text style={{color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.welterWeight, marginLeft: 8,}}>{userStore.user.school}</Text>
+                </View>
+              }
+
+              <View style={{flex: 1, paddingHorizontal: 16, marginTop: 8,}}>
+                <Text style={{color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.middleWeight, textShadowColor: Colors.darkest, textShadowRadius: 2}}>{userStore.user.bio}</Text>
               </View>
 
-              <View style={{height: 80,}} />
+              <View style={{height: 128,}} />
             </ScrollView>
           </View>
 

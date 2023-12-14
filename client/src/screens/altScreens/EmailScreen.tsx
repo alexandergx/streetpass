@@ -10,14 +10,13 @@ import GradientBackground from '../../components/gradientBackground'
 import { connect } from 'react-redux'
 import { bindActionCreators, Dispatch, AnyAction, } from 'redux'
 import { IStores, } from '../../state/store'
-import { Screens } from '../../navigation'
 import { validateEmail } from '../../utils/functions'
 import ButtonInput from '../../components/textInput/ButtonInput'
-// import { ISetUpdateEmail, setUpdateEmail } from '../../state/actions/UserActions'
 import { ISystemStore } from '../../state/reducers/SystemReducer'
 import { InputLimits } from '../../utils/constants'
 import { Lit } from '../../utils/locale'
 import AnimatedBackground from '../../components/animated/AnimatedBackground'
+import { ISetUpdateUser, setUpdateUser } from '../../state/actions/UserActions'
 
 const mapStateToProps = (state: IStores) => {
   const { systemStore, userStore: { user: { email, }, }, } = state
@@ -27,7 +26,7 @@ const mapStateToProps = (state: IStores) => {
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => ({
   actions: bindActionCreators(Object.assign(
     {
-      // setUpdateEmail,
+      setUpdateUser,
     }
   ), dispatch),
 })
@@ -37,7 +36,7 @@ interface IEmailScreenProps {
   systemStore: ISystemStore,
   email: string,
   actions: {
-    // setUpdateEmail: (params: ISetUpdateEmail) => void,
+    setUpdateUser: (params: ISetUpdateUser) => void,
   }
 }
 interface IEmailScreenState {
@@ -74,12 +73,12 @@ class EmailScreen extends React.Component<IEmailScreenProps> {
   }
 
   handleUpdateEmail = async () => {
-    // if (this.state.email !== this.props.email) {
-    //   this.setState({ loading: true, })
-    //   await this.props.actions.setUpdateEmail(this.state.email)
-    //   this.setState({ loading: false, })
-    // }
-    // this.props.navigation.goBack()
+    if (this.state.email !== this.props.email) {
+      this.setState({ loading: true, })
+      await this.props.actions.setUpdateUser({ email: this.state.email, })
+      this.setState({ loading: false, })
+    }
+    this.props.navigation.goBack()
   }
 
   render() {
@@ -97,10 +96,10 @@ class EmailScreen extends React.Component<IEmailScreenProps> {
           behavior={'padding'}
           style={{
             flex: 1, display: 'flex',
-            justifyContent: 'center', alignItems: 'center', paddingHorizontal: 16,
+            justifyContent: 'center', alignItems: 'center', padding: 16,
           }}
         >
-          <View style={{flex: 1, width: '100%', marginTop: 8,}}>
+          <View style={{flex: 1, width: '100%',}}>
             <ButtonInput
               systemStore={systemStore}
               value={this.state.email}

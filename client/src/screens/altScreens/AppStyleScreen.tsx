@@ -84,7 +84,7 @@ class AppStyleScreen extends React.Component<IAppStyleScreenProps> {
 
         <KeyboardAvoidingView
           behavior={'padding'}
-          style={{flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 16,}}
+          style={{flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 16,}}
         >
           <View style={{flex: 1, width: '100%', marginVertical: 16, borderRadius: 16, overflow: 'hidden',}}>
             <BlurView

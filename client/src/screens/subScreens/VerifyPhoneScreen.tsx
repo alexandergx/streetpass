@@ -108,7 +108,11 @@ class VerifyPhoneScreen extends React.Component<IVerifyPhoneScreenProps> {
       this.setState({ loading: true, })
       const result = await verifyPhoneNumber({ securityPin: this.state.securityPin, })
       this.setState({ loading: false, pinSent: true, })
-      if (result) this.props.navigation.navigate(Screens.PersonalInfo)
+      if (result) {
+        if (!this.props.userStore.user.dob) this.props.navigation.navigate(Screens.PersonalInfo)
+        else if (!this.props.userStore.user.media.length) this.props.navigation.navigate(Screens.Sex)
+        else this.props.navigation.navigate(Screens.StreetPass)
+      }
     } catch {
       this.setState({ loading: false, })
     }

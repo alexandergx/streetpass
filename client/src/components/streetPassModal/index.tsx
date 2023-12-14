@@ -16,6 +16,8 @@ import DotIcon from '../../assets/icons/dot.svg'
 import DotFillIcon from '../../assets/icons/dot-fill.svg'
 import EllipsisIcon from '../../assets/icons/ellipsis.svg'
 import ChevronDownIcon from '../../assets/icons/chevron-down.svg'
+import WorkIcon from '../../assets/icons/work.svg'
+import SchoolIcon from '../../assets/icons/school.svg'
 import FastImage from 'react-native-fast-image'
 import { BlurView } from '@react-native-community/blur'
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler'
@@ -49,6 +51,7 @@ const StreetPassModal: React.FC<IStreetPassModalProps> = ({
           <View style={{marginTop: 64,}}>
             <Carousel
               ref={streetPassCarouselRef}
+              enabled={streetPass.media.length > 1}
               panGestureHandlerProps={{ activeOffsetX: [-10, 10], }}
               defaultIndex={streetPassImageIndex || 0}
               loop={false}
@@ -83,7 +86,7 @@ const StreetPassModal: React.FC<IStreetPassModalProps> = ({
               />
 
               <View style={{flexDirection: 'row', width: '100%', justifyContent: 'center',}}>
-                {Array.from({ length: streetPass.media.length, }, (v, i) => {
+                {streetPass.media.length > 1 && Array.from({ length: streetPass.media.length, }, (v, i) => {
                   return imageIndex === i
                     ? <DotFillIcon key={i} fill={Colors.safeLightest} width={24} height={24} />
                     : <DotIcon key={i} fill={Colors.safeLightest} width={24} height={24} />
@@ -120,10 +123,10 @@ const StreetPassModal: React.FC<IStreetPassModalProps> = ({
             </View>
           </View>
           
-          <View style={{flex: 1, flexDirection: 'row', paddingHorizontal: 16, paddingTop: 24, marginBottom: 8,}}>
+          <View style={{flex: 1, flexDirection: 'row', paddingHorizontal: 16, paddingTop: 24,}}>
             <View style={{flex: 1,}}>
               <Text style={{color: Colors.lightest, fontSize: Fonts.lg, fontWeight: Fonts.heavyWeight, textShadowColor: Colors.darkest, textShadowRadius: 2,}}>{streetPass.name} <Text style={{fontWeight: Fonts.lightWeight,}}>{streetPass.age}</Text></Text>
-              <Text numberOfLines={1} style={{color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.featherWeight, textShadowColor: Colors.darkest, textShadowRadius: 2}}>Streetpassed {timePassedSince(streetPass.streetPassDate, systemStore.Locale)}</Text>
+              <Text numberOfLines={1} style={{color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.featherWeight, textShadowColor: Colors.darkest, textShadowRadius: 2}}>Streetpassed {timePassedSince(streetPass.date, systemStore.Locale)}</Text>
             </View>
 
             {!hideActions &&
@@ -153,11 +156,25 @@ const StreetPassModal: React.FC<IStreetPassModalProps> = ({
             }
           </View>
 
-          <View style={{flex: 1, paddingHorizontal: 16,}}>
-            <Text style={{marginTop: 16, color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.welterWeight, textShadowColor: Colors.darkest, textShadowRadius: 2}}>{streetPass.bio}</Text>
+          {streetPass.work &&
+            <View style={{flex: 1, flexDirection: 'row', paddingHorizontal: 16,}}>
+              <WorkIcon fill={Colors.lightest} width={16} height={16} />
+              <Text style={{color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.welterWeight, marginLeft: 8,}}>{streetPass.work}</Text>
+            </View>
+          }
+
+          {streetPass.school &&
+            <View style={{flex: 1, flexDirection: 'row', paddingHorizontal: 16, marginBottom: 8,}}>
+              <SchoolIcon fill={Colors.lightest} width={16} height={16} />
+              <Text style={{color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.welterWeight, marginLeft: 8,}}>{streetPass.school}</Text>
+            </View>
+          }
+
+          <View style={{flex: 1, paddingHorizontal: 16, marginTop: 8,}}>
+            <Text style={{color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.middleWeight, textShadowColor: Colors.darkest, textShadowRadius: 2}}>{streetPass.bio}</Text>
           </View>
 
-          <View style={{height: 80,}} />
+          <View style={{height: 128,}} />
         </ScrollView>
 
         {selectionModalConfig &&

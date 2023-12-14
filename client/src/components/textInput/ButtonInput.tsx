@@ -116,6 +116,7 @@ class ButtonInput extends React.Component<IButtonInputProps> {
             }}
           >
             <RNTextInput
+              {...this.props}
               ref={this.props.inputRef || this.textInputRef}
               multiline={false}
               editable={!this.props.disabled}
@@ -124,13 +125,12 @@ class ButtonInput extends React.Component<IButtonInputProps> {
               placeholderTextColor={this.props.placeholderColor ? this.props.placeholderColor : Colors.light}
               autoCapitalize={'none'}
               style={{
-                color: this.props.textColor !== undefined ? this.props.textColor : Colors.lightest,
+                color: this.props.textColor ? this.props.textColor : Colors.lightest,
                 fontWeight: this.props.disabled ? Fonts.welterWeight : Fonts.middleWeight as any,
                 fontSize: Fonts.lg,
                 width: '100%', height: '100%', opacity: this.props.editable === false ? 0.4 : 1,
                 ...this.props.style,
               }}
-              {...this.props}
             />
           </View>
 

@@ -81,13 +81,25 @@ export enum ISignInErrors {
 }
 
 export enum LocalStorage {
-  AuthStore = 'authStore',
   SystemStore = 'systemStore',
+  AuthStore = 'authStore',
+  CameraStore = 'cameraStore',
 }
 
 export enum AuthStore {
   AccessToken = 'accessToken',
   RefreshToken = 'refreshToken',
+}
+
+export enum CameraStore {
+  DefaultFrontCamera = 'defaultFrontCamera',
+  SaveMedia = 'saveMedia',
+  HDR = 'hdr',
+  Stabilization = 'stabilization',
+  Audio = 'audio',
+  Grid = 'grid',
+  Timer = 'timer',
+  TimerValue = 'timerValue',
 }
 
 export enum SystemStore {

@@ -8,14 +8,12 @@ import { BlurView } from '@react-native-community/blur'
 import NavHeader from '../navigation/NavHeader'
 import CrossIcon from '../../assets/icons/cross.svg'
 import Button from '../button'
-// import { Slider } from '@miblanchard/react-native-slider'
 import { InputLimits, streetPassAges } from '../../utils/constants'
 import Slider from '../slider'
-// import { requestLocationAlways } from '../../utils/services'
-// import { Screens } from '../../navigation'
-// import { getAge } from '../../utils/functions'
+import { requestLocationAlways } from '../../utils/services'
 import MaleIcon from '../../assets/icons/male.svg'
 import FemaleIcon from '../../assets/icons/female.svg'
+import { ISetUpdateUser } from '../../state/actions/UserActions'
 
 interface IStreetPassSettingsModalProps {
   navigation: any,
@@ -23,7 +21,7 @@ interface IStreetPassSettingsModalProps {
   userStore: IUserStore,
   toggleModal: () => void,
   actions: {
-    //
+    setUpdateUser: (params: ISetUpdateUser) => void,
   }
 }
 export interface IStreetPassSettingsModalState {
@@ -55,20 +53,22 @@ class StreetPassSettingsModal extends React.Component<IStreetPassSettingsModalPr
       || this.state.age !== this.props.userStore.user.streetPassPreferences.age
     ) {
       this.setState({ loading: true, })
-      // if (this.state.streetPass !== this.props.userStore.user.streetPass) await this.props.actions.setUpdateStreetPass(this.state.streetPass)
-      // await this.props.actions.setUpdateStreetPassPreferences({
-      //   discoverable: this.state.discoverable,
-      //   location: this.state.location,
-      //   sex: this.state.sex,
-      //   age: this.state.age,
-      // })
+      this.props.actions.setUpdateUser({
+        streetPass: this.state.streetPass,
+        streetPassPreferences: {
+          discoverable: this.state.discoverable,
+          location: this.state.location,
+          sex: this.state.sex,
+          age: this.state.age,
+        },
+      })
       this.setState({ loading: false, })
       this.props.toggleModal()
     } else this.props.toggleModal()
   }
 
   render() {
-    const { systemStore, userStore, toggleModal, }: IStreetPassSettingsModalProps = this.props
+    const { systemStore, toggleModal, }: IStreetPassSettingsModalProps = this.props
     const { Colors, } = systemStore
 
     const streetPassConfig: IListGroupConfig = {
@@ -76,33 +76,12 @@ class StreetPassSettingsModal extends React.Component<IStreetPassSettingsModalPr
       list: [
         {
           title: Lit[this.props.systemStore.Locale].Title.StreetPass, toggleValue: this.state.streetPass, onToggle: async () => {
-            return null
-            // if (!userStore.user.dob) {
-            //   Alert.alert(Lit[this.props.systemStore.Locale].Copywrite.PersonalInfo[0], Lit[this.props.systemStore.Locale].Copywrite.PersonalInfo[1],
-            //     [
-            //       { text: Lit[this.props.systemStore.Locale].Button.No, onPress: () => null, },
-            //       { text: Lit[this.props.systemStore.Locale].Button.Ok, onPress: () => this.props.navigation.navigate(Screens.PersonalInfo), },
-            //     ]
-            //   )
-            //   return
-            // }
-
-            // const age = getAge(userStore.user.dob)
-            // if (age <= InputLimits.StreetPassAgeMin) {
-            //   Alert.alert(Lit[this.props.systemStore.Locale].Copywrite.StreetPassAge[0], Lit[this.props.systemStore.Locale].Copywrite.StreetPassAge[1],
-            //     [
-            //       { text: Lit[systemStore.Locale].Button.Ok, onPress: () => null, },
-            //     ]
-            //   )
-            //   return
-            // }
-
-            // if (!this.state.streetPass) {
-            //   await requestLocationAlways(this.props.systemStore.Locale).then(async result => {
-            //     if (!result) return
-            //     this.setState({ streetPass: !this.state.streetPass, })
-            //   })
-            // } else this.setState({ streetPass: !this.state.streetPass, })
+            if (!this.state.streetPass) {
+              await requestLocationAlways(this.props.systemStore.Locale).then(async result => {
+                if (!result) return
+                this.setState({ streetPass: !this.state.streetPass, })
+              })
+            } else this.setState({ streetPass: !this.state.streetPass, })
           },
           description: Lit[this.props.systemStore.Locale].Copywrite.StreetPassDescription,
         },

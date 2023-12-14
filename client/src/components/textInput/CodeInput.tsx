@@ -97,7 +97,7 @@ class CodeInput extends React.Component<ICodeInputProps> {
             keyboardType={'numeric'}
             textAlign={'center'}
             disabled={this.props.disabled}
-            style={{fontSize: Fonts.lg, paddingVertical: 16,}}
+            style={{fontSize: Fonts.xl, paddingVertical: 16,}}
           />
         </View>
 
@@ -115,7 +115,7 @@ class CodeInput extends React.Component<ICodeInputProps> {
             keyboardType={'numeric'}
             textAlign={'center'}
             disabled={this.props.disabled}
-            style={{fontSize: Fonts.lg, paddingVertical: 16,}}
+            style={{fontSize: Fonts.xl, paddingVertical: 16,}}
           />
         </View>
         
@@ -133,7 +133,7 @@ class CodeInput extends React.Component<ICodeInputProps> {
             keyboardType={'numeric'}
             textAlign={'center'}
             disabled={this.props.disabled}
-            style={{fontSize: Fonts.lg, paddingVertical: 16,}}
+            style={{fontSize: Fonts.xl, paddingVertical: 16,}}
           />
         </View>
 
@@ -151,7 +151,7 @@ class CodeInput extends React.Component<ICodeInputProps> {
             keyboardType={'numeric'}
             textAlign={'center'}
             disabled={this.props.disabled}
-            style={{fontSize: Fonts.lg, paddingVertical: 16,}}
+            style={{fontSize: Fonts.xl, paddingVertical: 16,}}
           />
         </View>
 
@@ -169,7 +169,7 @@ class CodeInput extends React.Component<ICodeInputProps> {
             keyboardType={'numeric'}
             textAlign={'center'}
             disabled={this.props.disabled}
-            style={{fontSize: Fonts.lg, paddingVertical: 16,}}
+            style={{fontSize: Fonts.xl, paddingVertical: 16,}}
           />
         </View>
 
@@ -187,7 +187,7 @@ class CodeInput extends React.Component<ICodeInputProps> {
             keyboardType={'numeric'}
             textAlign={'center'}
             disabled={this.props.disabled}
-            style={{fontSize: Fonts.lg, paddingVertical: 16,}}
+            style={{fontSize: Fonts.xl, paddingVertical: 16,}}
           />
         </View>
       </View>

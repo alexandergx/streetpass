@@ -76,6 +76,10 @@ PODS:
   - fmt (6.2.1)
   - glog (0.3.5)
   - hermes-engine (0.70.10)
+  - KTVCocoaHTTPServer (1.0.0):
+    - CocoaAsyncSocket
+  - KTVHTTPCache (2.0.1):
+    - KTVCocoaHTTPServer
   - libevent (2.1.12)
   - libwebp (1.3.2):
     - libwebp/demux (= 1.3.2)
@@ -329,14 +333,30 @@ PODS:
     - React-Core
   - react-native-cameraroll (7.2.0):
     - React-Core
+  - react-native-contacts (7.0.8):
+    - React-Core
   - react-native-date-picker (4.3.3):
+    - React-Core
+  - react-native-image-picker (7.1.0):
     - React-Core
   - react-native-mmkv-storage (0.9.1):
     - MMKV (= 1.2.13)
     - React-Core
   - react-native-netinfo (11.1.1):
     - React-Core
+  - react-native-network-info (5.2.1):
+    - React
   - react-native-safe-area-context (4.7.4):
+    - React-Core
+  - react-native-sms (1.11.0):
+    - React
+  - react-native-video (5.2.1):
+    - React-Core
+    - react-native-video/Video (= 5.2.1)
+  - react-native-video-cache (2.7.4):
+    - KTVHTTPCache (~> 2.0.0)
+    - React
+  - react-native-video/Video (5.2.1):
     - React-Core
   - React-perflogger (0.70.10)
   - React-RCTActionSheet (0.70.10):
@@ -406,6 +426,8 @@ PODS:
     - React-perflogger (= 0.70.10)
   - RNAppleAuthentication (2.3.0):
     - React-Core
+  - RNCPushNotificationIOS (1.11.0):
+    - React-Core
   - RNDeviceInfo (10.12.0):
     - React-Core
   - RNFastImage (8.6.3):
@@ -425,6 +447,8 @@ PODS:
     - React-Core
     - React-RCTImage
     - TOCropViewController
+  - RNPermissions (4.0.0):
+    - React-Core
   - RNReactNativeHapticFeedback (2.2.0):
     - React-Core
   - RNReanimated (3.4.2):
@@ -469,6 +493,10 @@ PODS:
     - SDWebImage/Core (~> 5.10)
   - SocketRocket (0.6.1)
   - TOCropViewController (2.6.1)
+  - VisionCamera (3.6.16):
+    - React
+    - React-callinvoker
+    - React-Core
   - Yoga (1.14.0)
   - YogaKit (1.18.1):
     - Yoga (~> 1.14)
@@ -525,10 +553,16 @@ DEPENDENCIES:
   - react-native-background-upload (from `../node_modules/react-native-background-upload`)
   - "react-native-blur (from `../node_modules/@react-native-community/blur`)"
   - "react-native-cameraroll (from `../node_modules/@react-native-camera-roll/camera-roll`)"
+  - react-native-contacts (from `../node_modules/react-native-contacts`)
   - react-native-date-picker (from `../node_modules/react-native-date-picker`)
+  - react-native-image-picker (from `../node_modules/react-native-image-picker`)
   - react-native-mmkv-storage (from `../node_modules/react-native-mmkv-storage`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
+  - react-native-network-info (from `../node_modules/react-native-network-info`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
+  - react-native-sms (from `../node_modules/react-native-sms`)
+  - react-native-video (from `../node_modules/react-native-video`)
+  - react-native-video-cache (from `../node_modules/react-native-video-cache`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../node_modules/react-native/Libraries/NativeAnimation`)
@@ -542,15 +576,18 @@ DEPENDENCIES:
   - React-runtimeexecutor (from `../node_modules/react-native/ReactCommon/runtimeexecutor`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - "RNAppleAuthentication (from `../node_modules/@invertase/react-native-apple-authentication`)"
+  - "RNCPushNotificationIOS (from `../node_modules/@react-native-community/push-notification-ios`)"
   - RNDeviceInfo (from `../node_modules/react-native-device-info`)
   - RNFastImage (from `../node_modules/react-native-fast-image`)
   - "RNFlashList (from `../node_modules/@shopify/flash-list`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNImageCropPicker (from `../node_modules/react-native-image-crop-picker`)
+  - RNPermissions (from `../node_modules/react-native-permissions`)
   - RNReactNativeHapticFeedback (from `../node_modules/react-native-haptic-feedback`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNSVG (from `../node_modules/react-native-svg`)
+  - VisionCamera (from `../node_modules/react-native-vision-camera`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -566,6 +603,8 @@ SPEC REPOS:
     - Flipper-RSocket
     - FlipperKit
     - fmt
+    - KTVCocoaHTTPServer
+    - KTVHTTPCache
     - libevent
     - libwebp
     - lottie-ios
@@ -631,14 +670,26 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-community/blur"
   react-native-cameraroll:
     :path: "../node_modules/@react-native-camera-roll/camera-roll"
+  react-native-contacts:
+    :path: "../node_modules/react-native-contacts"
   react-native-date-picker:
     :path: "../node_modules/react-native-date-picker"
+  react-native-image-picker:
+    :path: "../node_modules/react-native-image-picker"
   react-native-mmkv-storage:
     :path: "../node_modules/react-native-mmkv-storage"
   react-native-netinfo:
     :path: "../node_modules/@react-native-community/netinfo"
+  react-native-network-info:
+    :path: "../node_modules/react-native-network-info"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
+  react-native-sms:
+    :path: "../node_modules/react-native-sms"
+  react-native-video:
+    :path: "../node_modules/react-native-video"
+  react-native-video-cache:
+    :path: "../node_modules/react-native-video-cache"
   React-perflogger:
     :path: "../node_modules/react-native/ReactCommon/reactperflogger"
   React-RCTActionSheet:
@@ -665,6 +716,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   RNAppleAuthentication:
     :path: "../node_modules/@invertase/react-native-apple-authentication"
+  RNCPushNotificationIOS:
+    :path: "../node_modules/@react-native-community/push-notification-ios"
   RNDeviceInfo:
     :path: "../node_modules/react-native-device-info"
   RNFastImage:
@@ -675,6 +728,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-gesture-handler"
   RNImageCropPicker:
     :path: "../node_modules/react-native-image-crop-picker"
+  RNPermissions:
+    :path: "../node_modules/react-native-permissions"
   RNReactNativeHapticFeedback:
     :path: "../node_modules/react-native-haptic-feedback"
   RNReanimated:
@@ -683,6 +738,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-screens"
   RNSVG:
     :path: "../node_modules/react-native-svg"
+  VisionCamera:
+    :path: "../node_modules/react-native-vision-camera"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -705,6 +762,8 @@ SPEC CHECKSUMS:
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   glog: 04b94705f318337d7ead9e6d17c019bd9b1f6b1b
   hermes-engine: 409b787d72bde225a3e5ce982f9c3ace6ff56691
+  KTVCocoaHTTPServer: df8d7b861e603ff8037e9b2138aca2563a6b768d
+  KTVHTTPCache: 588c3eb16f6bd1e6fde1e230dabfb7bd4e490a4d
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   libwebp: 1786c9f4ff8a279e4dac1e8f385004d5fc253009
   lottie-ios: 25e7b2675dad5c3ddad369ac9baab03560c5bfdd
@@ -730,10 +789,16 @@ SPEC CHECKSUMS:
   react-native-background-upload: 7c608537f87106c93530a3a19a853afd55466823
   react-native-blur: cfdad7b3c01d725ab62a8a729f42ea463998afa2
   react-native-cameraroll: 2a198b0eb86c7ccf3303fb57702b2465cc292c94
+  react-native-contacts: cb4f3b823550adbce0802901b9e63bf1526ec0af
   react-native-date-picker: 1d61c76315098a6ad4c643a356f005916c7d4875
+  react-native-image-picker: a82b781c14f1f5c16953290bee2039db43822517
   react-native-mmkv-storage: cfb6854594cfdc5f7383a9e464bb025417d1721c
   react-native-netinfo: b0ae7d0f76302eaf249de7b2b7add297e155b1d0
+  react-native-network-info: d1290ffc0bd0709e11436f5b8d7f605dcc5c4530
   react-native-safe-area-context: 2cd91d532de12acdb0a9cbc8d43ac72a8e4c897c
+  react-native-sms: 31fbb9d6ebb565ad32e409eaf9dc70329936a129
+  react-native-video: c26780b224543c62d5e1b2a7244a5cd1b50e8253
+  react-native-video-cache: 8300762bd3fd1c3dd19b76ba5236ca35de1f4bf7
   React-perflogger: f86e85eb59151d09e9b44b8931f5c088e4f08bbc
   React-RCTActionSheet: cd3d76501a6069e164986b93f144be34b593955c
   React-RCTAnimation: 2d09db635202e5d6f66de596f5a6b38389fe76ec
@@ -747,11 +812,13 @@ SPEC CHECKSUMS:
   React-runtimeexecutor: 77aa3714a353cfb1a5f5e315e8af5154cd3d9402
   ReactCommon: a29dac86d7219579db079cef8f380ebffe1ba545
   RNAppleAuthentication: e99eaf3c4c01ad8ecb6125dd6f0cfd98871685b5
+  RNCPushNotificationIOS: 64218f3c776c03d7408284a819b2abfda1834bc8
   RNDeviceInfo: db5c64a060e66e5db3102d041ebe3ef307a85120
   RNFastImage: 5c9c9fed9c076e521b3f509fe79e790418a544e8
   RNFlashList: 4b4b6b093afc0df60ae08f9cbf6ccd4c836c667a
   RNGestureHandler: 4279931048471f17faf46d912b2e96e10f1da99b
   RNImageCropPicker: d9616a0cb9b72e8551ff94a7a5021fbd29050aa5
+  RNPermissions: a651eaefd39e84ed11b48fa925028f5dfce746e9
   RNReactNativeHapticFeedback: ec56a5f81c3941206fd85625fa669ffc7b4545f9
   RNReanimated: aa8bda648be0174b2b83246ab9cd2644b46ca3c1
   RNScreens: 2b19e2471db8a581c83f381f4ea5d43071c9a3bf
@@ -760,9 +827,10 @@ SPEC CHECKSUMS:
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   TOCropViewController: edfd4f25713d56905ad1e0b9f5be3fbe0f59c863
+  VisionCamera: b236f548d6507923857dade542c7e0a148ed3492
   Yoga: 0518155cfbcc68c56223422f6a20a71b82e307d2
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: 4c55690612b9447e3baa2882495b08aa9454d921
+PODFILE CHECKSUM: da62a437c9ad4ad13c394e00e93af72e10219db9
 
 COCOAPODS: 1.14.3

@@ -16,7 +16,7 @@ export const getRefreshHeaders = () => { return { 'refresh-token': MMKV.getStrin
 let env: string
 // env = 'prod'
 env = 'dev'
-export const baseUrl = (env == 'prod') ? 'streetpass.app' : 'localhost:8080' // 'localhost:8080' // development simulator, '192.168.0.11:8080' // development home, '10.0.0.2:8080' // development away
+export const baseUrl = (env == 'prod') ? 'streetpass.app' : '192.168.0.11:8080' // 'localhost:8080' // development simulator, '192.168.0.11:8080' // development home, '10.0.0.2:8080' // development away
 export const protocol = (env == 'prod') ? { 0: 'https://', 1: 'wss://', } : { 0: 'http://', 1: 'ws://', }
 const wsLink = new GraphQLWsLink(
   createClient({ url: `${protocol[1]}${baseUrl}/graphql`,
@@ -168,6 +168,7 @@ export const SIGN_IN = (input: ISignInMutation) => {
             video
             thumbnail
           }
+          joinDate
         }
         code
       }
@@ -283,6 +284,22 @@ export const SORT_MEDIA = (input: ISortMediaMutation) => {
   let mutation = `
     mutation {
       sortMedia(input: {
+  `
+  mutation = mutation + inputConstructor(input)
+  mutation = mutation + `
+      })
+    }
+  `
+  return gql(mutation)
+}
+
+export interface IRemoveMediaMutation {
+  mediaIds: Array<string | null>,
+}
+export const REMOVE_MEDIA = (input: IRemoveMediaMutation) => {
+  let mutation = `
+    mutation {
+      removeMedia(input: {
   `
   mutation = mutation + inputConstructor(input)
   mutation = mutation + `

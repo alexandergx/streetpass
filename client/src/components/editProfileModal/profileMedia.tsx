@@ -1,15 +1,11 @@
 import React, { useState, useImperativeHandle, forwardRef, } from 'react'
 import {
   View,
-  ScrollView,
-  Text,
-  KeyboardAvoidingView,
   TouchableOpacity,
   Dimensions,
   ActivityIndicator,
 } from 'react-native'
 import { BlurView } from '@react-native-community/blur'
-import { IUserStore } from '../../state/reducers/UserReducer'
 import { ISystemStore } from '../../state/reducers/SystemReducer'
 import { useMutation, } from '@apollo/client'
 import { ReactNativeFile, } from 'apollo-upload-client'
@@ -17,18 +13,19 @@ import { MMKVLoader } from 'react-native-mmkv-storage'
 import CrossCircledIcon from '../../assets/icons/cross-circled.svg'
 import PlusIcon from '../../assets/icons/plus.svg'
 import ProfileIcon from '../../assets/icons/profile.svg'
-import PhotoIcon from '../../assets/icons/photo.svg'
 import GalleryIcon from '../../assets/icons/gallery.svg'
 import CameraIcon from '../../assets/icons/camera.svg'
 import DraggableGrid from 'react-native-draggable-grid'
 import FastImage from 'react-native-fast-image'
-import { LocalStorage } from '../../utils/constants'
+import { InputLimits, LocalStorage } from '../../utils/constants'
 import { IEditProfileModalState, IUploadMedia } from '.'
-import ImagePicker from 'react-native-image-crop-picker'
 import { UPLOAD_IMAGE, UPLOAD_VIDEO, apiRequest, getAccessHeaders } from '../../api'
 import Video from 'react-native-video'
 import convertToProxyURL from 'react-native-video-cache'
 import { ISetSortMedia } from '../../state/actions/UserActions'
+import { removeMedia } from '../../api/user'
+import { launchImageLibrary, } from 'react-native-image-picker'
+import { Lit } from '../../utils/locale'
 
 const MMKV = new MMKVLoader().withEncryption().withInstanceID(LocalStorage.AuthStore).initialize()
 
@@ -53,15 +50,16 @@ const ProfileMedia = forwardRef<ProfileMediaMethods, IProfileBlockProps>(({ syst
 
   const save = async () => {
     try {
-      setState({ loading: true, })
+      state.deletedMedia.length && await removeMedia({ mediaIds: state.deletedMedia, })
       const sortOrderMedia: Array<IUploadMedia> = []
       for (const media of state.media.filter((i: IUploadMedia) => i.key !== null)) {
-        setLoading(media.key)
         if (media.image && media.new) {
+          setLoading(media.key)
           const refreshed = await apiRequest(null)
           const { data, } = await uploadImage({ variables: { file: new ReactNativeFile({ uri: media.image, name: 'file', }), }, })
           sortOrderMedia.push({ ...media, mediaId: data.uploadMedia, })
-        } else if (media.video) {
+        } else if (media.video && media.new) {
+          setLoading(media.key)
           const refreshed = await apiRequest(null)
           const { data, } = await updateVideo({ variables: { file: new ReactNativeFile({ uri: media.video, name: 'file', }), }, })
           sortOrderMedia.push({ ...media, mediaId: data.uploadMedia, })
@@ -69,11 +67,9 @@ const ProfileMedia = forwardRef<ProfileMediaMethods, IProfileBlockProps>(({ syst
       }
       await actions.setSortMedia(sortOrderMedia)
       setLoading(null)
-      setState({ loading: false, })
       return true
     } catch(e) {
       console.log('[UPLOAD ERROR]', e)
-      setState({ loading: false, })
     }
     return false
   }
@@ -82,12 +78,24 @@ const ProfileMedia = forwardRef<ProfileMediaMethods, IProfileBlockProps>(({ syst
 
   const selectFromGallery = async () => {
     setState({ selectionModalConfig: null, })
-    const result = await ImagePicker.openPicker({
-      mediaType: 'any',
-      cropping: true,
-      // multiple: true,
-    })
-    setState({ media: [...state.media.filter((i: IUploadMedia) => i.key !== null), { image: `file:///${result.path}`, key: state.media.length, new: true, }, { key: null, }].slice(0, 9), })
+    const result = await launchImageLibrary({ mediaType: 'mixed', formatAsMp4: false, selectionLimit: 1, })
+    if (result?.assets && result.assets.length > 0 && result.assets[0].duration) {
+      if (result.assets[0].duration <= (InputLimits.VideoLengthMax + 1)) {
+        setState({ media: [...state.media.filter((i: IUploadMedia) => i.key !== null), { video: result.assets[0].uri, key: state.media.length, new: true, }, { key: null, }].slice(0, 9), })
+      } else {
+        // TODO - alert video must be 15secs
+        // Alert.alert(Lit[systemStore.Locale].Copywrite.VideoLength[0], Lit[systemStore.Locale].Copywrite.VideoLength[1])
+      }
+      return
+    }
+    if (result?.assets && result.assets.length > 0) setState({ media: [...state.media.filter((i: IUploadMedia) => i.key !== null), { image: result.assets[0].uri, key: state.media.length, new: true, }, { key: null, }].slice(0, 9), })
+
+    // const result = await ImagePicker.openPicker({
+    //   mediaType: 'any',
+    //   cropping: true,
+    //   // multiple: true,
+    // })
+    // setState({ media: [...state.media.filter((i: IUploadMedia) => i.key !== null), { image: `file:///${result.path}`, key: state.media.length, new: true, }, { key: null, }].slice(0, 9), })
   }
 
   return (
@@ -99,17 +107,23 @@ const ProfileMedia = forwardRef<ProfileMediaMethods, IProfileBlockProps>(({ syst
           return (item.key !== null ?
             <View
               key={item.key}
-              style={{width: Dimensions.get('window').width * 0.30, aspectRatio: 1/1.2, justifyContent: 'center', alignItems: 'center', padding: 4,}}
+              style={{width: Dimensions.get('window').width * 0.31, aspectRatio: 1/1.18, justifyContent: 'center', alignItems: 'center', padding: 4,}}
             >
+              {item.thumbnail &&
+                <FastImage
+                  source={{ uri: item.thumbnail, }}
+                  style={{position: 'absolute', zIndex: -1, width: '100%', height: '100%', borderRadius: 16, overflow: 'hidden',}}
+                />
+              }
+
               {item.image &&
                 <FastImage
-                  key={item.key}
                   source={{ uri: item.image, }}
                   style={{width: '100%', height: '100%', borderRadius: 16, overflow: 'hidden',}}
                 />
               }
 
-              {/* {item.video &&
+              {item.video &&
                 <Video
                   source={{ uri: convertToProxyURL(item.video), }}
                   paused={false}
@@ -126,14 +140,14 @@ const ProfileMedia = forwardRef<ProfileMediaMethods, IProfileBlockProps>(({ syst
                     bufferForPlaybackAfterRebufferMs: 1000,
                   }}
                   resizeMode={'cover'}
-                  style={{width: '100%', height: '100%',}}
+                  style={{width: '100%', height: '100%', borderRadius: 16, overflow: 'hidden',}}
                 />
-              } */}
+              }
 
               <TouchableOpacity
                 activeOpacity={Colors.activeOpacity}
-                onPress={() => setState({ media: state.media.filter((i: IUploadMedia) => i.key !== item.key), deletedMedia: [...state.deletedMedia, item] })}
-                style={{position: 'absolute', bottom: -2, right: -4,}}
+                onPress={() => setState({ media: state.media.filter((i: IUploadMedia) => i.key !== item.key), deletedMedia: item.mediaId ? [...state.deletedMedia, item.mediaId] : state.deletedMedia, })}
+                style={{position: 'absolute', bottom: -2, right: -2,}}
               >
                 <CrossCircledIcon fill={Colors.safeLightest} width={32} height={32} />
               </TouchableOpacity>
@@ -156,18 +170,17 @@ const ProfileMedia = forwardRef<ProfileMediaMethods, IProfileBlockProps>(({ syst
                   title: 'Upload media',
                   list: [
                     { Icon: GalleryIcon, title: 'Select from gallery', onPress: selectFromGallery, },
-                    { Icon: CameraIcon, title: 'Use camera', onPress: () => null, },
+                    { Icon: CameraIcon, title: 'Use camera', onPress: () => setState({ camera: true, selectionModalConfig: null, }), },
                   ],
                 },
               })}
-              style={{width: Dimensions.get('window').width * 0.30, aspectRatio: 1/1.2, justifyContent: 'center', alignItems: 'center', padding: 4,}}
+              style={{width: Dimensions.get('window').width * 0.31, aspectRatio: 1/1.18, justifyContent: 'center', alignItems: 'center', padding: 4,}}
             >
               <BlurView
                 blurType={Colors.darkestBlur}
                 style={{position: 'absolute', zIndex: -1, width: '100%', height: '100%', backgroundColor: Colors.darkBackground, borderRadius: 16, overflow: 'hidden',}}
               />
 
-              <PhotoIcon style={{position: 'absolute', zIndex: -1,}} fill={Colors.dark} width={64} height={64} />
               <PlusIcon fill={Colors.lightBlue} width={16} height={16} />
             </TouchableOpacity>
           )

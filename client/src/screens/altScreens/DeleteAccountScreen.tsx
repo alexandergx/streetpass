@@ -129,10 +129,10 @@ class DeleteAccountScreen extends React.Component<IDeleteAccountScreenProps> {
           behavior={'padding'}
           style={{
             flex: 1, display: 'flex',
-            justifyContent: 'center', alignItems: 'center', paddingHorizontal: 16,
+            justifyContent: 'center', alignItems: 'center', padding: 16,
           }}
         >
-          <View style={{flex: 1, width: '100%', marginTop: 8,}}>
+          <View style={{flex: 1, width: '100%',}}>
             <ButtonInput
               systemStore={systemStore}
               value={this.state.password}

@@ -3,18 +3,18 @@ import { ISignInErrors, InputLimits, } from '../../utils/constants'
 import { ISetPhoneNumber, ISetSortMedia, ISetUpdateUser, } from '../actions/UserActions'
 
 export interface IStreetPassPreferences {
-  discoverable?: boolean,
-  location?: boolean,
-  sex?: boolean | null,
-  age?: [number, number],
+  discoverable: boolean,
+  location: boolean,
+  sex: boolean | null,
+  age: [number, number],
 }
 
 export interface INotificationPreferences {
-  messages?: boolean,
-  matches?: boolean,
-  streetPasses?: boolean,
-  emails?: boolean,
-  newsletters?: boolean,
+  messages: boolean,
+  matches: boolean,
+  streetPasses: boolean,
+  emails: boolean,
+  newsletters: boolean,
 }
 
 export interface IMedia {
@@ -50,6 +50,7 @@ export interface IUser {
   streetPassPreferences: IStreetPassPreferences,
   notificationPreferences: INotificationPreferences,
   media: Array<IMedia>,
+  joinDate: Date | null,
 }
 
 export interface IUserStore {
@@ -105,6 +106,7 @@ const INITIAL_STATE: IUserStore = {
       newsletters: true,
     },
     media: [],
+    joinDate: null,
   },
   error: false,
 }

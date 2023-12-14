@@ -1,4 +1,4 @@
-import { apiRequest, GET_USER, IGetUserQuery, ISendPinMutation, ISignInMutation, ISortMediaMutation, IUpdateUserMutation, IVerifyPhoneNumberMutation, SEND_PIN, SIGN_IN, SORT_MEDIA, UPDATE_USER, VERIFY_PHONE_NUMBER, } from '.'
+import { apiRequest, GET_USER, IGetUserQuery, IRemoveMediaMutation, ISendPinMutation, ISignInMutation, ISortMediaMutation, IUpdateUserMutation, IVerifyPhoneNumberMutation, REMOVE_MEDIA, SEND_PIN, SIGN_IN, SORT_MEDIA, UPDATE_USER, VERIFY_PHONE_NUMBER, } from '.'
 import { IUser, IUserProfile, } from '../state/reducers/UserReducer'
 import { ISignInErrors } from '../utils/constants'
 import { Locales } from '../utils/locale'
@@ -67,6 +67,17 @@ export const sortMedia = async (input: IUSortMediaReq): Promise<ISortMediaRes> =
   try {
     const { data, } = await apiRequest(SORT_MEDIA(input))
     return data.sortMedia
+  } catch(e) {
+    throw new Error
+  }
+}
+
+export type IRemoveMediaReq = IRemoveMediaMutation
+export type IRemoveMediaRes = boolean
+export const removeMedia = async (input: IRemoveMediaReq): Promise<IRemoveMediaRes> => {
+  try {
+    const { data, } = await apiRequest(REMOVE_MEDIA(input))
+    return data.removeMedia
   } catch(e) {
     throw new Error
   }

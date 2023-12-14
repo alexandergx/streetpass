@@ -88,6 +88,7 @@ class UserSettingsModal extends React.Component<IProfileSettingsModalProps> {
       <BlurView blurType={Colors.darkBlur as any} style={{position: 'absolute', zIndex: 2, width: '100%', height: '100%',}}>
         <NavHeader
           systemStore={systemStore}
+          title={Lit[systemStore.Locale].Title.Settings}
           color={Colors.lightest}
           StartIcon={CrossIcon}
           onPress={() => this.state.signingOut ? null : toggleModal()}

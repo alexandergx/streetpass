@@ -29,6 +29,7 @@ import { IUserStore } from '../../state/reducers/UserReducer'
 import { Lit, } from '../../utils/locale'
 import { Screens, } from '../../navigation'
 import AnimatedBackground from '../../components/animated/AnimatedBackground'
+import { ISetUpdateUser, setUpdateUser } from '../../state/actions/UserActions'
 
 const mapStateToProps = (state: IStores) => {
   const { systemStore, userStore, } = state
@@ -38,7 +39,7 @@ const mapStateToProps = (state: IStores) => {
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => ({
   actions: bindActionCreators(Object.assign(
     {
-      // setUpdateNotificationPreferences,
+      setUpdateUser,
     }
   ), dispatch),
 })
@@ -48,7 +49,7 @@ interface INotificationsScreenProps {
   systemStore: ISystemStore,
   userStore: IUserStore,
   actions: {
-    // setUpdateNotificationPreferences: (params: ISetUpdateNotificationPreferences) => void,
+    setUpdateUser: (params: ISetUpdateUser) => void,
   }
 }
 interface INotificationsScreenState {
@@ -70,92 +71,78 @@ class NotificationsScreen extends React.Component<INotificationsScreenProps> {
   }
 
   unsetNotifications = async () => {
-    // Alert.alert(
-    //   Lit[this.props.systemStore.Locale].Copywrite.NotificationsRequired[0], Lit[this.props.systemStore.Locale].Copywrite.NotificationsRequired[1],
-    //   [
-    //     { text: Lit[this.props.systemStore.Locale].Button.No, onPress: () => null, },
-    //     { text: Lit[this.props.systemStore.Locale].Button.Enable, onPress: () => Linking.openURL('app-settings:')},
-    //   ]
-    // )
-    // await this.props.actions.setUpdateNotificationPreferences({
-    //   follows: false,
-    //   followRequests: false,
-    //   likes: false,
-    //   comments: false,
-    //   replies: false,
-    //   subscribedPosts: false,
-    //   messages: false,
-    //   streetPasses: false,
-    //   emails: this.props.userStore.user.notificationPreferences.emails,
-    //   newsletters: this.props.userStore.user.notificationPreferences.emails,
-    // })
-    // this.setState({
-    //   follows: false,
-    //   followRequests: false,
-    //   likes: false,
-    //   comments: false,
-    //   replies: false,
-    //   subscribedPosts: false,
-    //   messages: false,
-    //   streetPasses: false,
-    // })
+    Alert.alert(
+      Lit[this.props.systemStore.Locale].Copywrite.NotificationsRequired[0], Lit[this.props.systemStore.Locale].Copywrite.NotificationsRequired[1],
+      [
+        { text: Lit[this.props.systemStore.Locale].Button.No, onPress: () => null, },
+        { text: Lit[this.props.systemStore.Locale].Button.Enable, onPress: () => Linking.openURL('app-settings:')},
+      ]
+    )
+    await this.props.actions.setUpdateUser({
+      notificationPreferences: {
+        messages: false,
+        matches: false,
+        streetPasses: false,
+        emails: this.props.userStore.user.notificationPreferences.emails,
+        newsletters: this.props.userStore.user.notificationPreferences.newsletters,
+      }
+    })
+    this.setState({
+      messages: false,
+      matches: false,
+      streetPasses: false,
+    })
   }
 
   unsetEmails = async () => {
-    // Alert.alert(
-    //   Lit[this.props.systemStore.Locale].Copywrite.EmailRequired[0], Lit[this.props.systemStore.Locale].Copywrite.EmailRequired[1],
-    //   [
-    //     { text: Lit[this.props.systemStore.Locale].Button.No, onPress: () => null, },
-    //     { text: Lit[this.props.systemStore.Locale].Button.Enable, onPress: () => this.props.navigation.navigate(Screens.Email)},
-    //   ]
-    // )
-    // await this.props.actions.setUpdateNotificationPreferences({
-    //   follows: this.props.userStore.user.notificationPreferences.follows,
-    //   followRequests: this.props.userStore.user.notificationPreferences.followRequests,
-    //   likes: this.props.userStore.user.notificationPreferences.likes,
-    //   comments: this.props.userStore.user.notificationPreferences.comments,
-    //   replies: this.props.userStore.user.notificationPreferences.replies,
-    //   subscribedPosts: this.props.userStore.user.notificationPreferences.subscribedPosts,
-    //   messages: this.props.userStore.user.notificationPreferences.messages,
-    //   streetPasses: this.props.userStore.user.notificationPreferences.streetPasses,
-    //   emails: false,
-    //   newsletters: false,
-    // })
-    // this.setState({
-    //   emails: false,
-    //   newsletters: false,
-    // })
+    Alert.alert(
+      Lit[this.props.systemStore.Locale].Copywrite.EmailRequired[0], Lit[this.props.systemStore.Locale].Copywrite.EmailRequired[1],
+      [
+        { text: Lit[this.props.systemStore.Locale].Button.No, onPress: () => null, },
+        { text: Lit[this.props.systemStore.Locale].Button.Enable, onPress: () => this.props.navigation.navigate(Screens.Email)},
+      ]
+    )
+    await this.props.actions.setUpdateUser({
+      notificationPreferences: {
+        messages: this.props.userStore.user.notificationPreferences.messages,
+        matches: this.props.userStore.user.notificationPreferences.matches,
+        streetPasses: this.props.userStore.user.notificationPreferences.streetPasses,
+        emails: false,
+        newsletters: false,
+      }
+    })
+    this.setState({
+      emails: false,
+      newsletters: false,
+    })
   }
 
   handleUpdateNotifications = async () => {
-    // this.setState({ loading: true, })
-    // if ((this.state.emails || this.state.newsletters) && !this.props.userStore.user.email) {
-    //   this.unsetEmails()
-    //   this.setState({ loading: false, })
-    //   return
-    // }
-    // if (this.state.follows || this.state.followRequests || this.state.likes || this.state.comments || this.state.replies || this.state.subscribedPosts || this.state.messages || this.state.streetPasses) {
-    //   const permissions = await PushNotificationIOS.requestPermissions()
-    //   if (permissions.authorizationStatus === 1) {
-    //     this.unsetNotifications()
-    //     this.setState({ loading: false, })
-    //     return
-    //   }
-    // }
-    // await this.props.actions.setUpdateNotificationPreferences({
-    //   follows: this.state.follows,
-    //   followRequests: this.state.followRequests,
-    //   likes: this.state.likes,
-    //   comments: this.state.comments,
-    //   replies: this.state.replies,
-    //   subscribedPosts: this.state.subscribedPosts,
-    //   messages: this.state.messages,
-    //   streetPasses: this.state.streetPasses,
-    //   emails: this.state.emails,
-    //   newsletters: this.state.newsletters,
-    // })
-    // this.setState({ loading: false, })
-    // this.props.navigation.goBack()
+    this.setState({ loading: true, })
+    if ((this.state.emails || this.state.newsletters) && !this.props.userStore.user.email) {
+      this.unsetEmails()
+      this.setState({ loading: false, })
+      return
+    }
+    if (this.state.messages || this.state.matches || this.state.streetPasses) {
+      // const permissions = await PushNotificationIOS.requestPermissions()
+      // if (permissions.authorizationStatus === 1) {
+      //   this.unsetNotifications()
+      //   this.setState({ loading: false, })
+      //   return
+      // }
+    }
+    await this.props.actions.setUpdateUser({
+      notificationPreferences: {
+        messages: this.state.messages,
+        matches: this.state.matches,
+        streetPasses: this.state.streetPasses,
+        emails: this.state.emails,
+        newsletters: this.state.newsletters,
+      }
+    })
+    this.setState({ loading: false, })
+    this.props.navigation.goBack()
   }
 
   render() {

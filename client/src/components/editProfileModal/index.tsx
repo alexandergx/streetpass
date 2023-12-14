@@ -20,12 +20,14 @@ import ProfileMedia, { ProfileMediaMethods } from './profileMedia'
 import SelectionModal from '../selectionModal'
 import { IListGroupConfig } from '../listGroup'
 import { Screens } from '../../navigation'
+import CameraModal from '../cameraModal'
 
 export interface IUploadMedia {
   key: number | null,
   mediaId: string | null,
   image?: string,
   video?: string,
+  thumbnail?: string,
   new: boolean,
 }
 
@@ -43,7 +45,7 @@ export interface IEditProfileModalProps {
 }
 export interface IEditProfileModalState {
   media: Array<IUploadMedia>,
-  deletedMedia: Array<IUploadMedia>,
+  deletedMedia: Array<string>,
   scroll: boolean,
   keyboard: boolean,
   loading: boolean,
@@ -51,6 +53,7 @@ export interface IEditProfileModalState {
   work: string,
   school: string,
   selectionModalConfig: IListGroupConfig | null,
+  camera: boolean,
 }
 class EditProfileModal extends React.Component<IEditProfileModalProps> {
   constructor(props: IEditProfileModalProps) {
@@ -62,7 +65,7 @@ class EditProfileModal extends React.Component<IEditProfileModalProps> {
   profileMediaRef: RefObject<ProfileMediaMethods>
 
   state: IEditProfileModalState = {
-    media: [...(this.props.userStore.user.media || []).map((item, index) => { return { key: index, mediaId: item.mediaId, image: item.image, video: item.video, new: false, } }), { key: null, mediaId: null, new: false, }].slice(0, 9),
+    media: [...(this.props.userStore.user.media || []).map((item, index) => { return { key: index, mediaId: item.mediaId, image: item.image, video: item.video, thumbnail: item.thumbnail, new: false, } }), { key: null, mediaId: null, new: false, }].slice(0, 9),
     deletedMedia: [],
     scroll: true,
     keyboard: false,
@@ -71,6 +74,7 @@ class EditProfileModal extends React.Component<IEditProfileModalProps> {
     work: this.props.userStore.user.work || '',
     school: this.props.userStore.user.school || '',
     selectionModalConfig: null,
+    camera: false,
   }
 
   private keyboardWillShowListener: any
@@ -100,8 +104,8 @@ class EditProfileModal extends React.Component<IEditProfileModalProps> {
         || this.state.school !== this.props.userStore.user.school
       )) await this.props.actions.setUpdateUser({ bio: this.state.bio, work: this.state.work, school: this.state.school, })
       await this.props.actions.setUser()
-      this.props.navigation.navigate(Screens.StreetPass)
-      // TODO - conditionally toggleModal()
+      // this.props.navigation.navigate(Screens.StreetPass)
+      this.props.onPress ? this.props.onPress() : this.props.toggleModal()
     }
     this.setState({ loading: false, editProfile: true, })
   }
@@ -210,6 +214,14 @@ class EditProfileModal extends React.Component<IEditProfileModalProps> {
             </View>
           </KeyboardAvoidingView>
         </BlurView>
+
+        {this.state.camera &&
+          <CameraModal
+            systemStore={systemStore}
+            toggleModal={() => this.setState({ camera: false, })}
+            onCapture={({ image, video, }) => this.setState({ camera: false, media: [...this.state.media.filter((i: IUploadMedia) => i.key !== null), { image: image, video: video, key: this.state.media.length, new: true, }, { key: null, }].slice(0, 9), })}
+          />
+        }
 
         {this.state.selectionModalConfig &&
           <SelectionModal systemStore={systemStore} config={this.state.selectionModalConfig} toggleModal={() => this.setState({ selectionModalConfig: null, })} />

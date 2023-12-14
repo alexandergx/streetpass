@@ -1,12 +1,12 @@
 // import PushNotificationIOS from '@react-native-community/push-notification-ios'
-// import { check, request, PERMISSIONS, RESULTS, } from 'react-native-permissions'
-// import Contacts from 'react-native-contacts'
+import { check, request, PERMISSIONS, RESULTS, } from 'react-native-permissions'
+import Contacts from 'react-native-contacts'
 import { Alert, Linking, Share, Platform, } from 'react-native'
-// import SendSMS from 'react-native-sms'
-// import { Domain, Paths, } from './constants'
-// import ReactNativeHapticFeedback from 'react-native-haptic-feedback'
+import SendSMS from 'react-native-sms'
+import { Domain, } from './constants'
+import ReactNativeHapticFeedback from 'react-native-haptic-feedback'
 // import Geolocation from '@react-native-community/geolocation'
-// import { NetworkInfo, } from 'react-native-network-info'
+import { NetworkInfo, } from 'react-native-network-info'
 import { Lit, Locales, } from './locale'
 import { ISignInErrors } from './constants'
 import { Screens } from '../navigation'
@@ -73,37 +73,37 @@ export const signInCallback = (navigation: any, code: ISignInErrors | null) => {
 //   )
 // }
 
-// export const requestLocationAlways = (Locale: Locales): Promise<boolean> => {
-//   return new Promise((resolve) => {
-//     check(PERMISSIONS.IOS.LOCATION_ALWAYS)
-//       .then(async result => {
-//         switch (result) {
-//           case RESULTS.UNAVAILABLE:
-//           case RESULTS.LIMITED:
-//           case RESULTS.GRANTED:
-//             resolve(true)
-//             break
-//           case RESULTS.BLOCKED:
-//           case RESULTS.DENIED:
-//             const result = await request(PERMISSIONS.IOS.LOCATION_ALWAYS)
-//             if (result === RESULTS.GRANTED || result === RESULTS.LIMITED || result === RESULTS.UNAVAILABLE) {
-//               resolve(true)
-//               break
-//             }
-//             Alert.alert(Lit[Locale].Copywrite.AlwaysLocationRequired[0], Lit[Locale].Copywrite.AlwaysLocationRequired[1],
-//               [
-//                 { text: Lit[Locale].Button.No, onPress: () => resolve(false), },
-//                 { text: Lit[Locale].Button.Ok, onPress: () => {
-//                   resolve(false)
-//                   Linking.openURL('app-settings:')
-//                 }, },
-//               ]
-//             )
-//             break
-//         }
-//       })
-//   })
-// }
+export const requestLocationAlways = (Locale: Locales): Promise<boolean> => {
+  return new Promise((resolve) => {
+    check(PERMISSIONS.IOS.LOCATION_ALWAYS)
+      .then(async result => {
+        switch (result) {
+          case RESULTS.UNAVAILABLE:
+          case RESULTS.LIMITED:
+          case RESULTS.GRANTED:
+            resolve(true)
+            break
+          case RESULTS.BLOCKED:
+          case RESULTS.DENIED:
+            const result = await request(PERMISSIONS.IOS.LOCATION_ALWAYS)
+            if (result === RESULTS.GRANTED || result === RESULTS.LIMITED || result === RESULTS.UNAVAILABLE) {
+              resolve(true)
+              break
+            }
+            Alert.alert(Lit[Locale].Copywrite.AlwaysLocationRequired[0], Lit[Locale].Copywrite.AlwaysLocationRequired[1],
+              [
+                { text: Lit[Locale].Button.No, onPress: () => resolve(false), },
+                { text: Lit[Locale].Button.Ok, onPress: () => {
+                  resolve(false)
+                  Linking.openURL('app-settings:')
+                }, },
+              ]
+            )
+            break
+        }
+      })
+  })
+}
 
 // export const getLocation = (callback: (coordinates: any) => void) => {
 //   Geolocation.getCurrentPosition(
@@ -118,101 +118,101 @@ export const signInCallback = (navigation: any, code: ISignInErrors | null) => {
 //   )
 // }
 
-// export const requestCamera = (Locale: Locales): Promise<boolean> => {
-//   return new Promise((resolve) => {
-//     check(PERMISSIONS.IOS.CAMERA)
-//       .then(async result => {
-//         switch (result) {
-//           case RESULTS.UNAVAILABLE:
-//           case RESULTS.LIMITED:
-//           case RESULTS.GRANTED:
-//             resolve(true)
-//             break
-//           case RESULTS.BLOCKED:
-//           case RESULTS.DENIED:
-//             const result = await request(PERMISSIONS.IOS.CAMERA)
-//             if (result === RESULTS.GRANTED || result === RESULTS.LIMITED || result === RESULTS.UNAVAILABLE) {
-//               resolve(true)
-//               break
-//             }
-//             Alert.alert(Lit[Locale].Copywrite.CameraRequired[0], Lit[Locale].Copywrite.CameraRequired[1],
-//               [
-//                 { text: Lit[Locale].Button.No, onPress: () => resolve(false), },
-//                 { text: Lit[Locale].Button.Ok, onPress: () => {
-//                   resolve(false)
-//                   Linking.openURL('app-settings:')
-//                 }, },
-//               ]
-//             )
-//             break
-//         }
-//       })
-//   })
-// }
+export const requestCamera = (Locale: Locales): Promise<boolean> => {
+  return new Promise((resolve) => {
+    check(PERMISSIONS.IOS.CAMERA)
+      .then(async result => {
+        switch (result) {
+          case RESULTS.UNAVAILABLE:
+          case RESULTS.LIMITED:
+          case RESULTS.GRANTED:
+            resolve(true)
+            break
+          case RESULTS.BLOCKED:
+          case RESULTS.DENIED:
+            const result = await request(PERMISSIONS.IOS.CAMERA)
+            if (result === RESULTS.GRANTED || result === RESULTS.LIMITED || result === RESULTS.UNAVAILABLE) {
+              resolve(true)
+              break
+            }
+            Alert.alert(Lit[Locale].Copywrite.CameraRequired[0], Lit[Locale].Copywrite.CameraRequired[1],
+              [
+                { text: Lit[Locale].Button.No, onPress: () => resolve(false), },
+                { text: Lit[Locale].Button.Ok, onPress: () => {
+                  resolve(false)
+                  Linking.openURL('app-settings:')
+                }, },
+              ]
+            )
+            break
+        }
+      })
+  })
+}
 
-// export const requestMicrophone = (Locale: Locales, alert: boolean = false): Promise<boolean> => {
-//   return new Promise((resolve) => {
-//     check(PERMISSIONS.IOS.MICROPHONE)
-//       .then(async result => {
-//         switch (result) {
-//           case RESULTS.UNAVAILABLE:
-//           case RESULTS.LIMITED:
-//           case RESULTS.GRANTED:
-//             resolve(true)
-//             break
-//           case RESULTS.BLOCKED:
-//           case RESULTS.DENIED:
-//             const result = await request(PERMISSIONS.IOS.MICROPHONE)
-//             if (result === RESULTS.GRANTED || result === RESULTS.LIMITED || result === RESULTS.UNAVAILABLE) {
-//               resolve(true)
-//               break
-//             }
-//             if (alert) {
-//               Alert.alert(Lit[Locale].Copywrite.MicrophoneRequired[0], Lit[Locale].Copywrite.MicrophoneRequired[1],
-//                 [
-//                   { text: Lit[Locale].Button.No, onPress: () => null, },
-//                   { text: Lit[Locale].Button.Ok, onPress: () => Linking.openURL('app-settings:'), },
-//                 ]
-//               )
-//             }
-//             resolve(false)
-//             break
-//         }
-//       })
-//   })
-// }
+export const requestMicrophone = (Locale: Locales, alert: boolean = false): Promise<boolean> => {
+  return new Promise((resolve) => {
+    check(PERMISSIONS.IOS.MICROPHONE)
+      .then(async result => {
+        switch (result) {
+          case RESULTS.UNAVAILABLE:
+          case RESULTS.LIMITED:
+          case RESULTS.GRANTED:
+            resolve(true)
+            break
+          case RESULTS.BLOCKED:
+          case RESULTS.DENIED:
+            const result = await request(PERMISSIONS.IOS.MICROPHONE)
+            if (result === RESULTS.GRANTED || result === RESULTS.LIMITED || result === RESULTS.UNAVAILABLE) {
+              resolve(true)
+              break
+            }
+            if (alert) {
+              Alert.alert(Lit[Locale].Copywrite.MicrophoneRequired[0], Lit[Locale].Copywrite.MicrophoneRequired[1],
+                [
+                  { text: Lit[Locale].Button.No, onPress: () => null, },
+                  { text: Lit[Locale].Button.Ok, onPress: () => Linking.openURL('app-settings:'), },
+                ]
+              )
+            }
+            resolve(false)
+            break
+        }
+      })
+  })
+}
 
-// export const requestPhotoLibrary = (Locale: Locales, alert: boolean = false): Promise<boolean> => {
-//   return new Promise((resolve) => {
-//     check(PERMISSIONS.IOS.PHOTO_LIBRARY)
-//       .then(async result => {
-//         switch (result) {
-//           case RESULTS.UNAVAILABLE:
-//           case RESULTS.LIMITED:
-//           case RESULTS.GRANTED:
-//             resolve(true)
-//             break
-//           case RESULTS.BLOCKED:
-//           case RESULTS.DENIED:
-//             const result = await request(PERMISSIONS.IOS.PHOTO_LIBRARY)
-//             if (result === RESULTS.GRANTED || result === RESULTS.LIMITED || result === RESULTS.UNAVAILABLE) {
-//               resolve(true)
-//               break
-//             }
-//             if (alert) {
-//               Alert.alert(Lit[Locale].Copywrite.PhotosRequired[0], Lit[Locale].Copywrite.PhotosRequired[1],
-//                 [
-//                   { text: Lit[Locale].Button.No, onPress: () => null, },
-//                   { text: Lit[Locale].Button.Ok, onPress: () => Linking.openURL('app-settings:'), },
-//                 ]
-//               )
-//             }
-//             resolve(false)
-//             break
-//         }
-//       })
-//   })
-// }
+export const requestPhotoLibrary = (Locale: Locales, alert: boolean = false): Promise<boolean> => {
+  return new Promise((resolve) => {
+    check(PERMISSIONS.IOS.PHOTO_LIBRARY)
+      .then(async result => {
+        switch (result) {
+          case RESULTS.UNAVAILABLE:
+          case RESULTS.LIMITED:
+          case RESULTS.GRANTED:
+            resolve(true)
+            break
+          case RESULTS.BLOCKED:
+          case RESULTS.DENIED:
+            const result = await request(PERMISSIONS.IOS.PHOTO_LIBRARY)
+            if (result === RESULTS.GRANTED || result === RESULTS.LIMITED || result === RESULTS.UNAVAILABLE) {
+              resolve(true)
+              break
+            }
+            if (alert) {
+              Alert.alert(Lit[Locale].Copywrite.PhotosRequired[0], Lit[Locale].Copywrite.PhotosRequired[1],
+                [
+                  { text: Lit[Locale].Button.No, onPress: () => null, },
+                  { text: Lit[Locale].Button.Ok, onPress: () => Linking.openURL('app-settings:'), },
+                ]
+              )
+            }
+            resolve(false)
+            break
+        }
+      })
+  })
+}
 
 // export const requestContacts = (callback: (contacts: any) => void, Locale: Locales) => {
 //   check(PERMISSIONS.IOS.CONTACTS)
@@ -260,10 +260,6 @@ export const signInCallback = (navigation: any, code: ISignInErrors | null) => {
 //   await Share.share({ url: `${Domain}${Paths.Profile}${username}`, message: `${Lit[Locale].Copywrite.ShareProfile[0]} ${username} ${Lit[Locale].Copywrite.ShareProfile[1]}!`, })
 // }
 
-// export const sharePost = async (userId: string, postId: string) => {
-//   await Share.share({ url: `${Domain}${Paths.Post}${userId}-${postId}`, })
-// }
-
 // export const openCoordinates = (lon: number, lat: number, username: string, locale: string,) => {
 //   const scheme = Platform.select({ ios: 'maps://0,0?q=', android: 'geo:0,0?q=', }) || 'geo:0,0?q='
 //   const label = `${username}'s ${locale}`
@@ -296,19 +292,19 @@ export const openCoordinates = async (lon: number, lat: number, username: string
   Linking.openURL(appleMapsUrl)
 }
 
-// export const softVibrate = () => {
-//   ReactNativeHapticFeedback.trigger('impactLight', {
-//     enableVibrateFallback: true,
-//     ignoreAndroidSystemSettings: false,
-//   })
-// }
+export const softVibrate = () => {
+  ReactNativeHapticFeedback.trigger('impactLight', {
+    enableVibrateFallback: true,
+    ignoreAndroidSystemSettings: false,
+  })
+}
 
-// export const midVibrate = () => {
-//   ReactNativeHapticFeedback.trigger('soft', {
-//     enableVibrateFallback: true,
-//     ignoreAndroidSystemSettings: false,
-//   })
-// }
+export const midVibrate = () => {
+  ReactNativeHapticFeedback.trigger('soft', {
+    enableVibrateFallback: true,
+    ignoreAndroidSystemSettings: false,
+  })
+}
 
 // export const getIP = (callback: (IP: any) => void) => {
 //   NetworkInfo.getIPV4Address().then(ipv4Address => callback(ipv4Address))
