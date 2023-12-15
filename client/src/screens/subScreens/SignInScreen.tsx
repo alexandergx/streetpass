@@ -1,5 +1,6 @@
 import React from 'react'
 import {
+  Platform,
   Text,
   View,
 } from 'react-native'
@@ -14,9 +15,10 @@ import AnimatedBackground from '../../components/animated/AnimatedBackground'
 import { Screens } from '../../navigation'
 import GradientBackground from '../../components/gradientBackground'
 import { appleAuth, } from '@invertase/react-native-apple-authentication'
-import { ISignInErrors } from '../../utils/constants'
-import { ISetSignIn, setSignIn, } from '../../state/actions/UserActions'
-import { signInCallback } from '../../utils/services'
+import { ISignInErrors, OS } from '../../utils/constants'
+import { ISetSignIn, ISetUpdateUser, setSignIn, setUpdateUser, } from '../../state/actions/UserActions'
+import { requestPushNotifications, signInCallback } from '../../utils/services'
+import { registerDevice } from '../../api/user'
 
 const mapStateToProps = (state: IStores) => {
   const { systemStore, userStore, } = state
@@ -26,6 +28,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => ({
   actions: bindActionCreators(Object.assign(
     {
       setSignIn,
+      setUpdateUser,
     }
   ), dispatch),
 })
@@ -35,7 +38,8 @@ interface ISignInScreenProps {
   systemStore: ISystemStore,
   userStore: IUserStore,
   actions: {
-    setSignIn: (params: ISetSignIn) => void,
+    setSignIn: (params: ISetSignIn) => Promise<any>,
+    setUpdateUser: (params: ISetUpdateUser) => void,
   },
 }
 interface ISignInScreenState {
@@ -57,9 +61,23 @@ class SignInScreen extends React.Component<ISignInScreenProps> {
       const appleAuthRequestResponse = await appleAuth.performRequest({ requestedOperation: appleAuth.Operation.LOGIN, })
       const credentialState = await appleAuth.getCredentialStateForUser(appleAuthRequestResponse.user)
       if (credentialState === 1 && appleAuthRequestResponse.identityToken) {
-        this.props.actions.setSignIn({
+        await this.props.actions.setSignIn({
           input: { appleAuth: appleAuthRequestResponse.identityToken, },
           callback: (code) => signInCallback(this.props.navigation, code)
+        }).then(async () => {
+          await requestPushNotifications(async (deviceToken: string) => {
+            await registerDevice({ manufacturer: OS[Platform.OS], deviceToken, })
+          }, async (result) => {
+            !result && await this.props.actions.setUpdateUser({
+              notificationPreferences: {
+                messages: false,
+                matches: false,
+                streetPasses: false,
+                emails: this.props.userStore.user.notificationPreferences.emails,
+                newsletters: this.props.userStore.user.notificationPreferences.newsletters,
+              }
+            })
+          })
         })
       }
       this.setState({ loadingApple: false, })
@@ -71,8 +89,6 @@ class SignInScreen extends React.Component<ISignInScreenProps> {
   render() {
     const { navigation, systemStore, }: ISignInScreenProps = this.props
     const { Colors, Fonts, } = systemStore
-
-    // TODO - on mount this.props.actions.signOutUser()
 
     return (
       <>

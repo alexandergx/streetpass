@@ -9,7 +9,13 @@
 // import submarine from '../assets/mapStyles/submarine.json'
 // import latte from '../assets/mapStyles/latte.json'
 
+export enum ThemeTypes {
+  Light = 'light',
+  Dark = 'dark',
+}
+
 const darkSpectrums = {
+  themeType: ThemeTypes.Dark,
   light: 'rgba(255,255,255,0.5)', lighter: 'rgba(255,255,255,0.85)', lightest: 'rgba(255,255,255,1)',
   dark: 'rgba(0,0,0,0.3)', darker: 'rgba(0,0,0,0.5)', darkest: 'rgba(0,0,0,0.8)',
   lightBlur: 'light', lighterBlur: 'xlight', lightestBlur: 'chromeMaterialLight',
@@ -19,6 +25,7 @@ const darkSpectrums = {
 }
 
 const lightSpectrums = {
+  themeType: ThemeTypes.Light,
   light: 'rgba(0,0,0,0.3)', lighter: 'rgba(0,0,0,0.5)', lightest: 'rgba(0,0,0,1)',
   dark: 'rgba(255,255,255,0.85)', darker: 'rgba(255,255,255,0.6)', darkest: 'rgba(255,255,255,0.1)',
   lightBlur: 'ultraThinMaterialDark', lighterBlur: 'chromeMaterialDark', lightestBlur: 'thinMaterialDark',

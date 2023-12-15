@@ -31,8 +31,9 @@ import BlockingScreen from '../screens/altScreens/BlockingScreen'
 import EmailScreen from '../screens/altScreens/EmailScreen'
 import PhoneNumberScreen from '../screens/altScreens/PhoneNumberScreen'
 import DeleteAccountScreen from '../screens/altScreens/DeleteAccountScreen'
-import { ISetSignIn, setSignIn, } from '../state/actions/UserActions'
-import { signInCallback } from '../utils/services'
+import { ISetSignIn, ISetUpdateUser, setSignIn, setUpdateUser, } from '../state/actions/UserActions'
+import { requestPushNotifications, signInCallback } from '../utils/services'
+import { registerDevice } from '../api/user'
 
 export const navigationRef = createNavigationContainerRef()
 
@@ -46,6 +47,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => ({
   actions: bindActionCreators(Object.assign(
     {
       setSignIn,
+      setUpdateUser,
     }
   ), dispatch),
 })
@@ -77,6 +79,7 @@ interface IMapScreenProps {
   userStore: IUserStore,
   actions: {
     setSignIn: (params: ISetSignIn) => Promise<any>,
+    setUpdateUser: (params: ISetUpdateUser) => void,
   },
 }
 
@@ -89,6 +92,19 @@ function AppNavigation({ systemStore, userStore, actions, }: IMapScreenProps) {
         input: { appleAuth: '', }, callback: (code) => signInCallback(navigationRef, code),
       }).then(async () => {
         setInitialized(true)
+        await requestPushNotifications(async (deviceToken: string) => {
+          await registerDevice({ manufacturer: OS[Platform.OS], deviceToken, })
+        }, async (result) => {
+          !result && await actions.setUpdateUser({
+            notificationPreferences: {
+              messages: false,
+              matches: false,
+              streetPasses: false,
+              emails: userStore.user.notificationPreferences.emails,
+              newsletters: userStore.user.notificationPreferences.newsletters,
+            }
+          })
+        })
       }).catch((e: any) => {
         setInitialized(true)
         console.log('[AUTOSIGNIN ERROR]', e)

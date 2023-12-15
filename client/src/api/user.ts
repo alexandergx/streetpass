@@ -1,4 +1,4 @@
-import { apiRequest, GET_USER, IGetUserQuery, IRemoveMediaMutation, ISendPinMutation, ISignInMutation, ISortMediaMutation, IUpdateUserMutation, IVerifyPhoneNumberMutation, REMOVE_MEDIA, SEND_PIN, SIGN_IN, SORT_MEDIA, UPDATE_USER, VERIFY_PHONE_NUMBER, } from '.'
+import { apiRequest, DELETE_ACCOUNT, GET_USER, IGetUserQuery, IRemoveMediaMutation, ISendPinMutation, ISignInMutation, ISortMediaMutation, IUpdateUserMutation, IVerifyPhoneNumberMutation, REGISTER_DEVICE, REMOVE_MEDIA, SEND_PIN, SIGN_IN, SORT_MEDIA, UPDATE_USER, VERIFY_PHONE_NUMBER, } from '.'
 import { IUser, IUserProfile, } from '../state/reducers/UserReducer'
 import { ISignInErrors } from '../utils/constants'
 import { Locales } from '../utils/locale'
@@ -34,6 +34,31 @@ export const verifyPhoneNumber = async (input: IVerifyPhoneNumberReq): Promise<I
   try {
     const { data, } = await apiRequest(VERIFY_PHONE_NUMBER(input))
     return data.verifyPhoneNumber
+  } catch(e) {
+    throw new Error
+  }
+}
+
+export interface IRegisterDeviceReq {
+  manufacturer: string,
+  deviceToken: string,
+  unregister?: boolean,
+}
+export type IRegisterDeviceRes = boolean
+export const registerDevice = async ({ manufacturer, deviceToken, unregister, }: IRegisterDeviceReq): Promise<IRegisterDeviceRes> => {
+  try {
+    const { data, } = await apiRequest(REGISTER_DEVICE({ manufacturer, deviceToken, unregister, }))
+    return data.registerDevice
+  } catch(e) {
+    throw new Error
+  }
+}
+
+export type IDeleteAccountRes = boolean
+export const deleteAccount = async (): Promise<IDeleteAccountRes> => {
+  try {
+    const { data, } = await apiRequest(DELETE_ACCOUNT())
+    return data.deleteAccount
   } catch(e) {
     throw new Error
   }

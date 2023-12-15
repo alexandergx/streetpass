@@ -130,7 +130,7 @@ class EditProfileModal extends React.Component<IEditProfileModalProps> {
             style={{flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 16,}}
           >
             <View style={{flex: 1, width: '100%',}}>
-              <ScrollView ref={this.scrollRef} scrollEnabled={this.state.scroll} showsVerticalScrollIndicator={false} style={{width: '100%', height: 500,}}>
+              <ScrollView ref={this.scrollRef} scrollEnabled={this.state.scroll} showsVerticalScrollIndicator={false} keyboardDismissMode={'interactive'} style={{width: '100%',}}>
                 <ProfileMedia
                   ref={this.profileMediaRef}
                   systemStore={systemStore}

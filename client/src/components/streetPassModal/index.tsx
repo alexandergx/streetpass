@@ -124,9 +124,9 @@ const StreetPassModal: React.FC<IStreetPassModalProps> = ({
           </View>
           
           <View style={{flex: 1, flexDirection: 'row', paddingHorizontal: 16, paddingTop: 24,}}>
-            <View style={{flex: 1,}}>
-              <Text style={{color: Colors.lightest, fontSize: Fonts.lg, fontWeight: Fonts.heavyWeight, textShadowColor: Colors.darkest, textShadowRadius: 2,}}>{streetPass.name} <Text style={{fontWeight: Fonts.lightWeight,}}>{streetPass.age}</Text></Text>
-              <Text numberOfLines={1} style={{color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.featherWeight, textShadowColor: Colors.darkest, textShadowRadius: 2}}>Streetpassed {timePassedSince(streetPass.date, systemStore.Locale)}</Text>
+            <View style={{flex: 1, marginBottom: 16,}}>
+              <Text style={{color: Colors.lightest, fontSize: Fonts.xl, fontWeight: Fonts.heavyWeight, textShadowColor: Colors.darkest, textShadowRadius: 2,}}>{streetPass.name} <Text style={{fontWeight: Fonts.lightWeight,}}>{streetPass.age}</Text></Text>
+              <Text numberOfLines={1} style={{color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.lightWeight, textShadowColor: Colors.darkest, textShadowRadius: 2}}>Streetpassed {timePassedSince(streetPass.date, systemStore.Locale)}</Text>
             </View>
 
             {!hideActions &&

@@ -128,7 +128,7 @@ class ListGroup extends React.Component<IListGroupProps> {
 
                 {description &&
                   <View style={{marginHorizontal: 32, marginBottom: 16,}}>
-                    <Text style={{color: disabled || blur ? Colors.light : Colors.lightest, fontWeight: Fonts.lightWeight as any,}}>{description}</Text>
+                    <Text style={{color: disabled || blur ? Colors.light : Colors.lightest, fontWeight: Fonts.welterWeight, fontSize: Fonts.md,}}>{description}</Text>
                   </View>
                 }
               </View>

@@ -46,8 +46,8 @@ interface IVerifyPhoneScreenProps {
   },
 }
 interface IVerifyPhoneScreenState {
-  countryCode: string,
   phoneNumber: string,
+  countryCode: string,
   validPhoneNumber: boolean,
   securityPin: string,
   loadingPin: boolean,
@@ -65,8 +65,8 @@ class VerifyPhoneScreen extends React.Component<IVerifyPhoneScreenProps> {
   inputRef(input: any) { this.childRef = input }
 
   state: IVerifyPhoneScreenState = {
-    countryCode: '1',
     phoneNumber: '',
+    countryCode: '1',
     validPhoneNumber: false,
     securityPin: '',
     loadingPin: false,
@@ -96,7 +96,7 @@ class VerifyPhoneScreen extends React.Component<IVerifyPhoneScreenProps> {
   handleSendPin = async () => {
     try {
       this.setState({ loadingPin: true, })
-      await this.props.actions.setPhoneNumber({ phoneNumber: this.state.phoneNumber, countryCode: this.state.countryCode, })
+      await this.props.actions.setPhoneNumber({ phoneNumber: this.state.phoneNumber.replace(/\s/g, ''), countryCode: this.state.countryCode, })
       this.setState({ loadingPin: false, pinSent: true, })
     } catch {
       this.setState({ loadingPin: false, })

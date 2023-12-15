@@ -26,13 +26,14 @@ import AppTitle from '../appTitle'
 import { AppVersion } from '../../utils/constants'
 import { baseUrl, protocol } from '../../api'
 import { Lit } from '../../utils/locale'
+import { formatPhonenumber } from '../../utils/data'
 
 interface IProfileSettingsModalProps {
   navigation: any,
   systemStore: ISystemStore,
   userStore: IUserStore,
   toggleModal: () => void,
-  // handleLogout: () => void,
+  handleSignOut: () => void,
 }
 interface IProfileSettingsModalState {
   settings: boolean,
@@ -45,7 +46,7 @@ class UserSettingsModal extends React.Component<IProfileSettingsModalProps> {
   }
 
   render() {
-    const { navigation, systemStore, userStore, toggleModal, }: IProfileSettingsModalProps = this.props
+    const { navigation, systemStore, userStore, toggleModal, handleSignOut, }: IProfileSettingsModalProps = this.props
     const { Colors, Fonts, } = systemStore
 
     const profileConfig: IListGroupConfig = {
@@ -57,19 +58,21 @@ class UserSettingsModal extends React.Component<IProfileSettingsModalProps> {
       ],
     }
 
+    // formatPhonenumber(userStore.user.countryCode, userStore.user.phoneNumber)
+
     const accountConfig: IListGroupConfig = {
       title: Lit[systemStore.Locale].Title.Account,
       list: [
         { Icon: EmailIcon, title: Lit[systemStore.Locale].ScreenTitle.EmailScreen, content: userStore.user.email, onPress: () => navigation.navigate(Screens.Email), },
         { Icon: PhoneIcon, title: Lit[systemStore.Locale].ScreenTitle.PhoneNumberScreen, content:
-          `${userStore.user.countryCode && userStore.user.phoneNumber ? '+' : ''}${userStore.user.countryCode ? userStore.user.countryCode : ''} ${userStore.user.phoneNumber ? userStore.user.phoneNumber : ''}`,
+          `${userStore.user.countryCode && userStore.user.phoneNumber ? `+${userStore.user.countryCode} ${formatPhonenumber(userStore.user.countryCode, userStore.user.phoneNumber)}` : ''}`,
           onPress: () => navigation.navigate(Screens.PhoneNumber), },
         { Icon: DeleteIcon, title: Lit[systemStore.Locale].Title.DeleteAccount, onPress: () => navigation.navigate(Screens.DeleteAccount), },
         { Icon: ExitIcon, title: Lit[systemStore.Locale].Title.SignOut, disabled: false, noRight: true, loading: this.state.signingOut,
           onPress: async () => {
-            // this.setState({ signingOut: true, })
-            // await handleLogout()
-            // this.setState({ signingOut: false, })
+            this.setState({ signingOut: true, })
+            await handleSignOut()
+            this.setState({ signingOut: false, })
           },
         },
       ],
@@ -96,7 +99,7 @@ class UserSettingsModal extends React.Component<IProfileSettingsModalProps> {
 
         <View style={{flex: 1, width: '100%', height: '100%',}}>
 
-          <ScrollView style={{width: '100%', height: '100%', paddingHorizontal: 16,}} showsVerticalScrollIndicator={false}>
+          <ScrollView showsVerticalScrollIndicator={false} style={{width: '100%', height: '100%', paddingHorizontal: 16,}} >
             <ListGroup systemStore={systemStore} config={profileConfig} />
             <ListGroup systemStore={systemStore} config={accountConfig} />
             <ListGroup systemStore={systemStore} config={supportConfig} />

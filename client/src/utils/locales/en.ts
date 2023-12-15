@@ -21,7 +21,7 @@ const Locale: ILocale = {
     Support: 'Support',
     About: 'About',
     Help: 'Help',
-    ToS: 'Terms of Service & Privacy Policy',
+    ToS: 'Terms of Service & Privacy',
     Alerts: 'Alerts',
     Messages: 'Messages',
     Matches: 'Matches',
@@ -87,6 +87,8 @@ const Locale: ILocale = {
     EmailRequired: ['Email required', 'Please add your email.'],
     NotificationsRequired: ['Notifications required', 'Please enable Notifications in app settings.'],
     AlwaysLocationRequired: ['Always On Location Required', 'Please enable Always On Location in app settings to use StreetPass.'],
+    DeleteAccount: ['Delete account?', 'This cannot be undone.'],
+    VideoLength: ['Video length too long', `Video uploads cannot exceed ${InputLimits.VideoLengthMax}s.`],
   },
   Button: {
     Save: 'Save',

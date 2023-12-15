@@ -23,9 +23,12 @@ import { MMKVLoader } from 'react-native-mmkv-storage'
 import { LocalStorage, } from '../../utils/constants'
 import { Lit } from '../../utils/locale'
 import AnimatedBackground from '../../components/animated/AnimatedBackground'
+import { setSignOut } from '../../state/actions/UserActions'
+import { deleteAccount } from '../../api/user'
 
-const MMKVAuth = new MMKVLoader().withEncryption().withInstanceID(LocalStorage.AuthStore).initialize()
 const MMKVTheme = new MMKVLoader().withInstanceID(LocalStorage.SystemStore).initialize()
+const MMKVAuth = new MMKVLoader().withEncryption().withInstanceID(LocalStorage.AuthStore).initialize()
+const MMKVCamera = new MMKVLoader().withEncryption().withInstanceID(LocalStorage.CameraStore).initialize()
 
 const mapStateToProps = (state: IStores) => {
   const { systemStore, userStore, } = state
@@ -35,9 +38,7 @@ const mapStateToProps = (state: IStores) => {
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => ({
   actions: bindActionCreators(Object.assign(
     {
-      // deleteUser,
-      // setLoginError,
-      // unsetMarkers,
+      setSignOut,
     }
   ), dispatch),
 })
@@ -47,21 +48,17 @@ interface IDeleteAccountScreenProps {
   systemStore: ISystemStore,
   userStore: IUserStore,
   actions: {
-    // deleteUser: (params: IDeleteUser) => void,
-    // setLoginError: (params: ISetLoginError) => void,
-    // unsetMarkers: () => void,
+    setSignOut: () => void,
   },
 }
 interface IDeleteAccountScreenState {
-  password: string,
-  showPassword: boolean,
+  delete: string,
   keyboard: boolean,
   loading: boolean,
 }
 class DeleteAccountScreen extends React.Component<IDeleteAccountScreenProps> {
   state: IDeleteAccountScreenState = {
-    password: '',
-    showPassword: false,
+    delete: '',
     keyboard: false,
     loading: false,
   }
@@ -88,30 +85,24 @@ class DeleteAccountScreen extends React.Component<IDeleteAccountScreenProps> {
   }
 
   handleDeleteAccount = async () => {
-    // this.props.actions.setLoginError(false)
-    // Alert.alert(
-    //   Lit[this.props.systemStore.Locale].Copywrite.DeleteAccount[0], Lit[this.props.systemStore.Locale].Copywrite.DeleteAccount[1],
-    //   [
-    //     { text: Lit[this.props.systemStore.Locale].Button.Delete, onPress: async () => {
-    //       this.setState({ loading: true, })
-    //       await this.props.actions.deleteUser(this.state.password)
-    //       if (!this.props.userStore.loginError) {
-    //         await this.props.actions.unsetMarkers()
-    //         MMKVAuth.clearStore()
-    //         MMKVMap.clearStore()
-    //         MMKVCamera.clearStore()
-    //         MMKVTheme.clearStore()
-    //         this.props.navigation.navigate(Screens.Map)
-    //         this.setState({ loading: false, })
-    //       }
-    //       else {
-    //         this.setState({ password: '', })
-    //         this.setState({ loading: false, })
-    //       }
-    //     }},
-    //     { text: Lit[this.props.systemStore.Locale].Button.Cancel, onPress: () => null, style: 'cancel', },
-    //   ]
-    // )
+    Alert.alert(
+      Lit[this.props.systemStore.Locale].Copywrite.DeleteAccount[0], Lit[this.props.systemStore.Locale].Copywrite.DeleteAccount[1],
+      [
+        { text: Lit[this.props.systemStore.Locale].Button.Delete, onPress: async () => {
+          this.setState({ loading: true, })
+          const result = await deleteAccount()
+          if (result) {
+            await this.props.actions.setSignOut()
+            MMKVTheme.clearStore()
+            MMKVAuth.clearStore()
+            MMKVCamera.clearStore()
+            this.props.navigation.navigate(Screens.SignIn)
+          }
+          this.setState({ loading: false, })
+        }},
+        { text: Lit[this.props.systemStore.Locale].Button.Cancel, onPress: () => null, style: 'cancel', },
+      ]
+    )
   }
 
   render() {
@@ -135,9 +126,9 @@ class DeleteAccountScreen extends React.Component<IDeleteAccountScreenProps> {
           <View style={{flex: 1, width: '100%',}}>
             <ButtonInput
               systemStore={systemStore}
-              value={this.state.password}
+              value={this.state.delete}
               placeholder={Lit[systemStore.Locale].Button.Delete}
-              onChangeText={(text: string) => this.setState({ password: text, })}
+              onChangeText={(text: string) => this.setState({ delete: text, })}
             />
           </View>
 
@@ -148,9 +139,7 @@ class DeleteAccountScreen extends React.Component<IDeleteAccountScreenProps> {
               title={Lit[systemStore.Locale].Button.DeleteAccount}
               color={Colors.red}
               loading={this.state.loading}
-              disabled={
-                !this.state.password
-              }
+              disabled={this.state.delete !== Lit[systemStore.Locale].Button.Delete}
             />
           </View>
         </KeyboardAvoidingView>

@@ -14,7 +14,6 @@ import { ISystemStore, } from '../state/reducers/SystemReducer'
 // import PushNotificationIOS from '@react-native-community/push-notification-ios'
 // import { requestLocationAlways, requestPushNotifications, } from '../utils/services'
 // import { registerDevice, syncLocation, } from '../api/user'
-import { IChatsStore, } from '../state/reducers/ChatsReducer'
 // import { ISetChat, ISetChatId, ISetChats, ISetChatsSearch, IUnsetChat, setChat, setChatId, setChats, setChatsSearch, unsetChat, unsetChatsSearch, } from '../state/actions/ChatsActions'
 // import BackgroundGeolocation, { Subscription, } from 'react-native-background-geolocation'
 // import { apiRequest, baseUrl, getAccessHeaders, protocol, } from '../api'
@@ -28,15 +27,16 @@ import StreetPassModal from '../components/streetPassModal'
 import { CardItemHandle } from 'rn-tinder-card'
 import { mockStreetPasses, } from '../utils/MockData'
 import AnimatedBackground from '../components/animated/AnimatedBackground'
+import { ISetUpdateUser, setUpdateUser } from '../state/actions/UserActions'
 
 const mapStateToProps = (state: IStores) => {
-  const { systemStore, userStore, chatsStore, } = state
-  return { systemStore, userStore, chatsStore, }
+  const { systemStore, userStore, } = state
+  return { systemStore, userStore, }
 }
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => ({
   actions: bindActionCreators(Object.assign(
     {
-      //
+      setUpdateUser,
     }
   ), dispatch),
 })
@@ -45,9 +45,8 @@ interface IStreetPassScreenProps {
   navigation: any,
   systemStore: ISystemStore,
   userStore: IUserStore,
-  chatsStore: IChatsStore,
   actions: {
-    //
+    setUpdateUser: (params: ISetUpdateUser) => void,
   },
 }
 interface IStreetPassScreenState {
@@ -69,7 +68,7 @@ class StreetPassScreen extends React.Component<IStreetPassScreenProps> {
   }
 
   render() {
-    const { navigation, systemStore, userStore, chatsStore, actions, }: IStreetPassScreenProps = this.props
+    const { navigation, systemStore, userStore, actions, }: IStreetPassScreenProps = this.props
     const { Colors, Fonts, } = systemStore
 
     const streetPasses = mockStreetPasses
@@ -86,7 +85,7 @@ class StreetPassScreen extends React.Component<IStreetPassScreenProps> {
             userStore={userStore}
             toggleModal={() => this.setState({ streetPassSettings: false, })}
             actions={{
-              //
+              setUpdateUser: actions.setUpdateUser,
             }}
           />
         }

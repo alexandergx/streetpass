@@ -106,6 +106,8 @@ export type ILocale = {
     EmailRequired: [string, string],
     NotificationsRequired: [string, string],
     AlwaysLocationRequired: [string, string],
+    DeleteAccount: [string, string],
+    VideoLength: [string, string],
   },
   Button: {
     Save: string,

@@ -149,6 +149,7 @@ export const SIGN_IN = (input: ISignInMutation) => {
           bio
           work
           school
+          streetPass
           streetPassPreferences {
             discoverable
             location
@@ -205,6 +206,33 @@ export const VERIFY_PHONE_NUMBER = (input: IVerifyPhoneNumberMutation) => {
   mutation = mutation + inputConstructor(input)
   mutation = mutation + `
       })
+    }
+  `
+  return gql(mutation)
+}
+
+export interface IRegisterDeviceMutation {
+  manufacturer: string,
+  deviceToken: string,
+  unregister?: boolean,
+}
+export const REGISTER_DEVICE = (input: IRegisterDeviceMutation) => {
+  let mutation = `
+    mutation {
+      registerDevice(input: {
+  `
+  mutation = mutation + inputConstructor(input)
+  mutation = mutation + `
+      })
+    }
+  `
+  return gql(mutation)
+}
+
+export const DELETE_ACCOUNT = () => {
+  let mutation = `
+    mutation {
+      deleteAccount
     }
   `
   return gql(mutation)

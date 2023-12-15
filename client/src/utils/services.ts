@@ -1,4 +1,4 @@
-// import PushNotificationIOS from '@react-native-community/push-notification-ios'
+import PushNotificationIOS from '@react-native-community/push-notification-ios'
 import { check, request, PERMISSIONS, RESULTS, } from 'react-native-permissions'
 import Contacts from 'react-native-contacts'
 import { Alert, Linking, Share, Platform, } from 'react-native'
@@ -27,51 +27,51 @@ export const signInCallback = (navigation: any, code: ISignInErrors | null) => {
       navigation.navigate(Screens.Sex, { editProfile: true, })
       break
     default:
-      return
+      navigation.navigate(Screens.StreetPass)
   }
 }
 
-// export async function requestPushNotifications(onDeviceTokenReceived: (deviceToken: string) => void, callback: (result: boolean) => void = () => null) {
-//   try {
-//     PushNotificationIOS.addEventListener('register', (deviceToken) => {
-//       onDeviceTokenReceived(deviceToken)
-//       PushNotificationIOS.removeEventListener('register')
-//     })
-//     PushNotificationIOS.addEventListener('registrationError', (error) => {
-//       console.log('[DEVICE TOKEN ERROR]', error)
-//       PushNotificationIOS.removeEventListener('registrationError')
-//     })
-//     const permissions = await PushNotificationIOS.requestPermissions()
-//     callback && callback(permissions.authorizationStatus == 1 ? false : true)
-//   } catch (error) {
-//     console.error('[REQUEST APNS ERROR]', error)
-//   }
-// }
+export async function requestPushNotifications(onDeviceTokenReceived: (deviceToken: string) => void, callback: (result: boolean) => void = () => null) {
+  try {
+    PushNotificationIOS.addEventListener('register', (deviceToken) => {
+      onDeviceTokenReceived(deviceToken)
+      PushNotificationIOS.removeEventListener('register')
+    })
+    PushNotificationIOS.addEventListener('registrationError', (error) => {
+      console.log('[DEVICE TOKEN ERROR]', error)
+      PushNotificationIOS.removeEventListener('registrationError')
+    })
+    const permissions = await PushNotificationIOS.requestPermissions()
+    callback && callback(permissions.authorizationStatus == 1 ? false : true)
+  } catch (error) {
+    console.error('[REQUEST APNS ERROR]', error)
+  }
+}
 
-// export async function listenPushNotifications(onNotificationReceived: (notification: any) => void) {
-//   try {
-//     PushNotificationIOS.addEventListener('notification', (notification) => { onNotificationReceived(notification.getData()) })
-//   } catch (error) {
-//     console.error('[LISTEN ERROR]', error)
-//   }
-// }
+export async function listenPushNotifications(onNotificationReceived: (notification: any) => void) {
+  try {
+    PushNotificationIOS.addEventListener('notification', (notification) => { onNotificationReceived(notification.getData()) })
+  } catch (error) {
+    console.error('[LISTEN ERROR]', error)
+  }
+}
 
-// export const requestLocation = () => {
-//   check(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE)
-//     .then((result) => {
-//       switch (result) {
-//         case RESULTS.UNAVAILABLE:
-//         case RESULTS.LIMITED:
-//         case RESULTS.GRANTED:
-//         case RESULTS.BLOCKED:
-//           break
-//         case RESULTS.DENIED:
-//           request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE)
-//           break
-//       }
-//     }
-//   )
-// }
+export const requestLocation = () => {
+  check(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE)
+    .then((result) => {
+      switch (result) {
+        case RESULTS.UNAVAILABLE:
+        case RESULTS.LIMITED:
+        case RESULTS.GRANTED:
+        case RESULTS.BLOCKED:
+          break
+        case RESULTS.DENIED:
+          request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE)
+          break
+      }
+    }
+  )
+}
 
 export const requestLocationAlways = (Locale: Locales): Promise<boolean> => {
   return new Promise((resolve) => {

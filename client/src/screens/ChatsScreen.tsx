@@ -31,6 +31,7 @@ import ExclamationIcon from '../assets/icons/exclamation-circled.svg'
 import GradientBackground from '../components/gradientBackground'
 import { Lit, } from '../utils/locale'
 import AnimatedBackground from '../components/animated/AnimatedBackground'
+import { ThemeTypes } from '../utils/themes'
 
 const mapStateToProps = (state: IStores) => {
   const { systemStore, userStore, } = state
@@ -107,7 +108,7 @@ class ChatsScreen extends React.Component<IChatsScreenProps> {
             behavior={'padding'}
             style={{flex: 1,}}
           >            
-            <ScrollView showsVerticalScrollIndicator={false} style={{flex: 1, width: '100%', height: '100%',}}>
+            <ScrollView showsVerticalScrollIndicator={false} keyboardDismissMode={'interactive'} style={{flex: 1, width: '100%', height: '100%',}}>
               <View style={{flex: 1, width: '100%', marginTop: 72,}}>
                 <Text style={{paddingHorizontal: 16, marginBottom: 8, color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.cruiserWeight,}}>{Lit[systemStore.Locale].Title.Matches}</Text>
 
@@ -139,7 +140,7 @@ class ChatsScreen extends React.Component<IChatsScreenProps> {
                           >
                             {(this.state.matchId || this.state.chatId) && this.state.matchId !== item.item.matchId &&
                               <BlurView
-                                blurType={Colors.darkestBlur as any}
+                                blurType={Colors.themeType === ThemeTypes.Dark ? undefined : Colors.safeLightBlur}
                                 blurAmount={2}
                                 style={{position: 'absolute', zIndex: 1, alignSelf: 'center', width: '100%', height: '100%', borderRadius: 16,}}
                               />
@@ -171,7 +172,7 @@ class ChatsScreen extends React.Component<IChatsScreenProps> {
 
                 {/* <Text style={{paddingHorizontal: 16, marginTop: 16, marginBottom: 8, color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.cruiserWeight,}}>Chats</Text> */}
 
-                <View style={{flex: 0, width: '100%', marginTop: 8, marginBottom: 8, justifyContent: 'flex-end', alignItems: 'center', paddingHorizontal: 16,}}>
+                <View style={{flex: 0, width: '100%', marginTop: 16, marginBottom: 8, justifyContent: 'flex-end', alignItems: 'center', paddingHorizontal: 16,}}>
                   <ButtonInput
                     systemStore={systemStore}
                     // inputRef={this.inputRef}
@@ -222,7 +223,7 @@ class ChatsScreen extends React.Component<IChatsScreenProps> {
                           >
                             {(this.state.matchId || this.state.chatId) && this.state.chatId !== item.item.chatId &&
                               <BlurView
-                                blurType={Colors.darkestBlur as any}
+                                blurType={Colors.themeType === ThemeTypes.Dark ? undefined : Colors.safeLightBlur}
                                 blurAmount={2}
                                 style={{position: 'absolute', zIndex: 1, width: '100%', height: '100%', borderRadius: 16,}}
                               />

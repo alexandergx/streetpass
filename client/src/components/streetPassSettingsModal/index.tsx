@@ -39,21 +39,21 @@ class StreetPassSettingsModal extends React.Component<IStreetPassSettingsModalPr
     discoverable: this.props.userStore.user.streetPassPreferences.discoverable,
     location: this.props.userStore.user.streetPassPreferences.location,
     sex: this.props.userStore.user.streetPassPreferences.sex,
-    age: this.props.userStore.user.streetPassPreferences.age || [InputLimits.StreetPassAgeMin, InputLimits.StreetPassAgeMax],
+    age: this.props.userStore.user.streetPassPreferences.age,
     loading: false,
     scroll: true,
   }
 
   updateSettings = async () => {
-    if (
-      this.state.streetPass !== this.props.userStore.user.streetPass
-      || this.state.discoverable !== this.props.userStore.user.streetPassPreferences.discoverable
-      || this.state.location !== this.props.userStore.user.streetPassPreferences.location
-      || this.state.sex !== this.props.userStore.user.streetPassPreferences.sex
-      || this.state.age !== this.props.userStore.user.streetPassPreferences.age
+    if (true
+      // this.state.streetPass !== this.props.userStore.user.streetPass
+      // || this.state.discoverable !== this.props.userStore.user.streetPassPreferences.discoverable
+      // || this.state.location !== this.props.userStore.user.streetPassPreferences.location
+      // || this.state.sex !== this.props.userStore.user.streetPassPreferences.sex
+      // || this.state.age !== this.props.userStore.user.streetPassPreferences.age
     ) {
       this.setState({ loading: true, })
-      this.props.actions.setUpdateUser({
+      await this.props.actions.setUpdateUser({
         streetPass: this.state.streetPass,
         streetPassPreferences: {
           discoverable: this.state.discoverable,
@@ -107,15 +107,15 @@ class StreetPassSettingsModal extends React.Component<IStreetPassSettingsModalPr
       ],
     }
 
-    const locationConfig: IListGroupConfig = {
-      title: Lit[systemStore.Locale].Title.VisibleOnMap,
-      list: [
-        {
-          title: Lit[systemStore.Locale].Title.StreetPassLocation, toggleValue: this.state.location, onToggle: () => this.setState({ location: !this.state.location, }),
-          description: Lit[systemStore.Locale].Copywrite.StreetPassLocationDescription,
-        },
-      ],
-    }
+    // const locationConfig: IListGroupConfig = {
+    //   title: Lit[systemStore.Locale].Title.VisibleOnMap,
+    //   list: [
+    //     {
+    //       title: Lit[systemStore.Locale].Title.StreetPassLocation, toggleValue: this.state.location, onToggle: () => this.setState({ location: !this.state.location, }),
+    //       description: Lit[systemStore.Locale].Copywrite.StreetPassLocationDescription,
+    //     },
+    //   ],
+    // }
 
     return (
       <>
@@ -147,7 +147,7 @@ class StreetPassSettingsModal extends React.Component<IStreetPassSettingsModalPr
                       onSlidingEnd={() => this.setState({ scroll: true, })}
                     />
                     <ListGroup systemStore={systemStore} config={discoverableConfig} />
-                    <ListGroup systemStore={systemStore} config={locationConfig} />
+                    {/* <ListGroup systemStore={systemStore} config={locationConfig} /> */}
 
                     <View style={{height: 32,}} />
                   </>

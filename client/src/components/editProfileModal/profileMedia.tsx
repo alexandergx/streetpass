@@ -4,6 +4,7 @@ import {
   TouchableOpacity,
   Dimensions,
   ActivityIndicator,
+  Alert,
 } from 'react-native'
 import { BlurView } from '@react-native-community/blur'
 import { ISystemStore } from '../../state/reducers/SystemReducer'
@@ -82,20 +83,10 @@ const ProfileMedia = forwardRef<ProfileMediaMethods, IProfileBlockProps>(({ syst
     if (result?.assets && result.assets.length > 0 && result.assets[0].duration) {
       if (result.assets[0].duration <= (InputLimits.VideoLengthMax + 1)) {
         setState({ media: [...state.media.filter((i: IUploadMedia) => i.key !== null), { video: result.assets[0].uri, key: state.media.length, new: true, }, { key: null, }].slice(0, 9), })
-      } else {
-        // TODO - alert video must be 15secs
-        // Alert.alert(Lit[systemStore.Locale].Copywrite.VideoLength[0], Lit[systemStore.Locale].Copywrite.VideoLength[1])
-      }
+      } else Alert.alert(Lit[systemStore.Locale].Copywrite.VideoLength[0], Lit[systemStore.Locale].Copywrite.VideoLength[1])
       return
     }
     if (result?.assets && result.assets.length > 0) setState({ media: [...state.media.filter((i: IUploadMedia) => i.key !== null), { image: result.assets[0].uri, key: state.media.length, new: true, }, { key: null, }].slice(0, 9), })
-
-    // const result = await ImagePicker.openPicker({
-    //   mediaType: 'any',
-    //   cropping: true,
-    //   // multiple: true,
-    // })
-    // setState({ media: [...state.media.filter((i: IUploadMedia) => i.key !== null), { image: `file:///${result.path}`, key: state.media.length, new: true, }, { key: null, }].slice(0, 9), })
   }
 
   return (
@@ -107,8 +98,16 @@ const ProfileMedia = forwardRef<ProfileMediaMethods, IProfileBlockProps>(({ syst
           return (item.key !== null ?
             <View
               key={item.key}
-              style={{width: Dimensions.get('window').width * 0.31, aspectRatio: 1/1.18, justifyContent: 'center', alignItems: 'center', padding: 4,}}
+              style={{
+                width: Dimensions.get('window').width * 0.31, aspectRatio: 1/1.15, justifyContent: 'center', alignItems: 'center', padding: 4,
+                marginRight: index % 3 === 0 ? 4 : 0, marginLeft: index % 3 === 2 ? 4 : 0,
+              }}
             >
+              <BlurView
+                blurType={Colors.darkestBlur}
+                style={{position: 'absolute', zIndex: -2, width: '100%', height: '100%', backgroundColor: Colors.darkBackground, borderRadius: 16, overflow: 'hidden',}}
+              />
+
               {item.thumbnail &&
                 <FastImage
                   source={{ uri: item.thumbnail, }}
@@ -147,7 +146,7 @@ const ProfileMedia = forwardRef<ProfileMediaMethods, IProfileBlockProps>(({ syst
               <TouchableOpacity
                 activeOpacity={Colors.activeOpacity}
                 onPress={() => setState({ media: state.media.filter((i: IUploadMedia) => i.key !== item.key), deletedMedia: item.mediaId ? [...state.deletedMedia, item.mediaId] : state.deletedMedia, })}
-                style={{position: 'absolute', bottom: -2, right: -2,}}
+                style={{position: 'absolute', bottom: -2, right: 0,}}
               >
                 <CrossCircledIcon fill={Colors.safeLightest} width={32} height={32} />
               </TouchableOpacity>
@@ -174,7 +173,10 @@ const ProfileMedia = forwardRef<ProfileMediaMethods, IProfileBlockProps>(({ syst
                   ],
                 },
               })}
-              style={{width: Dimensions.get('window').width * 0.31, aspectRatio: 1/1.18, justifyContent: 'center', alignItems: 'center', padding: 4,}}
+              style={{
+                width: Dimensions.get('window').width * 0.31, aspectRatio: 1/1.15, justifyContent: 'center', alignItems: 'center', padding: 4,
+                marginRight: index % 3 === 0 ? 4 : 0, marginLeft: index % 3 === 2 ? 4 : 0,
+              }}
             >
               <BlurView
                 blurType={Colors.darkestBlur}

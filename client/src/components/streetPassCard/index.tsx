@@ -115,10 +115,10 @@ const StreetPassCard: React.FC<IStreetPassCardProps> = ({ navigation, systemStor
               colors={['rgba(0,0,0,0.5)', 'rgba(0,0,0,0.4)', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,0.2)', 'rgba(0,0,0,0.1)', 'rgba(0,0,0,0)']} start={{ x: 1, y: 1 }} end={{ x: 1, y: 0 }}
             />
 
-            <View style={{flexDirection: 'row', marginBottom: 16, paddingHorizontal: 24,}}>
+            <View style={{flexDirection: 'row', marginBottom: 24, paddingHorizontal: 24,}}>
               <View style={{flex: 1,}}>
-                <Text style={{color: Colors.safeLightest, fontSize: Fonts.lg, fontWeight: Fonts.heavyWeight, textShadowColor: Colors.safeDarkest, textShadowRadius: 2,}}>{streetPass.name} <Text style={{fontWeight: Fonts.lightWeight,}}>{streetPass.age}</Text></Text>
-                <Text numberOfLines={1} style={{color: Colors.safeLightest, fontSize: Fonts.md, fontWeight: Fonts.lightWeight, textShadowColor: Colors.safeDarkest, textShadowRadius: 2}}>{streetPass.bio}</Text>
+                <Text style={{color: Colors.safeLightest, fontSize: Fonts.xl, fontWeight: Fonts.heavyWeight, textShadowColor: Colors.safeDarkest, textShadowRadius: 2,}}>{streetPass.name} <Text style={{fontWeight: Fonts.lightWeight,}}>{streetPass.age}</Text></Text>
+                <Text numberOfLines={1} style={{color: Colors.safeLightest, fontSize: Fonts.md, fontWeight: Fonts.middleWeight, textShadowColor: Colors.safeDarkest, textShadowRadius: 2}}>{streetPass.bio}</Text>
               </View>
 
               <TouchableOpacity

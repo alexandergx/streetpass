@@ -1,6 +1,7 @@
 import React, { RefObject } from 'react'
 import {
   Dimensions,
+  Platform,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -23,16 +24,18 @@ import DotFillIcon from '../assets/icons/dot-fill.svg'
 import WorkIcon from '../assets/icons/work.svg'
 import SchoolIcon from '../assets/icons/school.svg'
 import Carousel, { ICarouselInstance } from 'react-native-reanimated-carousel'
-import { mockUserProfile } from '../utils/MockData'
 import FastImage from 'react-native-fast-image'
 import LinearGradient from 'react-native-linear-gradient'
 import { getAge, timePassedSince } from '../utils/functions'
 import EditProfileModal from '../components/editProfileModal'
 import UserSettingsModal from '../components/userSettingsModal'
 import AnimatedBackground from '../components/animated/AnimatedBackground'
-import { ISetSortMedia, ISetUpdateUser, setSortMedia, setUpdateUser, setUser } from '../state/actions/UserActions'
+import { ISetSortMedia, ISetUpdateUser, setSignOut, setSortMedia, setUpdateUser, setUser } from '../state/actions/UserActions'
 import Video from 'react-native-video'
 import convertToProxyURL from 'react-native-video-cache'
+import { requestPushNotifications } from '../utils/services'
+import { OS } from '../utils/constants'
+import PushNotificationIOS from '@react-native-community/push-notification-ios'
 
 const mapStateToProps = (state: IStores) => {
   const { systemStore, userStore, } = state
@@ -44,6 +47,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => ({
       setUser,
       setUpdateUser,
       setSortMedia,
+      setSignOut,
     }
   ), dispatch),
 })
@@ -56,12 +60,14 @@ interface IUserScreenProps {
     setUser: () => void,
     setUpdateUser: (params: ISetUpdateUser) => void,
     setSortMedia: (params: ISetSortMedia) => void,
+    setSignOut: () => void,
   },
 }
 interface IUserScreenState {
   imageIndex: number,
   editProfile: boolean,
   userSettings: boolean,
+  signingOut: boolean,
 }
 class UserScreen extends React.Component<IUserScreenProps> {
   constructor(props: IUserScreenProps) {
@@ -72,6 +78,18 @@ class UserScreen extends React.Component<IUserScreenProps> {
     imageIndex: 0,
     editProfile: false,
     userSettings: false,
+    signingOut: false,
+  }
+
+  handleSignOut = async () => {
+    this.setState({ signingOut: true, })
+    await requestPushNotifications(async (deviceToken: string) => {
+      // await registerDevice({ manufacturer: OS[Platform.OS], deviceToken, unregister: true, })
+      PushNotificationIOS.setApplicationIconBadgeNumber(0)
+    })
+    await this.props.actions.setSignOut()
+    this.setState({ signingOut: false, })
+    this.props.navigation.navigate(Screens.SignIn)
   }
 
   render() {
@@ -104,6 +122,7 @@ class UserScreen extends React.Component<IUserScreenProps> {
             systemStore={systemStore}
             userStore={userStore}
             toggleModal={() => this.setState({ userSettings: false, })}
+            handleSignOut={this.handleSignOut}
           />
         }
 
@@ -126,7 +145,7 @@ class UserScreen extends React.Component<IUserScreenProps> {
                   panGestureHandlerProps={{ activeOffsetX: [-10, 10], }}
                   loop={false}
                   width={Dimensions.get('window').width}
-                  height={Dimensions.get('window').height * 0.60}
+                  height={Dimensions.get('window').height * 0.57}
                   data={userStore.user.media}
                   onSnapToItem={index => this.setState({ imageIndex: index, })}
                   renderItem={(item: any) => (
@@ -203,10 +222,10 @@ class UserScreen extends React.Component<IUserScreenProps> {
                 </View>
               </View>
               
-              <View style={{flex: 1, flexDirection: 'row', paddingHorizontal: 16, paddingTop: 24, marginBottom: 8,}}>
+              <View style={{flex: 1, flexDirection: 'row', paddingHorizontal: 16, paddingTop: 24, marginBottom: 16,}}>
                 <View style={{flex: 1,}}>
-                  <Text style={{color: Colors.lightest, fontSize: Fonts.lg, fontWeight: Fonts.heavyWeight, textShadowColor: Colors.darkest, textShadowRadius: 2,}}>{userStore.user.name} <Text style={{fontWeight: Fonts.lightWeight,}}> {getAge(userStore.user.dob)}</Text></Text>
-                  <Text numberOfLines={1} style={{color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.featherWeight, textShadowColor: Colors.darkest, textShadowRadius: 2}}>Joined {timePassedSince(userStore.user.joinDate, systemStore.Locale)}</Text>
+                  <Text style={{color: Colors.lightest, fontSize: Fonts.xl, fontWeight: Fonts.heavyWeight, textShadowColor: Colors.darkest, textShadowRadius: 2,}}>{userStore.user.name} <Text style={{fontWeight: Fonts.lightWeight,}}> {getAge(userStore.user.dob)}</Text></Text>
+                  <Text numberOfLines={1} style={{color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.lightWeight, textShadowColor: Colors.darkest, textShadowRadius: 2}}>Joined {timePassedSince(userStore.user.joinDate, systemStore.Locale)}</Text>
                 </View>
               </View>
 

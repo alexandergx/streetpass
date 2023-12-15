@@ -65,8 +65,8 @@ class PhoneNumberScreen extends React.Component<IPhoneNumberScreenProps> {
   inputRef(input: any) { this.childRef = input }
 
   state: IPhoneNumberScreenState = {
-    countryCode: this.props.countryCode || '1',
-    phoneNumber: this.props.countryCode?.length && this.props.phoneNumber?.length && formatPhonenumber(this.props.countryCode, this.props.phoneNumber) || '',
+    phoneNumber: formatPhonenumber(this.props.countryCode, this.props.phoneNumber),
+    countryCode: this.props.countryCode,
     validPhoneNumber: false,
     securityPin: '',
     loadingPin: false,
@@ -100,7 +100,7 @@ class PhoneNumberScreen extends React.Component<IPhoneNumberScreenProps> {
   handleSendPin = async () => {
     try {
       this.setState({ loadingPin: true, })
-      await this.props.actions.setPhoneNumber({ phoneNumber: this.state.phoneNumber, countryCode: this.state.countryCode, })
+      await this.props.actions.setPhoneNumber({ phoneNumber: this.state.phoneNumber.replace(/\s/g, ''), countryCode: this.state.countryCode, })
       this.setState({ loadingPin: false, pinSent: true, })
     } catch {
       this.setState({ loadingPin: false, })
