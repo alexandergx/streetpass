@@ -1,12 +1,10 @@
 {
-  "name": "streetpass",
-  "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "name": "reel",
+  "version": "1.1.0",
   "private": true,
-  "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
+    "postbuild": "cp -r src/assets dist/assets || xcopy src\\assets dist\\assets /E /I",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "dev": "nest start --watch",
@@ -33,10 +31,8 @@
     "@nestjs/throttler": "^4.0.0",
     "apn": "^2.2.0",
     "apollo-server-express": "^3.12.0",
-    "apple-signin-auth": "^1.7.5",
     "aws-sdk": "^2.1326.0",
     "bcrypt": "^5.1.0",
-    "dotenv": "^16.3.1",
     "express-rate-limit": "^6.7.0",
     "ffmpeg-extract-frames": "^2.0.2",
     "ffmpeg-static": "^5.1.0",
@@ -62,6 +58,7 @@
     "sharp": "^0.31.3",
     "tmp-promise": "^3.0.3",
     "twilio": "^4.10.0",
+    "verify-apple-id-token": "^3.1.0",
     "ws": "^8.13.0"
   },
   "devDependencies": {

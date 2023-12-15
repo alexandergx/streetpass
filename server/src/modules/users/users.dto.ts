@@ -3,42 +3,9 @@ import GraphQLUpload from 'graphql-upload/GraphQLUpload.js'
 import { FileUpload } from 'src/utils/constants'
 
 @InputType()
-export class FindUserDto {
-  @Field(() => String)
-  userId: string
-}
-
-@InputType()
-export class FollowUserDto {
-  @Field(() => String)
-  userId: string
-}
-
-@InputType()
-export class SubscribeUserDto {
-  @Field(() => String)
-  userId: string
-}
-
-@InputType()
-export class RemoveFollowerDto {
-  @Field(() => String)
-  userId: string
-}
-
-@InputType()
-export class BlockUserDto {
-  @Field(() => String)
-  userId: string
-}
-
-@InputType()
-export class FollowRequestDto {
-  @Field(() => String)
-  userId: string
-
-  @Field(() => Boolean)
-  accept: boolean
+export class GetUserDto {
+  @Field(() => String, { nullable: true, })
+  userId?: string
 }
 
 @InputType()
@@ -59,25 +26,10 @@ export class UpdateStreetPassPreferencesDto {
 @InputType()
 export class UpdateNotificationPreferencesDto {
   @Field(() => Boolean, { nullable: true, })
-  follows?: boolean
-
-  @Field(() => Boolean, { nullable: true, })
-  followRequests?: boolean
-
-  @Field(() => Boolean, { nullable: true, })
-  likes?: boolean
-
-  @Field(() => Boolean, { nullable: true, })
-  comments?: boolean
-
-  @Field(() => Boolean, { nullable: true, })
-  replies?: boolean
-
-  @Field(() => Boolean, { nullable: true, })
-  subscribedPosts?: boolean
-
-  @Field(() => Boolean, { nullable: true, })
   messages?: boolean
+
+  @Field(() => Boolean, { nullable: true, })
+  matches?: boolean
 
   @Field(() => Boolean, { nullable: true, })
   streetPasses?: boolean
@@ -90,21 +42,9 @@ export class UpdateNotificationPreferencesDto {
 }
 
 @InputType()
-export class UpdatePrivacyPreferencesDto {
-  @Field(() => Boolean, { nullable: true, })
-  likes?: boolean
-
-  @Field(() => Boolean, { nullable: true, })
-  comments?: boolean
-
-  @Field(() => Boolean, { nullable: true, })
-  messages?: boolean
-}
-
-@InputType()
 export class UpdateUserDto {
   @Field(() => String, { nullable: true, })
-  username?: string
+  email?: string
 
   @Field(() => String, { nullable: true, })
   name?: string
@@ -119,101 +59,38 @@ export class UpdateUserDto {
   bio?: string
 
   @Field(() => String, { nullable: true, })
-  email?: string
+  work?: string
 
   @Field(() => String, { nullable: true, })
-  countryCode?: string
-
-  @Field(() => String, { nullable: true, })
-  phonenumber?: string
-
-  @Field(() => GraphQLUpload, { nullable: true, })
-  profilePicture?: Promise<FileUpload>
-
-  @Field(() => Boolean, { nullable: true, })
-  removeProfilePicture?: boolean
+  school?: string
 
   @Field(() => Boolean, { nullable: true, })
   streetPass?: boolean
 
-  @Field(() => UpdateStreetPassPreferencesDto, { nullable: true, })
-  streetPassPreferences?: UpdateStreetPassPreferencesDto
+  @Field(() => String, { nullable: true, }) // UpdateStreetPassPreferencesDto stringified
+  streetPassPreferences?: string
 
-  @Field(() => UpdateNotificationPreferencesDto, { nullable: true, })
-  notificationPreferences?: UpdateNotificationPreferencesDto
-
-  @Field(() => UpdatePrivacyPreferencesDto, { nullable: true, })
-  privacyPreferences?: UpdatePrivacyPreferencesDto
-
-  @Field(() => Boolean, { nullable: true, })
-  privateProfile?: boolean
+  @Field(() => String, { nullable: true, }) // UpdateNotificationPreferencesDto stringified
+  notificationPreferences?: string
 }
 
 @InputType()
-export class SearchUsersDto {
-  @Field(() => String, { nullable: true, })
-  userId?: string
+export class UploadMediaDto {
+  @Field(() => GraphQLUpload, { nullable: true, })
+  image: Promise<FileUpload>
 
-  @Field(() => String)
-  username: string
-
-  @Field(() => Boolean, { nullable: true, })
-  following?: boolean
-
-  @Field(() => Boolean, { nullable: true, })
-  available?: boolean
+  @Field(() => GraphQLUpload, { nullable: true, })
+  video: Promise<FileUpload>
 }
 
 @InputType()
-export class RemoveRecentSearchDto {
-  @Field(() => String, { nullable: true, })
-  userId?: string
+export class RemoveMediaDto {
+  @Field(() => [String])
+  mediaIds?: string[]
 }
 
 @InputType()
-export class GetBlockingDto {
-  @Field(() => String, { nullable: true, })
-  index?: string
-
-  @Field(() => Number, { nullable: true, })
-  page?: number
-}
-
-@InputType()
-export class GetFollowingFollowersDto {
-  @Field(() => String, { nullable: true, })
-  userId?: string
-
-  @Field(() => String, { nullable: true, })
-  index?: string
-
-  @Field(() => Number, { nullable: true, })
-  page?: number
-
-  @Field(() => Boolean, { nullable: true, })
-  following?: boolean
-}
-
-@InputType()
-export class StreetPassDto {
-  @Field(() => Number)
-  lat: number
-
-  @Field(() => Number)
-  lon: number
-}
-
-@InputType()
-export class GetStreetPassesDto {
-  @Field(() => Number, { nullable: true, })
-  lat?: number
-
-  @Field(() => Number, { nullable: true, })
-  lon?: number
-
-  @Field(() => String, { nullable: true, })
-  index?: string
-
-  @Field(() => Number, { nullable: true, })
-  page?: number
+export class SortMediaDto {
+  @Field(() => [String])
+  mediaIds?: string[]
 }

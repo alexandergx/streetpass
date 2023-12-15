@@ -3,67 +3,46 @@ import { InjectModel } from '@nestjs/mongoose'
 import mongoose, { Model } from 'mongoose'
 import { User, UserDocument, } from 'src/schemas/user.schema'
 import { Auth, AuthDecodedToken, AuthTokens, } from './auth.entities'
-import { RegisterDeviceDto, RefreshAuthDto, Auth0Dto, AuthPhoneDto, VerifyPhoneDto, } from './auth.dto'
+import { SignInDto, VerifyPhoneNumberDto, SendPinDto, RegisterDeviceDto, } from './auth.dto'
 import * as bcrypt from 'bcrypt'
 import { Context, GqlExecutionContext } from '@nestjs/graphql'
 import { JwtService } from '@nestjs/jwt'
 import { GraphQLError } from 'graphql'
-import { Errors, InputLimits, s3, accessConfig, refreshConfig, Time, } from 'src/utils/constants'
+import { Errors, InputLimits, s3, accessConfig, refreshConfig, Time, SignInErrors, } from 'src/utils/constants'
 import { sendSMS, verifyAppleAuth, verifyGoogleAuth, } from 'src/utils/services'
-import { UserChats, UserChatsDocument } from 'src/schemas/userChats.schema'
 import { UserRecords, UserRecordsDocument } from 'src/schemas/userRecords.schema'
-import { StreetPasses, StreetPassesDocument } from 'src/schemas/streetPasses.schema'
-import { validatePhonenumber } from 'src/utils/functions'
-import { Chat, ChatDocument } from 'src/schemas/chat.schema'
-import { Interaction, InteractionDocument } from 'src/schemas/interaction.schema'
-import { Interactions, InteractionsDocument } from 'src/schemas/interactions.schema'
+import { validatePhoneNumber } from 'src/utils/functions'
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(UserRecords.name) private userRecordsModel: Model<UserRecordsDocument>,
-    @InjectModel(Chat.name) private chatModel: Model<ChatDocument>,
-    @InjectModel(UserChats.name) private userChatsModel: Model<UserChatsDocument>,
-    @InjectModel(StreetPasses.name) private streetPassesModel: Model<StreetPassesDocument>,
-    @InjectModel(Interaction.name) private interactionModel: Model<InteractionDocument>,
-    @InjectModel(Interactions.name) private interactionsModel: Model<InteractionsDocument>,
     private readonly jwtService: JwtService,
   ) {}
 
-  async auth0(input: Auth0Dto): Promise<Auth | boolean> {
-    const date = new Date().toISOString()
-    let user: UserDocument = undefined
-    switch(true) {
-      case (input.appleAuth !== null):
-        const appleAuth = verifyAppleAuth(input.appleAuth)
-        user = await this.userModel.findOneAndUpdate(
-          { appleAuth: appleAuth, },
-          input.lat !== undefined && input.lon !== undefined
-            ? { $set: { locale: input.locale, lastSeen: date, lastCoordinates: [input.lon, input.lat], }, }
-            : { $set: { locale: input.locale, lastSeen: date, }, },
-          { upsert: true, },
-        ).lean()
-        break
-      case (input.googleAuth !== null):
-        const googleAuth = verifyGoogleAuth(input.googleAuth)
-        user = await this.userModel.findOneAndUpdate(
-          { googleAuth: googleAuth, },
-          input.lat !== undefined && input.lon !== undefined
-            ? { $set: { locale: input.locale, lastSeen: date, lastCoordinates: [input.lon, input.lat], }, }
-            : { $set: { locale: input.locale, lastSeen: date, }, },
-          { upsert: true, },
-        ).lean()
-      default:
-        break
+  async signIn(input: SignInDto, @Context() context: any): Promise<Auth> {
+    let user: UserDocument
+    if (input.appleAuth) {
+      const appleAuth = await verifyAppleAuth(input.appleAuth)
+      user = await this.userModel.findOneAndUpdate(
+        { appleAuth: appleAuth, deleted: false, },
+        { $setOnInsert: { appleAuth: appleAuth, }, },
+        { upsert: true, new: true, returnDocument: 'after', }
+      ).lean()
+    }
+    if (!user && !input.appleAuth && context.req.headers['access-token'] && context.req.headers['access-token'] !== 'null') {
+      const { userId, } = this.jwtService.verify(context.req.headers['access-token']) as AuthDecodedToken
+      user = await this.userModel.findOne(
+        { _id: new mongoose.mongo.ObjectId(userId), },
+      ).lean()
     }
     if (user) {
-      if (!user.phoneAuth.verified) return false
-      this.userRecordsModel.updateOne(
-        { userId: user._id.toString(), },
-        { $set: { appVersion: input?.appVersion, }, $addToSet: { logins: date.split('T')[0], IPs: input?.IP, deviceIds: input?.deviceId, carriers: input?.carrier, }, },
-        { upsert: true, },
-      ).then(() => {})
+      let code = null
+      if (!code && !user.phoneAuth.verified) code = SignInErrors.VerifyPhoneNumber
+      if (!code && (!user.name || !user.dob)) code = SignInErrors.IncompleteAccount
+      if (!code && (user.sex === undefined || user.streetPassPreferences.sex === undefined)) code = SignInErrors.IncompletePreferences
+      if (!code && !user.media.length) code = SignInErrors.IncompleteProfile
       const accessToken = this.jwtService.sign({ userId: user._id.toString(), }, accessConfig)
       const refreshToken = this.jwtService.sign({ userId: user._id.toString(), }, refreshConfig)
       return {
@@ -78,109 +57,57 @@ export class AuthService {
           dob: user.dob,
           sex: user.sex,
           bio: user.bio,
+          work: user.work,
+          school: user.school,
+          streetPass: user.streetPass,
           streetPassPreferences: user.streetPassPreferences,
           notificationPreferences: user.notificationPreferences,
-          privacyPreferences: user.privacyPreferences
-        }
+          media: user.media.map(media => { return { mediaId: media.mediaId, image: media.image, video: media.video, thumbnail: media.thumbnail, }}),
+          joinDate: new Date(parseInt(user._id.toString().substring(0, 8), 16) * 1000),
+        },
+        code: code,
       }
     }
     throw new GraphQLError(Errors.GeneralError)
   }
 
-  async authPhone(input: AuthPhoneDto): Promise<Auth | boolean> {
-    if (!validatePhonenumber(input.phoneNumber)) throw new GraphQLError(Errors.InputError)
-    const date = new Date()
-    const user = await this.userModel.findOneAndUpdate(
-      { phoneNumber: `${input.countryCode}${input.phoneNumber}`, },
-      { $set: { locale: input.locale, lastSeen: date, lastCoordinates: [input.lon || 0, input.lat || 0], }, },
-    ).lean()
-
-    if (!user) {
+  async sendPin(input: SendPinDto, @Context() context: any): Promise<boolean> {
+    if (!validatePhoneNumber(input.phoneNumber)) throw new GraphQLError(Errors.InputError)
+    const { userId, } = this.jwtService.verify(context.req.headers['access-token']) as AuthDecodedToken
+    const user = await this.userModel.findOne({ _id: new mongoose.mongo.ObjectId(userId), }).lean()
+    if (user) {
       const securityPin = Math.floor(100000 + Math.random() * 900000).toString()
+      console.log(securityPin) // TODO - send pin SMS below
       const securityPinHash = await bcrypt.hash(securityPin, 10)
-      const user = await new this.userModel({
-        phoneAuth: { verified: false, securityPin: securityPinHash, expiresAt: new Date(Date.now() + Time.Hour * 1000), },
-        phoneNumber: `${input.countryCode}${input.phoneNumber}`,
-        countryCode: input.countryCode,
-        locale: input.locale,
-        lastSeen: date,
-        lastCoordinates: [input.lon || 0, input.lat || 0],
-      }).save()
-      await new this.userRecordsModel(
-        { userId: user._id.toString(), },
-        { $set: { appVersion: input?.appVersion, }, $addToSet: { logins: date.toISOString().split('T')[0], IPs: input?.IP, deviceIds: input?.deviceId, carriers: input?.carrier, }, },
-      ).save()
-      sendSMS({
-        phonenumber: `${user.countryCode}${user.phoneNumber}`,
-        sms: `Verify your phone number with this pin - ${securityPin}\nStreetPass`,
-      })
-      return false
-    }
-
-    if (user && !user.phoneAuth.verified) {
-      const securityPin = Math.floor(100000 + Math.random() * 900000).toString()
-      const securityPinHash = await bcrypt.hash(securityPin, 10)
-      await this.userModel.updateOne(
-        { _id: new mongoose.mongo.ObjectId(user._id), },
-        { $set: {
-          phoneAuth: { verified: false, securityPin: securityPinHash, expiresAt: new Date(Date.now() + Time.Hour * 1000), },
-          locale: input.locale,
-          lastSeen: date,
-          lastCoordinates: [input.lon || 0, input.lat || 0],
-        }, },
-      )
-      this.userRecordsModel.updateOne(
-        { userId: user._id.toString(), },
-        { $set: { appVersion: input?.appVersion, }, $addToSet: { logins: date.toISOString().split('T')[0], IPs: input?.IP, deviceIds: input?.deviceId, carriers: input?.carrier, }, },
-        { upsert: true, },
-      ).then(() => {})
-      sendSMS({
-        phonenumber: `${user.countryCode}${user.phoneNumber}`,
-        sms: `Verify your phone number with this pin - ${securityPin}\nStreetPass`,
-      })
+      if (!user.identicalNumber || user.identicalNumber !== `${input.countryCode}${input.phoneNumber}`.replace(/\s/g, '')) {
+        await this.userModel.updateOne(
+          { _id: new mongoose.mongo.ObjectId(userId) },
+          { $set: {
+              phoneAuth: { verified: false, securityPin: securityPinHash, expiresAt: new Date(Date.now() + Time.Hour * 1000), },
+              identicalNumber: `${input.countryCode}${input.phoneNumber}`.replace(/\s/g, ''),
+              phoneNumber: input.phoneNumber,
+              countryCode: input.countryCode,
+          }, },
+        )
+      }
+      // sendSMS({
+      //   phonenumber: `${user.countryCode}${user.phoneNumber}`,
+      //   sms: `Use this pin to verify your phone number: ${securityPin}.\n- StreetPass`,
+      // })
       return true
     }
-
-    if (user && user.phoneAuth.verified) {
-      this.userRecordsModel.updateOne(
-        { userId: user._id.toString(), },
-        { $set: { appVersion: input?.appVersion, }, $addToSet: { logins: date.toISOString().split('T')[0], IPs: input?.IP, deviceIds: input?.deviceId, carriers: input?.carrier, }, },
-        { upsert: true, },
-      ).then(() => {})
-      const accessToken = this.jwtService.sign({ userId: user._id.toString(), }, accessConfig)
-      const refreshToken = this.jwtService.sign({ userId: user._id.toString(), }, refreshConfig)
-      return {
-        accessToken: accessToken,
-        refreshToken: refreshToken,
-        user: {
-          userId: user._id.toString(),
-          countryCode: user.countryCode,
-          phoneNumber: user.phoneNumber,
-          email: user.email,
-          name: user.name,
-          dob: user.dob,
-          sex: user.sex,
-          bio: user.bio,
-          streetPassPreferences: user.streetPassPreferences,
-          notificationPreferences: user.notificationPreferences,
-          privacyPreferences: user.privacyPreferences
-        }
-      }
-    }
     throw new GraphQLError(Errors.GeneralError)
   }
 
-  async verifyPhone(input: VerifyPhoneDto): Promise<boolean> {
-    if (!validatePhonenumber(input.phoneNumber)) throw new GraphQLError(Errors.InputError)
-    const user = await this.userModel.findOne({ phoneNumber: `${input.countryCode}${input.phoneNumber}`, }).lean()
+  async verifyPhoneNumber(input: VerifyPhoneNumberDto, @Context() context: any): Promise<boolean> {
+    const { userId, } = this.jwtService.verify(context.req.headers['access-token']) as AuthDecodedToken
+    const user = await this.userModel.findOne({ _id: new mongoose.mongo.ObjectId(userId), }).lean()
     if (user) {
-      const date = new Date()
       const pinMatch = await bcrypt.compare(input.securityPin, user.phoneAuth.securityPin)
       if (pinMatch && user.phoneAuth.expiresAt > new Date()) {
         await this.userModel.findOneAndUpdate(
-          { phoneNumber: `${input.countryCode}${input.phoneNumber}`, },
-          { $set: { phoneAuth: { verified: true, }, }, },
-        ).lean()
+          { _id: new mongoose.mongo.ObjectId(userId), },
+          { $set: { phoneAuth: { verified: true, securityPin: user.phoneAuth.securityPin, expiresAt: new Date(Date.now() + Time.Minute * 7 * 1000), }, }, }).lean()
         return true
       }
     }
@@ -198,20 +125,52 @@ export class AuthService {
     }
   }
 
-  async refresh(input: RefreshAuthDto, @Context() context: any): Promise<AuthTokens> {
+  async deleteAccount(@Context() context: any): Promise<boolean> {
+    const { userId, } = this.jwtService.verify(context.req.headers['access-token']) as AuthDecodedToken
+    const user = await this.userModel.findOne({ _id: new mongoose.mongo.ObjectId(userId), }).lean()
+    if (user) {
+      for (const medium of user.media) {
+        if (medium.image) await s3.deleteObject({ Bucket: process.env.S3_MEDIA_BUCKET as string, Key: medium.image.split('/')[medium.image.split('/').length - 1], }).promise() // TODO - revise
+        if (medium.video) await s3.deleteObject({ Bucket: process.env.S3_MEDIA_BUCKET as string, Key: medium.video.split('/')[medium.video.split('/').length - 1], }).promise() // TODO - revise
+        if (medium.thumbnail) await s3.deleteObject({ Bucket: process.env.S3_MEDIA_BUCKET as string, Key: medium.thumbnail.split('/')[medium.thumbnail.split('/').length - 1], }).promise() // TODO - revise
+        if (medium.compact) await s3.deleteObject({ Bucket: process.env.S3_MEDIA_BUCKET as string, Key: medium.compact.split('/')[medium.compact.split('/').length - 1], }).promise() // TODO - revise
+      }
+
+      // const { chats, } = await this.userChatsModel.findOne({ userId: userId, })
+      // chats.forEach(async chat => {
+      //   await this.userChatsModel.findOneAndUpdate(
+      //     { userId: chat.userId, },
+      //     { $pull: { chats: { userId: userId, }, }, },
+      //   )
+      //   // TODO - pubsub delete chat
+      //   await this.chatModel.deleteOne({ _id: new mongoose.mongo.ObjectId(chat.chatId), })
+      // })
+      // await this.userChatsModel.deleteOne({ userId: userId, })
+
+      // await this.interactionModel.deleteMany({ userId: userId, })
+      // const interactions = await this.interactionModel.find({ targetUserId: userId, })
+      // interactions.forEach(async interaction => {
+      //   await this.interactionsModel.updateOne(
+      //     { userId: interaction.userId, },
+      //     { $pull: { interactions: userId, }, },
+      //   )
+      // })
+      // await this.interactionsModel.deleteOne({ userId: userId, })
+
+      // await this.streetPassesModel.deleteOne({ userId: userId, })
+
+      await this.userModel.updateOne(
+        { _id: new mongoose.mongo.ObjectId(userId), },
+        { $set: { deleted: true, identicalNumber: userId, media: [], }, },
+      )
+      return true
+    }
+    throw new GraphQLError(Errors.NotFound)
+  }
+
+  async refresh(@Context() context: any): Promise<AuthTokens> {
     const jwtVerified = this.jwtService.verify(context.req.headers['refresh-token'])
     if (jwtVerified) {
-      const date = new Date().toISOString()
-      this.userModel.findOneAndUpdate(
-        { _id: new mongoose.mongo.ObjectId(jwtVerified.userId), },
-        input.lat !== undefined && input.lon !== undefined
-          ? { $set: { locale: input.locale || undefined, lastLogin: date, lastCoordinates: [input.lon, input.lat], }, }
-          : { $set: { locale: input.locale || undefined, lastLogin: date, }, },
-      ).then(() => {})
-      this.userRecordsModel.updateOne(
-        { userId: jwtVerified.userId, },
-        { $set: { appVersion: input?.appVersion, }, $addToSet: { logins: date.split('T')[0], IPs: input?.IP, deviceIds: input?.deviceId, carriers: input?.carrier, }, },
-      ).then(() => {})
       const accessToken = this.jwtService.sign({ userId: jwtVerified.userId, }, accessConfig)
       const refreshToken = this.jwtService.sign({ userId: jwtVerified.userId, }, refreshConfig)
       return {
@@ -220,45 +179,6 @@ export class AuthService {
       }
     }
     throw new GraphQLError(Errors.AuthError)
-  }
-
-  async remove(@Context() context: any): Promise<boolean> {
-    const { userId, } = this.jwtService.verify(context.req.headers['access-token']) as AuthDecodedToken
-    const user = await this.userModel.findOne({ _id: new mongoose.mongo.ObjectId(userId), }).lean()
-    if (user) {
-      // TODO - cleanup user media from S3
-      // if (user.profilePictureThumbnail) await s3.deleteObject({ Bucket: process.env.S3_PROFILE_PICTURES_BUCKET as string, Key: user.profilePictureThumbnail.split('/')[user.profilePictureThumbnail.split('/').length - 1], }).promise() // TODO - revise
-      // if (user.profilePicture) await s3.deleteObject({ Bucket: process.env.S3_PROFILE_PICTURES_BUCKET as string, Key: user.profilePicture.split('/')[user.profilePicture.split('/').length - 1], }).promise() // TODO - revise
-
-      const { chats, } = await this.userChatsModel.findOne({ userId: userId, })
-      chats.forEach(async chat => {
-        await this.userChatsModel.findOneAndUpdate(
-          { userId: chat.userId, },
-          { $pull: { chats: { userId: userId, }, }, },
-        )
-        // TODO - pubsub delete chat
-        await this.chatModel.deleteOne({ _id: new mongoose.mongo.ObjectId(chat.chatId), })
-      })
-      await this.userChatsModel.deleteOne({ userId: userId, })
-
-      await this.interactionModel.deleteMany({ userId: userId, })
-      const interactions = await this.interactionModel.find({ targetUserId: userId, })
-      interactions.forEach(async interaction => {
-        await this.interactionsModel.updateOne(
-          { userId: interaction.userId, },
-          { $pull: { interactions: userId, }, },
-        )
-      })
-      await this.interactionsModel.deleteOne({ userId: userId, })
-
-      await this.streetPassesModel.deleteOne({ userId: userId, })
-      await this.userModel.updateOne(
-        { _id: new mongoose.mongo.ObjectId(userId), },
-        { $set: { deleted: true, }, }
-      )
-      return true
-    }
-    throw new GraphQLError(Errors.NotFound)
   }
 }
 

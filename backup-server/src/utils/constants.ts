@@ -1,6 +1,5 @@
 import { Stream, } from 'stream'
 import { S3, } from 'aws-sdk'
-import { registerEnumType } from '@nestjs/graphql'
 
 export const accessConfig = { expiresIn: '420s', }
 export const refreshConfig = { expiresIn: '30d', }
@@ -31,13 +30,6 @@ export enum Errors {
   GeneralError = 'general error',
 }
 
-export enum SignInErrors {
-  VerifyPhoneNumber = 'verify phone number',
-  IncompleteAccount = 'incomplete account',
-  IncompletePreferences = 'incomplete preferences',
-  IncompleteProfile = 'incomplete profile',
-}
-
 export const InputLimits = {
   UsernameMin: 3,
   UsernameMax: 16,
@@ -54,7 +46,6 @@ export const InputLimits = {
   UploadBytesMax: 134217728,
   StreetPassAgeMin: 18,
   StreetPassAgeMax: 99,
-  MediaUploadsMax: 9,
 }
 
 export const PubSubOptions = { host: process.env.REDIS_HOST, port: Number(process.env.REDIS_PORT), }

@@ -1,31 +1,33 @@
-import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql'
-import { Auth, AuthTokens, } from './/auth.entities'
-import { RegisterDeviceDto, Auth0Dto, AuthPhoneDto, VerifyPhoneDto, RefreshAuthDto, } from './auth.dto'
-import { AuthGuard, AuthService } from './auth.service'
-import { UseGuards } from '@nestjs/common'
-import { Throttle } from '@nestjs/throttler'
-import { Time } from 'src/utils/constants'
+import { Args, Context, Mutation, Query, Resolver, } from '@nestjs/graphql'
+import { VerifyPhoneNumberDto, SignInDto, SendPinDto, RegisterDeviceDto, } from './auth.dto'
+import { AuthGuard, AuthService, } from './auth.service'
+import { UseGuards, } from '@nestjs/common'
+import { Throttle, } from '@nestjs/throttler'
+import { Time, } from 'src/utils/constants'
+import { Auth, AuthTokens, } from './auth.entities'
 
 @Resolver()
 export class AuthResolver {
   constructor(private authService: AuthService) {}
 
-  @Mutation(() => Auth || Boolean)
-  @Throttle(30, Time.Month)
-  async auth0(@Args('input') input: Auth0Dto) {
-    return this.authService.auth0(input)
-  }
-
-  @Mutation(() => Auth || Boolean)
-  @Throttle(30, Time.Month)
-  async authPhone(@Args('input') input: AuthPhoneDto) {
-    return this.authService.authPhone(input)
+  @Mutation(() => Auth)
+  @Throttle(7, Time.Hour)
+  async signIn(@Args('input') input: SignInDto, @Context() context: any) {
+    return this.authService.signIn(input, context)
   }
 
   @Mutation(() => Boolean)
-  @Throttle(30, Time.Month)
-  async verifyPhone(@Args('input') input: VerifyPhoneDto) {
-    return this.authService.verifyPhone(input)
+  @UseGuards(AuthGuard)
+  @Throttle(3, Time.Day)
+  async sendPin(@Args('input') input: SendPinDto, @Context() context: any) {
+    return this.authService.sendPin(input, context)
+  }
+
+  @Mutation(() => Boolean)
+  @UseGuards(AuthGuard)
+  @Throttle(3, Time.Day)
+  async verifyPhoneNumber(@Args('input') input: VerifyPhoneNumberDto, @Context() context: any) {
+  return this.authService.verifyPhoneNumber(input, context)
   }
 
   @Mutation(() => Boolean)
@@ -34,13 +36,14 @@ export class AuthResolver {
   }
 
   @Query(() => AuthTokens)
-  async refreshTokens(@Args('input') input: RefreshAuthDto, @Context() context: any) {
-    return this.authService.refresh(input, context)
+  async refreshTokens(@Context() context: any) {
+    return this.authService.refresh(context)
   }
 
   @Mutation(() => Boolean)
   @UseGuards(AuthGuard)
-  async deleteAuth(@Context() context: any) {
-    return this.authService.remove(context)
+  @Throttle(3, Time.Day)
+  async deleteAccount(@Context() context: any) {
+    return this.authService.deleteAccount(context)
   }
 }

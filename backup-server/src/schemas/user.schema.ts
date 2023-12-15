@@ -1,28 +1,6 @@
 import { Prop, Schema, SchemaFactory, raw } from '@nestjs/mongoose'
-import mongoose, { HydratedDocument, Types, } from 'mongoose'
+import { HydratedDocument } from 'mongoose'
 import { InputLimits } from 'src/utils/constants'
-
-export type MediaDocument = HydratedDocument<Media>
-@Schema()
-export class Media {
-  @Prop({ required: true, })
-  mediaId: string
-
-  @Prop({ required: false, })
-  image: string
-
-  @Prop({ required: false, })
-  video: string
-
-  @Prop({ required: true, })
-  thumbnail: string
-
-  @Prop({ required: true, })
-  compact: string
-
-  @Prop({ required: true, })
-  date: Date
-}
 
 export type PhoneAuthDocument = HydratedDocument<PhoneAuth>
 @Schema()
@@ -46,7 +24,7 @@ export class StreetPassPreferences {
   @Prop({ required: true, default: true, })
   location: boolean
 
-  @Prop({ required: false, default: undefined, })
+  @Prop({ required: false, default: null, })
   sex: boolean | null // true/male, false/female, null/any
 
   @Prop({ required: true, default: [InputLimits.StreetPassAgeMin, InputLimits.StreetPassAgeMax], })
@@ -66,17 +44,20 @@ export class NotificationPreferences {
   streetPasses: boolean
 
   @Prop({ required: true, default: true, })
+  alerts: boolean
+
+  @Prop({ required: true, default: true, })
   emails: boolean
 
   @Prop({ required: true, default: true, })
   newsletters: boolean
 }
 
-// export type PrivacyPreferencesDocument = HydratedDocument<PrivacyPreferences>
-// @Schema()
-// export class PrivacyPreferences {
-//   //
-// }
+export type PrivacyPreferencesDocument = HydratedDocument<PrivacyPreferences>
+@Schema()
+export class PrivacyPreferences {
+  //
+}
 
 export type DeviceTokensDocument = HydratedDocument<DeviceTokens>
 @Schema()
@@ -91,23 +72,20 @@ export class DeviceTokens {
 export type UserDocument = HydratedDocument<User>
 @Schema()
 export class User {
-  @Prop({ required: false, index: true, })
+  @Prop({ required: true, default: () => new PhoneAuth(), })
+  phoneAuth: PhoneAuth
+
+  @Prop({ required: true, index: true, })
   appleAuth: string
 
-  @Prop({ required: false, index: true, })
+  @Prop({ required: true, index: true, })
   googleAuth: string
-
-  @Prop({ required: false, unique: true, index: true, })
-  identicalNumber: string
   
-  @Prop({ required: false, })
+  @Prop({ required: true, unique: true, index: true, })
   phoneNumber: string
 
   @Prop({ required: false, })
   countryCode: string
-
-  @Prop({ required: true, default: () => new PhoneAuth(), })
-  phoneAuth: PhoneAuth
 
   @Prop({ required: false, index: true, })
   email: string
@@ -118,23 +96,14 @@ export class User {
   @Prop({ required: false, })
   dob: Date
 
-  @Prop({ required: false, default: undefined, })
+  @Prop({ required: true, default: false, })
   sex: boolean | null // true/male, false/female, null/any
 
   @Prop({ required: false, })
   locale: string
 
-  @Prop({ required: true, default: [], })
-  media: Media[]
-
   @Prop({ required: false, })
   bio: string
-
-  @Prop({ required: false, })
-  work: string
-
-  @Prop({ required: false, })
-  school: string
 
   @Prop({ required: true, default: false, })
   deleted: boolean
@@ -143,13 +112,10 @@ export class User {
   banned: boolean
 
   @Prop({ required: false, index: '2dsphere', })
-  lastCoordinates: [number, number] // lon, lat
+  lastCoordinates: [number, number] // !lon, lat
 
   @Prop({ required: false, })
   lastSeen: Date
-
-  @Prop({ required: true, default: false, })
-  streetPass: boolean
 
   @Prop({ required: true, default: () => new StreetPassPreferences(), })
   streetPassPreferences: StreetPassPreferences
@@ -157,8 +123,8 @@ export class User {
   @Prop({ required: true, default: () => new NotificationPreferences(), })
   notificationPreferences: NotificationPreferences
 
-  // @Prop({ required: true, default: () => new PrivacyPreferences(), })
-  // privacyPreferences: PrivacyPreferences
+  @Prop({ required: true, default: () => new PrivacyPreferences(), })
+  privacyPreferences: PrivacyPreferences
 
   @Prop({ required: true, default: () => new DeviceTokens(), })
   deviceTokens: DeviceTokens

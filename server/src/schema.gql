@@ -1,0 +1,140 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Auth {
+  accessToken: String!
+  code: String
+  refreshToken: String!
+  user: AuthUser!
+}
+
+type AuthTokens {
+  accessToken: String!
+  refreshToken: String!
+}
+
+type AuthUser {
+  bio: String
+  countryCode: String
+  dob: DateTime
+  email: String
+  joinDate: DateTime!
+  media: [UserMedia!]!
+  name: String
+  notificationPreferences: NotificationPreferences!
+  phoneNumber: String
+  school: String
+  sex: Boolean
+  streetPass: Boolean
+  streetPassPreferences: StreetPassPreferences!
+  userId: String!
+  work: String
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+input GetUserDto {
+  userId: String
+}
+
+type Mutation {
+  deleteAccount: Boolean!
+  registerDevice(input: RegisterDeviceDto!): Boolean!
+  removeMedia(input: RemoveMediaDto!): Boolean!
+  sendPin(input: SendPinDto!): Boolean!
+  signIn(input: SignInDto!): Auth!
+  sortMedia(input: SortMediaDto!): Boolean!
+  updateUser(input: UpdateUserDto!): Boolean!
+  uploadMedia(input: UploadMediaDto!): String!
+  verifyPhoneNumber(input: VerifyPhoneNumberDto!): Boolean!
+}
+
+type NotificationPreferences {
+  emails: Boolean!
+  matches: Boolean!
+  messages: Boolean!
+  newsletters: Boolean!
+  streetPasses: Boolean!
+}
+
+type Query {
+  getUser(input: GetUserDto!): UserProfile!
+  refreshTokens: AuthTokens!
+}
+
+input RegisterDeviceDto {
+  deviceToken: String!
+  manufacturer: String!
+  unregister: Boolean
+}
+
+input RemoveMediaDto {
+  mediaIds: [String!]!
+}
+
+input SendPinDto {
+  countryCode: String!
+  phoneNumber: String!
+}
+
+input SignInDto {
+  appleAuth: String
+}
+
+input SortMediaDto {
+  mediaIds: [String!]!
+}
+
+type StreetPassPreferences {
+  age: [Float!]
+  discoverable: Boolean
+  location: Boolean
+  sex: Boolean
+}
+
+input UpdateUserDto {
+  bio: String
+  dob: DateTime
+  email: String
+  name: String
+  notificationPreferences: String
+  school: String
+  sex: Boolean
+  streetPass: Boolean
+  streetPassPreferences: String
+  work: String
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
+
+input UploadMediaDto {
+  image: Upload
+  video: Upload
+}
+
+type UserMedia {
+  image: String
+  mediaId: String!
+  thumbnail: String!
+  video: String
+}
+
+type UserProfile {
+  age: Float!
+  bio: String
+  media: [UserMedia!]!
+  name: String!
+  school: String
+  sex: Boolean
+  userId: String!
+  work: String
+}
+
+input VerifyPhoneNumberDto {
+  securityPin: String!
+}

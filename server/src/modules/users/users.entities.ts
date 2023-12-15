@@ -1,6 +1,21 @@
 import { ObjectType, Field, } from '@nestjs/graphql'
 
 @ObjectType()
+export class UserMedia {
+  @Field(() => String)
+  mediaId: string
+
+  @Field(() => String, { nullable: true, })
+  image?: string
+
+  @Field(() => String, { nullable: true, })
+  video?: string
+
+  @Field(() => String)
+  thumbnail: string
+}
+
+@ObjectType()
 export class UserProfile {
   @Field(() => String)
   userId: string
@@ -10,46 +25,19 @@ export class UserProfile {
 
   @Field(() => String, { nullable: true, })
   bio?: string
-}
 
-@ObjectType()
-export class Coordinates {
-  @Field(() => Number)
-  lat: number
+  @Field(() => String, { nullable: true, })
+  work?: string
 
-  @Field(() => Number)
-  lon: number
-}
-
-@ObjectType()
-export class StreetPass {
-  @Field(() => String)
-  userId: string
-
-  @Field(() => String)
-  name: string
-
-  @Field(() => Number)
-  age: number
+  @Field(() => String, { nullable: true, })
+  school?: string
 
   @Field(() => Boolean, { nullable: true, })
   sex?: boolean
 
-  @Field(() => Coordinates, { nullable: true, })
-  coordinates?: Coordinates
-
-  @Field(() => Date)
-  date: Date
-}
-
-@ObjectType()
-export class StreetPassesPagination {
   @Field(() => Number)
-  count: number
+  age: number
 
-  @Field(() => [StreetPass])
-  streetPasses: StreetPass[]
-
-  @Field(() => Number)
-  page: number
+  @Field(() => [UserMedia])
+  media: UserMedia[]
 }

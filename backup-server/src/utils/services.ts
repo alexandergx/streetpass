@@ -5,9 +5,8 @@ import apn from 'apn'
 import { DeviceTokens, } from 'src/schemas/user.schema'
 import { Worker, } from 'worker_threads'
 import { getS3Key, } from './functions'
-import appleSignin from 'apple-signin-auth'
+import verifyAppleIdToken from 'verify-apple-id-token'
 import { OAuth2Client, } from 'google-auth-library'
-import { GraphQLError } from 'graphql'
 
 export class Logger extends ConsoleLogger implements LoggerService {
   log(message: any, context?: string) { super.log(message, context) }
@@ -26,13 +25,13 @@ export class Logger extends ConsoleLogger implements LoggerService {
 
 export async function verifyAppleAuth(appleAuth: string): Promise<string | null> {
   try {
-    const { sub, } = await appleSignin.verifyIdToken(appleAuth, {
-      audience: process.env.APPLE_APP_BUNDLE_IDENTIFIER,
-      ignoreExpiration: true,
+    const payload = await verifyAppleIdToken({
+      idToken: appleAuth,
+      clientId: process.env.APPLE_DEVELOPER_APP_ID,
     })
-    return sub
+    return payload.sub
   } catch (e) {
-    throw new GraphQLError(Errors.AuthError)
+    return Errors.AuthError
   }
 }
 
@@ -50,15 +49,14 @@ export async function verifyGoogleAuth(googleAuth: string): Promise<string | nul
   }
 }
 
-const providerAPNs: any = undefined
-// const providerAPNs = new apn.Provider({
-//   token: {
-//     key: `./credentials/AuthKey_${process.env.APPLE_DEVELOPER_KEY_ID}.p8`,
-//     keyId: process.env.APPLE_DEVELOPER_KEY_ID,
-//     teamId: process.env.APPLE_DEVELOPER_TEAM_ID,
-//   },
-//   production: process.env.APP_ENV === 'production' ? true : false,
-// })
+const providerAPNs = new apn.Provider({
+  token: {
+    key: `./credentials/AuthKey_${process.env.APPLE_DEVELOPER_KEY_ID}.p8`,
+    keyId: process.env.APPLE_DEVELOPER_KEY_ID,
+    teamId: process.env.APPLE_DEVELOPER_TEAM_ID,
+  },
+  production: process.env.APP_ENV === 'production' ? true : false,
+})
 export interface SendPushNotification {
   deviceTokens: DeviceTokens,
   message: string,

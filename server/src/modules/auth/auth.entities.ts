@@ -1,4 +1,5 @@
 import { ObjectType, Field, } from '@nestjs/graphql'
+import { UserMedia } from '../users/users.entities'
 
 @ObjectType()
 export class StreetPassPreferences {
@@ -27,9 +28,6 @@ export class NotificationPreferences {
   streetPasses: boolean
 
   @Field(() => Boolean)
-  alerts: boolean
-
-  @Field(() => Boolean)
   emails: boolean
 
   @Field(() => Boolean)
@@ -37,29 +35,24 @@ export class NotificationPreferences {
 }
 
 @ObjectType()
-export class PrivacyPreferences {
-  //
-}
-
-@ObjectType()
 export class AuthUser {
   @Field(() => String)
   userId: string
   
-  @Field(() => String)
-  phoneNumber: string
+  @Field(() => String, { nullable: true, })
+  phoneNumber?: string
 
-  @Field(() => String)
-  countryCode: string
+  @Field(() => String, { nullable: true, })
+  countryCode?: string
 
   @Field(() => String, { nullable: true, })
   email?: string
 
-  @Field(() => String)
-  name: string
+  @Field(() => String, { nullable: true, })
+  name?: string
 
-  @Field(() => Date)
-  dob: Date
+  @Field(() => Date, { nullable: true, })
+  dob?: Date
 
   @Field(() => Boolean, { nullable: true, })
   sex?: boolean
@@ -67,14 +60,26 @@ export class AuthUser {
   @Field(() => String, { nullable: true, })
   bio?: string
 
+  @Field(() => String, { nullable: true, })
+  work?: string
+
+  @Field(() => String, { nullable: true, })
+  school?: string
+
+  @Field(() => Boolean, { nullable: true, })
+  streetPass?: boolean
+
   @Field(() => StreetPassPreferences)
   streetPassPreferences: StreetPassPreferences
 
   @Field(() => NotificationPreferences)
   notificationPreferences: NotificationPreferences
 
-  @Field(() => PrivacyPreferences)
-  privacyPreferences: PrivacyPreferences
+  @Field(() => [UserMedia])
+  media: UserMedia[]
+
+  @Field(() => Date)
+  joinDate?: Date
 }
 
 @ObjectType()
@@ -87,6 +92,9 @@ export class Auth {
 
   @Field(() => AuthUser)
   user: AuthUser
+
+  @Field(() => String, { nullable: true, })
+  code?: string
 }
 
 @ObjectType()
@@ -103,9 +111,9 @@ export class AuthDecodedToken {
   @Field(() => String)
   userId: string
 
-  @Field(() => Number, { description: 'Issues At', })
+  @Field(() => Number, { description: 'Issued At', })
   iat: number
 
-  @Field(() => Number, { description: 'Expiration Date', })
+  @Field(() => Number, { description: 'Expires Date', })
   exp: number
 }

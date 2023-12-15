@@ -2,8 +2,7 @@ import sharp from 'sharp'
 import { Stream, } from 'stream'
 
 export const validateUsername = (text: string) => !/[^A-Za-z0-9_]/g.test(text)
-export const validatePhoneNumber = (text: string) => /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im.test(text)
-export const validateEmail = (text: string) => text.toLowerCase().match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)
+export const validatePhonenumber = (text: string) => /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im.test(text)
 
 export const isJpg = (buffer: Buffer): boolean => {
 	if (!buffer || buffer.length < 3) return false
