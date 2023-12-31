@@ -6,17 +6,29 @@ import { User, UserDocument, } from 'src/schemas/user.schema'
 import { JwtService, } from '@nestjs/jwt'
 import { AuthDecodedToken, } from '../auth/auth.entities'
 import { GraphQLError, } from 'graphql'
-import { Errors, PushNotificationMessage, NotificationType, InputLimits, Time, streetPassLimit, } from 'src/utils/constants'
-import { s3 } from '../../utils/constants'
-import { GetUserDto, RemoveMediaDto, UpdateUserDto, UploadMediaDto } from './users.dto'
-import { generateHash, getAge, streamToBuffer, validateEmail } from 'src/utils/functions'
-import { compressImage, compressVideo } from 'src/utils/services'
-import { UserProfile } from './users.entities'
+import { Errors, PushNotificationMessage, NotificationType, InputLimits, Time, streetpassLimit, } from 'src/utils/constants'
+import { s3, } from '../../utils/constants'
+import { BlockUserDto, GetUserDto, RemoveMediaDto, UpdateUserDto, UploadMediaDto, } from './users.dto'
+import { generateHash, getAge, streamToBuffer, validateEmail, } from 'src/utils/functions'
+import { compressImage, compressVideo, } from 'src/utils/services'
+import { UserProfile, } from './users.entities'
+import { Streetpasses, StreetpassesDocument, } from 'src/schemas/streetpasses.schema'
+import { Matches, MatchesDocument, } from 'src/schemas/matches.schema'
+import { Matched, MatchedDocument, } from 'src/schemas/matched.schema'
+import { Blocked, BlockedDocument, } from 'src/schemas/blocked.schema'
+import { UserRecords, UserRecordsDocument, } from 'src/schemas/userRecords.schema'
+import { UserChats, UserChatsDocument, } from 'src/schemas/userChats.schema'
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
+    @InjectModel(UserRecords.name) private userRecordsModel: Model<UserRecordsDocument>,
+    @InjectModel(Streetpasses.name) private streetpassesModel: Model<StreetpassesDocument>,
+    @InjectModel(Matches.name) private matchesModel: Model<MatchesDocument>,
+    @InjectModel(Matched.name) private matchedModel: Model<MatchedDocument>,
+    @InjectModel(UserChats.name) private userChatsModel: Model<UserChatsDocument>,
+    @InjectModel(Blocked.name) private blockedModel: Model<BlockedDocument>,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -47,12 +59,27 @@ export class UsersService {
       name: user.name || input.name,
       dob: user.dob || input.dob,
       sex: user.sex !== undefined ? user.sex : input.sex,
-      streetPassPreferences: input.streetPassPreferences ? { ...user.streetPassPreferences, ...{ ...JSON.parse(input.streetPassPreferences), }, } : undefined,
+      streetpassPreferences: input.streetpassPreferences ? { ...user.streetpassPreferences, ...{ ...JSON.parse(input.streetpassPreferences), }, } : undefined,
       notificationPreferences: input.notificationPreferences ? { ...user.notificationPreferences, ...{ ...JSON.parse(input.notificationPreferences), }, } : undefined,
     }
     const updatedUser = await this.userModel.updateOne({ _id: new mongoose.mongo.ObjectId(userId), }, { $set: { ...update, }, })
     if (updatedUser.modifiedCount) return true
     return false
+  }
+
+  async blockUser(input: BlockUserDto, @Context() context: any): Promise<boolean> {
+    const { userId, } = this.jwtService.verify(context.req.headers['access-token']) as AuthDecodedToken
+    await this.streetpassesModel.updateOne({ userId: userId, }, { $pull: { streetpasses: { userId: input.userId, }, }, })
+    await this.streetpassesModel.updateOne({ userId: input.userId, }, { $pull: { streetpasses: { userId: userId, }, }, })
+    await this.matchesModel.updateOne({ userId: userId, }, { $pull: { matches: { userId: input.userId, }, }, })
+    await this.matchesModel.updateOne({ userId: input.userId, }, { $pull: { matches: { userId: userId, }, }, })
+    await this.matchedModel.updateOne({ userId: userId, }, { $pull: { matched: { userId: input.userId, }, }, })
+    await this.matchedModel.updateOne({ userId: input.userId, }, { $pull: { matched: { userId: userId, }, }, })
+    await this.userChatsModel.updateOne({ userId: userId, }, { $pull: { chats: { userId: input.userId, }, }, })
+    await this.userChatsModel.updateOne({ userId: input.userId, }, { $pull: { chats: { userId: userId, }, }, })
+    await this.blockedModel.updateOne({ userId: userId, }, { $addToSet: { blocking: input.userId, }, })
+    await this.blockedModel.updateOne({ userId: input.userId, }, { $addToSet: { blockers: userId, }, })
+    return true
   }
 
   async uploadMedia(input: UploadMediaDto, @Context() context: any): Promise<string> {
@@ -124,43 +151,7 @@ export class UsersService {
 export class PrivacyGuard implements CanActivate {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
-    private readonly jwtService: JwtService,
-  ) {}
-
-  async canActivate(context: ExecutionContext): Promise<boolean> {
-    // const request = GqlExecutionContext.create(context).getContext()
-    // if (request.req.headers['access-token'] && request.req.headers['access-token'] !== 'null') {
-    //   const { userId, } = this.jwtService.decode(request.req.headers['access-token']) as AuthDecodedToken
-    //   const input = request.req.body?.query ? request.req.body.query.match(/userId:\s+"([^"]+)"/) : request.req.body.mutation.match(/userId:\s+"([^"]+)"/)
-    //   if (input && input.length) {
-    //     const inputUserId = input[1]
-    //     if (userId === inputUserId) return true
-    //     const { blocking: authBlocking, } = await this.blockingModel.findOne({ userId: userId, }).lean() ?? {}
-    //     const { blocking, } = await this.blockingModel.findOne({ userId: inputUserId, }).lean() ?? {}
-    //     if (authBlocking?.includes(userId) || blocking?.includes(userId)) return false
-    //     // const query = request.req.body.query.match(/query\s*{\s*(\w+)/)
-    //     const mutation = request.req.body?.query?.match(/mutation\s*{\s*(\w+)/) || request.req.body?.mutation?.match(/mutation\s*{\s*(\w+)/)
-    //     if (mutation && mutation.length && mutation[0].includes('share')) {
-    //       const chat = await this.chatModel.findOne({ participants: { $all: [userId, inputUserId], }, }).lean()
-    //       if (chat) return true
-    //     }
-    //     const user = await this.userModel.findOne({ _id: new mongoose.mongo.ObjectId(inputUserId), }).lean()
-    //     const { followers, } = await this.followersModel.findOne({ userId: inputUserId, }).lean() ?? {}
-    //     if (user.privateProfile && !followers?.includes(userId)
-    //       && !['followUser', 'followRequest', 'subscribeUser', 'sendMessage'].some(query => request.req.body?.query.includes(query))
-    //     ) return false
-    //     return true
-    //   }
-    //   return true
-    // }
-    // throw new GraphQLError(Errors.AuthError)
-    return true
-  }
-}
-
-@Injectable()
-export class SelfGuard implements CanActivate {
-  constructor(
+    @InjectModel(Blocked.name) private blockedModel: Model<BlockedDocument>,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -171,7 +162,10 @@ export class SelfGuard implements CanActivate {
       const input = request.req.body?.query ? request.req.body.query.match(/userId:\s+"([^"]+)"/) : request.req.body.mutation.match(/userId:\s+"([^"]+)"/)
       if (input && input.length) {
         const inputUserId = input[1]
-        if (userId == inputUserId) return false
+        if (userId === inputUserId) return true
+        const { blocking, blockers, } = await this.blockedModel.findOne({ userId: userId, }).lean() ?? {}
+        if (blocking?.includes(inputUserId) || blockers?.includes(inputUserId)) return false
+        return true
       }
       return true
     }

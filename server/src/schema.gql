@@ -26,10 +26,20 @@ type AuthUser {
   phoneNumber: String
   school: String
   sex: Boolean
-  streetPass: Boolean
-  streetPassPreferences: StreetPassPreferences!
+  streetpass: Boolean
+  streetpassPreferences: StreetpassPreferences!
   userId: String!
   work: String
+}
+
+input ChatNotificationsDto {
+  chatId: String!
+  notifications: Boolean!
+}
+
+type ChatsPagination {
+  chats: [UserChat!]!
+  continue: Boolean!
 }
 
 """
@@ -37,17 +47,65 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+input GetChatsDto {
+  index: String
+}
+
+input GetMatchesDto {
+  index: Float
+}
+
+input GetMessagesDto {
+  chatId: String!
+  index: String
+}
+
 input GetUserDto {
   userId: String
 }
 
+type Match {
+  age: Float!
+  bio: String
+  date: String
+  media: [UserMedia!]!
+  name: String!
+  school: String
+  seen: Boolean!
+  sex: Boolean
+  unmatch: Boolean
+  userId: String!
+  work: String
+}
+
+input MatchDto {
+  match: Boolean!
+  userId: String!
+}
+
+type MatchesPagination {
+  continue: Boolean!
+  matches: [Match!]!
+}
+
+type MessagesPagination {
+  continue: Boolean!
+  messages: [UserMessage!]!
+}
+
 type Mutation {
+  chatNotifications(input: ChatNotificationsDto!): Boolean!
   deleteAccount: Boolean!
+  match(input: MatchDto!): Boolean!
+  readChat(input: ReadChatDto!): [UserChat!]!
   registerDevice(input: RegisterDeviceDto!): Boolean!
   removeMedia(input: RemoveMediaDto!): Boolean!
+  seenMatch(input: SeenMatchDto!): Boolean!
   sendPin(input: SendPinDto!): Boolean!
   signIn(input: SignInDto!): Auth!
   sortMedia(input: SortMediaDto!): Boolean!
+  streetpass(input: StreetpassDto!): Boolean!
+  unmatch(input: UnmatchDto!): Boolean!
   updateUser(input: UpdateUserDto!): Boolean!
   uploadMedia(input: UploadMediaDto!): String!
   verifyPhoneNumber(input: VerifyPhoneNumberDto!): Boolean!
@@ -58,12 +116,21 @@ type NotificationPreferences {
   matches: Boolean!
   messages: Boolean!
   newsletters: Boolean!
-  streetPasses: Boolean!
+  streetpasses: Boolean!
 }
 
 type Query {
+  getChats(input: GetChatsDto!): ChatsPagination!
+  getMatches(input: GetMatchesDto!): MatchesPagination!
+  getMessages(input: GetMessagesDto!): MessagesPagination!
+  getStreetpasses: [Streetpass!]!
   getUser(input: GetUserDto!): UserProfile!
   refreshTokens: AuthTokens!
+  searchChats(input: SearchChatsDto!): [UserChat!]!
+}
+
+input ReadChatDto {
+  chatId: String!
 }
 
 input RegisterDeviceDto {
@@ -74,6 +141,14 @@ input RegisterDeviceDto {
 
 input RemoveMediaDto {
   mediaIds: [String!]!
+}
+
+input SearchChatsDto {
+  name: String!
+}
+
+input SeenMatchDto {
+  userId: String!
 }
 
 input SendPinDto {
@@ -89,11 +164,51 @@ input SortMediaDto {
   mediaIds: [String!]!
 }
 
-type StreetPassPreferences {
+type Streetpass {
+  age: Float!
+  bio: String
+  date: DateTime!
+  media: [UserMedia!]!
+  name: String!
+  school: String
+  sex: Boolean
+  userId: String!
+  work: String
+}
+
+input StreetpassDto {
+  lat: Float!
+  lon: Float!
+}
+
+type StreetpassPreferences {
   age: [Float!]
   discoverable: Boolean
   location: Boolean
   sex: Boolean
+}
+
+input SubscribeChatsDto {
+  chatId: String
+  userId: String!
+}
+
+input SubscribeMatchesDto {
+  userId: String!
+}
+
+input SubscribeStreetpassesDto {
+  userId: String!
+}
+
+type Subscription {
+  matches(input: SubscribeMatchesDto!): Match!
+  messages(input: SubscribeChatsDto!): UserMessage!
+  streetpasses(input: SubscribeStreetpassesDto!): Boolean!
+}
+
+input UnmatchDto {
+  userId: String!
 }
 
 input UpdateUserDto {
@@ -104,8 +219,8 @@ input UpdateUserDto {
   notificationPreferences: String
   school: String
   sex: Boolean
-  streetPass: Boolean
-  streetPassPreferences: String
+  streetpass: Boolean
+  streetpassPreferences: String
   work: String
 }
 
@@ -117,11 +232,35 @@ input UploadMediaDto {
   video: Upload
 }
 
+type UserChat {
+  age: Float!
+  bio: String!
+  chatId: String!
+  date: DateTime!
+  lastMessage: String!
+  media: [UserMedia!]!
+  name: String!
+  notifications: Boolean!
+  school: String!
+  sex: Boolean
+  unread: Boolean!
+  userId: String!
+  work: String!
+}
+
 type UserMedia {
   image: String
   mediaId: String!
   thumbnail: String!
   video: String
+}
+
+type UserMessage {
+  chatId: String!
+  date: String!
+  message: String!
+  messageId: String!
+  userId: String!
 }
 
 type UserProfile {

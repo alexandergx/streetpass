@@ -12,12 +12,22 @@ import { Errors, InputLimits, s3, accessConfig, refreshConfig, Time, SignInError
 import { sendSMS, verifyAppleAuth, verifyGoogleAuth, } from 'src/utils/services'
 import { UserRecords, UserRecordsDocument } from 'src/schemas/userRecords.schema'
 import { validatePhoneNumber } from 'src/utils/functions'
+import { Blocked, BlockedDocument } from 'src/schemas/blocked.schema'
+import { Streetpasses, StreetpassesDocument } from 'src/schemas/streetpasses.schema'
+import { Streetpassed, StreetpassedDocument } from 'src/schemas/streetpassed.schema'
+import { Matches, MatchesDocument } from 'src/schemas/matches.schema'
+import { Matched, MatchedDocument } from 'src/schemas/matched.schema'
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
-    @InjectModel(UserRecords.name) private userRecordsModel: Model<UserRecordsDocument>,
+    // @InjectModel(UserRecords.name) private userRecordsModel: Model<UserRecordsDocument>,
+    @InjectModel(Streetpasses.name) private streetpassesModel: Model<StreetpassesDocument>,
+    @InjectModel(Streetpassed.name) private streetpassedModel: Model<StreetpassedDocument>,
+    @InjectModel(Matches.name) private matchesModel: Model<MatchesDocument>,
+    @InjectModel(Matched.name) private matchedModel: Model<MatchedDocument>,
+    @InjectModel(Blocked.name) private blockedModel: Model<BlockedDocument>,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -38,10 +48,21 @@ export class AuthService {
       ).lean()
     }
     if (user) {
+      // this.userRecordsModel.updateOne(
+      //   { userId: user._id.toString(), },
+      //   { $set: { appVersion: input?.appVersion, }, $addToSet: { logins: date.split('T')[0], IPs: input?.IP, deviceIds: input?.deviceId, carriers: input?.carrier, }, },
+      //   { upsert: true, },
+      // ).then(() => {})
+      this.streetpassesModel.updateOne({ userId: user._id.toString(), }, { $setOnInsert: { streetpasses: [], }, }, { upsert: true, }).then(() => {})
+      this.streetpassedModel.updateOne({ userId: user._id.toString(), }, { $setOnInsert: { streetpassed: [], }, }, { upsert: true, }).then(() => {})
+      this.matchesModel.updateOne({ userId: user._id.toString(), }, { $setOnInsert: { matches: [], }, }, { upsert: true, }).then(() => {})
+      this.matchedModel.updateOne({ userId: user._id.toString(), }, { $setOnInsert: { matched: [], }, }, { upsert: true, }).then(() => {})
+      this.blockedModel.updateOne({ userId: user._id.toString(), }, { $setOnInsert: { blocking: [], blockers: [], }, }, { upsert: true, }).then(() => {})
+
       let code = null
       if (!code && !user.phoneAuth.verified) code = SignInErrors.VerifyPhoneNumber
       if (!code && (!user.name || !user.dob)) code = SignInErrors.IncompleteAccount
-      if (!code && (user.sex === undefined || user.streetPassPreferences.sex === undefined)) code = SignInErrors.IncompletePreferences
+      if (!code && (user.sex === undefined || user.streetpassPreferences.sex === undefined)) code = SignInErrors.IncompletePreferences
       if (!code && !user.media.length) code = SignInErrors.IncompleteProfile
       const accessToken = this.jwtService.sign({ userId: user._id.toString(), }, accessConfig)
       const refreshToken = this.jwtService.sign({ userId: user._id.toString(), }, refreshConfig)
@@ -59,8 +80,8 @@ export class AuthService {
           bio: user.bio,
           work: user.work,
           school: user.school,
-          streetPass: user.streetPass,
-          streetPassPreferences: user.streetPassPreferences,
+          streetpass: user.streetpass,
+          streetpassPreferences: user.streetpassPreferences,
           notificationPreferences: user.notificationPreferences,
           media: user.media.map(media => { return { mediaId: media.mediaId, image: media.image, video: media.video, thumbnail: media.thumbnail, }}),
           joinDate: new Date(parseInt(user._id.toString().substring(0, 8), 16) * 1000),
@@ -92,7 +113,7 @@ export class AuthService {
       }
       // sendSMS({
       //   phonenumber: `${user.countryCode}${user.phoneNumber}`,
-      //   sms: `Use this pin to verify your phone number: ${securityPin}.\n- StreetPass`,
+      //   sms: `Use this pin to verify your phone number: ${securityPin}.\n- Streetpass`,
       // })
       return true
     }
@@ -157,7 +178,7 @@ export class AuthService {
       // })
       // await this.interactionsModel.deleteOne({ userId: userId, })
 
-      // await this.streetPassesModel.deleteOne({ userId: userId, })
+      // await this.streetpassesModel.deleteOne({ userId: userId, })
 
       await this.userModel.updateOne(
         { _id: new mongoose.mongo.ObjectId(userId), },

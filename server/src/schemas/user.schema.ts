@@ -37,9 +37,9 @@ export class PhoneAuth {
   expiresAt: Date
 }
 
-export type StreetPassPreferencesDocument = HydratedDocument<StreetPassPreferences>
+export type StreetpassPreferencesDocument = HydratedDocument<StreetpassPreferences>
 @Schema()
-export class StreetPassPreferences {
+export class StreetpassPreferences {
   @Prop({ required: true, default: true, })
   discoverable: boolean
 
@@ -49,7 +49,7 @@ export class StreetPassPreferences {
   @Prop({ required: false, default: undefined, })
   sex: boolean | null // true/male, false/female, null/any
 
-  @Prop({ required: true, default: [InputLimits.StreetPassAgeMin, InputLimits.StreetPassAgeMax], })
+  @Prop({ required: true, default: [InputLimits.StreetpassAgeMin, InputLimits.StreetpassAgeMax], })
   age: [number, number] // min, max
 }
 
@@ -63,7 +63,7 @@ export class NotificationPreferences {
   matches: boolean
 
   @Prop({ required: true, default: true, })
-  streetPasses: boolean
+  streetpasses: boolean
 
   @Prop({ required: true, default: true, })
   emails: boolean
@@ -149,10 +149,10 @@ export class User {
   lastSeen: Date
 
   @Prop({ required: true, default: false, })
-  streetPass: boolean
+  streetpass: boolean
 
-  @Prop({ required: true, default: () => new StreetPassPreferences(), })
-  streetPassPreferences: StreetPassPreferences
+  @Prop({ required: true, default: () => new StreetpassPreferences(), })
+  streetpassPreferences: StreetpassPreferences
 
   @Prop({ required: true, default: () => new NotificationPreferences(), })
   notificationPreferences: NotificationPreferences

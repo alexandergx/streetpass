@@ -31,6 +31,7 @@ export class AuthResolver {
   }
 
   @Mutation(() => Boolean)
+  @UseGuards(AuthGuard)
   async registerDevice(@Args('input') input: RegisterDeviceDto, @Context() context: any) {
     return this.authService.registerDevice(input, context)
   }

@@ -5,7 +5,7 @@ import { registerEnumType } from '@nestjs/graphql'
 export const accessConfig = { expiresIn: '420s', }
 export const refreshConfig = { expiresIn: '30d', }
 export const postLimit = 256
-export const streetPassLimit = 512
+export const streetpassLimit = 512
 
 export const Time = {
   Minute: 60,
@@ -52,8 +52,8 @@ export const InputLimits = {
   ShareMax: 50,
   VideoLengthMax: 15,
   UploadBytesMax: 134217728,
-  StreetPassAgeMin: 18,
-  StreetPassAgeMax: 99,
+  StreetpassAgeMin: 18,
+  StreetpassAgeMax: 99,
   MediaUploadsMax: 9,
 }
 
@@ -61,7 +61,9 @@ export const PubSubOptions = { host: process.env.REDIS_HOST, port: Number(proces
 
 export enum Subscriptions {
   PubSub = 'PUB_SUB', // redis pubsub key
-  MessageSent = 'messageSent',
+  Streetpasses = 'streetpasses',
+  Matches = 'matches',
+  Messages = 'messages',
 }
 
 export interface FileUpload {
@@ -82,14 +84,14 @@ export enum OS {
 export enum NotificationType { // NotificationPreferences property names
   Message = 'messages',
   Match = 'matches',
-  StreetPass = 'streetPass',
+  Streetpass = 'streetpass',
 }
 
 // TODO - replace with localization
 export enum PushNotificationMessage {
   messages = 'messaged you',
   matches = 'You got a new match',
-  streetPass = 'New StreetPasses',
+  streetpass = 'New Streetpasses',
 }
 
 export enum Locales {

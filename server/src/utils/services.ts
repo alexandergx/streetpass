@@ -98,8 +98,8 @@ export async function sendPushNotification({ deviceTokens, message, unread, payl
 // const notification   = new apn.Notification()
 // notification.expiry  = Math.floor(Date.now() / 1000) + 3600
 // notification.sound   = 'ping.aiff'
-// notification.alert   = `${PushNotificationMessage[NotificationType.StreetPass]}`
-// notification.payload = { type: NotificationType.StreetPass, streetPassId: 'testing', }
+// notification.alert   = `${PushNotificationMessage[NotificationType.Streetpass]}`
+// notification.payload = { type: NotificationType.Streetpass, streetpassId: 'testing', }
 // notification.topic   = process.env.APPLE_APP_BUNDLE_IDENTIFIER
 // notification.badge   = undefined
 // providerAPNs.send(notification, '5325ca54cd16f2bf2e336f5d2bfa2dcc1decb07be3bac4f3857ad8bb41ac7e24')

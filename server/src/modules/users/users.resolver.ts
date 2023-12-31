@@ -1,5 +1,5 @@
 import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql'
-import { UsersService, PrivacyGuard, SelfGuard, } from './users.service'
+import { UsersService, PrivacyGuard, } from './users.service'
 import { UseGuards } from '@nestjs/common'
 import { AuthGuard } from '../auth/auth.service'
 import { GetUserDto, RemoveMediaDto, SortMediaDto, UpdateUserDto, UploadMediaDto } from './users.dto'

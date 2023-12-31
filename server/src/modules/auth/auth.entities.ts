@@ -2,7 +2,7 @@ import { ObjectType, Field, } from '@nestjs/graphql'
 import { UserMedia } from '../users/users.entities'
 
 @ObjectType()
-export class StreetPassPreferences {
+export class StreetpassPreferences {
   @Field(() => Boolean, { nullable: true, })
   discoverable?: boolean
 
@@ -25,7 +25,7 @@ export class NotificationPreferences {
   matches: boolean
 
   @Field(() => Boolean)
-  streetPasses: boolean
+  streetpasses: boolean
 
   @Field(() => Boolean)
   emails: boolean
@@ -67,10 +67,10 @@ export class AuthUser {
   school?: string
 
   @Field(() => Boolean, { nullable: true, })
-  streetPass?: boolean
+  streetpass?: boolean
 
-  @Field(() => StreetPassPreferences)
-  streetPassPreferences: StreetPassPreferences
+  @Field(() => StreetpassPreferences)
+  streetpassPreferences: StreetpassPreferences
 
   @Field(() => NotificationPreferences)
   notificationPreferences: NotificationPreferences

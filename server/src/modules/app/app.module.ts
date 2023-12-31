@@ -1,20 +1,23 @@
 import * as dotenv from 'dotenv'; dotenv.config()
-import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common'
-import { GraphQLModule } from '@nestjs/graphql'
-import { join } from 'path'
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo'
-import { AppController } from './app.controller'
+import { MiddlewareConsumer, Module, RequestMethod, } from '@nestjs/common'
+import { GraphQLModule, } from '@nestjs/graphql'
+import { join, } from 'path'
+import { ApolloDriver, ApolloDriverConfig, } from '@nestjs/apollo'
+import { AppController, } from './app.controller'
 import { AppService, createBlacklistGuard, GqlRateLimitGuard, } from './app.service'
-import { MongooseModule } from '@nestjs/mongoose'
-import { AuthModule } from '../auth/auth.module'
-import { ThrottlerModule } from '@nestjs/throttler'
-import { APP_GUARD } from '@nestjs/core'
-import { Errors, PubSubOptions, Subscriptions, Time } from 'src/utils/constants'
-import { JwtService } from '@nestjs/jwt'
-import { GraphQLError } from 'graphql'
-import { RedisPubSub } from 'graphql-redis-subscriptions'
+import { MongooseModule, } from '@nestjs/mongoose'
+import { AuthModule, } from '../auth/auth.module'
+import { ThrottlerModule, } from '@nestjs/throttler'
+import { APP_GUARD, } from '@nestjs/core'
+import { Errors, PubSubOptions, Subscriptions, Time, } from 'src/utils/constants'
+import { JwtService, } from '@nestjs/jwt'
+import { GraphQLError, } from 'graphql'
+import { RedisPubSub, } from 'graphql-redis-subscriptions'
 import Redis from 'ioredis'
-import { UsersModule } from '../users/users.module'
+import { UsersModule, } from '../users/users.module'
+import { StreetpassModule, } from '../streetpass/streetpass.module'
+import { MatchesModule } from '../matches/matches.module'
+import { ChatsModule } from '../chats/chats.module'
 
 @Module({
   imports: [
@@ -51,6 +54,9 @@ import { UsersModule } from '../users/users.module'
     ThrottlerModule.forRoot({ ttl: Time.Minute * 6, limit: 1000, }),
     AuthModule,
     UsersModule,
+    StreetpassModule,
+    MatchesModule,
+    ChatsModule,
   ],
   controllers: [AppController],
   providers: [

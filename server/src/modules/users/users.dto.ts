@@ -9,7 +9,7 @@ export class GetUserDto {
 }
 
 @InputType()
-export class UpdateStreetPassPreferencesDto {
+export class UpdateStreetpassPreferencesDto {
   @Field(() => Boolean, { nullable: true, })
   discoverable?: boolean
 
@@ -32,7 +32,7 @@ export class UpdateNotificationPreferencesDto {
   matches?: boolean
 
   @Field(() => Boolean, { nullable: true, })
-  streetPasses?: boolean
+  streetpasses?: boolean
 
   @Field(() => Boolean, { nullable: true, })
   emails?: boolean
@@ -65,13 +65,19 @@ export class UpdateUserDto {
   school?: string
 
   @Field(() => Boolean, { nullable: true, })
-  streetPass?: boolean
+  streetpass?: boolean
 
-  @Field(() => String, { nullable: true, }) // UpdateStreetPassPreferencesDto stringified
-  streetPassPreferences?: string
+  @Field(() => String, { nullable: true, }) // UpdateStreetpassPreferencesDto stringified
+  streetpassPreferences?: string
 
   @Field(() => String, { nullable: true, }) // UpdateNotificationPreferencesDto stringified
   notificationPreferences?: string
+}
+
+@InputType()
+export class BlockUserDto {
+  @Field(() => String)
+  userId: string
 }
 
 @InputType()
