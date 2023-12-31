@@ -12,16 +12,6 @@ export interface ISystemStore {
   Spacing: any,
 }
 
-export enum SystemActions {
-  SetColors = 'SET_COLORS',
-  SaveColors =  'SAVE_COLORS',
-}
-
-type ThemeAction =
-  | { type: SystemActions.SetColors, payload: keyof typeof Themes, }
-  | { type: SystemActions.SaveColors, payload: keyof typeof Themes, }
-
-
 const MMKVSystem = new MMKVLoader().withInstanceID(LocalStorage.SystemStore).initialize()
 const savedTheme = MMKVSystem.getString(SystemStore.Theme) as keyof typeof Themes
 const theme = savedTheme && Object.keys(Themes).includes(savedTheme) ? savedTheme : Object.keys(Themes)[0] as keyof typeof Themes
@@ -85,6 +75,15 @@ const INITIAL_STATE: ISystemStore = {
     screenPadding: 16,
   },
 }
+
+export enum SystemActions {
+  SetColors = 'SET_COLORS',
+  SaveColors =  'SAVE_COLORS',
+}
+
+type ThemeAction =
+  | { type: SystemActions.SetColors, payload: keyof typeof Themes, }
+  | { type: SystemActions.SaveColors, payload: keyof typeof Themes, }
 
 const systemStore = (state = INITIAL_STATE, action: ThemeAction) => {
   switch (action.type) {

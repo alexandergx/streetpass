@@ -79,19 +79,17 @@ class EditProfileModal extends React.Component<IEditProfileModalProps> {
 
   private keyboardWillShowListener: any
   private keyboardWillHideListener: any
+  keyboardWillShow = () => this.setState({ keyboard: true, })
+  keyboardWillHide = () => this.setState({ keyboard: false, })
+
   componentDidMount () {
     this.keyboardWillShowListener = Keyboard.addListener('keyboardWillShow', this.keyboardWillShow)
     this.keyboardWillHideListener = Keyboard.addListener('keyboardWillHide', this.keyboardWillHide)
   }
+
   componentWillUnmount () {
     this.keyboardWillShowListener.remove()
     this.keyboardWillHideListener.remove()
-  }
-  keyboardWillShow = () => {
-    this.setState({ keyboard: true, })
-  }
-  keyboardWillHide = () => {
-    this.setState({ keyboard: false, })
   }
 
   handleUpdateProfile = async () => {
@@ -104,7 +102,7 @@ class EditProfileModal extends React.Component<IEditProfileModalProps> {
         || this.state.school !== this.props.userStore.user.school
       )) await this.props.actions.setUpdateUser({ bio: this.state.bio, work: this.state.work, school: this.state.school, })
       await this.props.actions.setUser()
-      // this.props.navigation.navigate(Screens.StreetPass)
+      // this.props.navigation.navigate(Screens.Streetpass)
       this.props.onPress ? this.props.onPress() : this.props.toggleModal()
     }
     this.setState({ loading: false, editProfile: true, })

@@ -78,19 +78,17 @@ class VerifyPhoneScreen extends React.Component<IVerifyPhoneScreenProps> {
 
   private keyboardWillShowListener: any
   private keyboardWillHideListener: any
+  keyboardWillShow = () => this.setState({ keyboard: true, })
+  keyboardWillHide = () => this.setState({ keyboard: false, })
+
   componentDidMount () {
     this.keyboardWillShowListener = Keyboard.addListener('keyboardWillShow', this.keyboardWillShow)
     this.keyboardWillHideListener = Keyboard.addListener('keyboardWillHide', this.keyboardWillHide)
   }
+
   componentWillUnmount () {
     this.keyboardWillShowListener.remove()
     this.keyboardWillHideListener.remove()
-  }
-  keyboardWillShow = () => {
-    this.setState({ keyboard: true, })
-  }
-  keyboardWillHide = () => {
-    this.setState({ keyboard: false, })
   }
 
   handleSendPin = async () => {
@@ -111,7 +109,7 @@ class VerifyPhoneScreen extends React.Component<IVerifyPhoneScreenProps> {
       if (result) {
         if (!this.props.userStore.user.dob) this.props.navigation.navigate(Screens.PersonalInfo)
         else if (!this.props.userStore.user.media.length) this.props.navigation.navigate(Screens.Sex)
-        else this.props.navigation.navigate(Screens.StreetPass)
+        else this.props.navigation.navigate(Screens.Streetpass)
       }
     } catch {
       this.setState({ loading: false, })

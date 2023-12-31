@@ -18,12 +18,12 @@ interface INavTabBarProps {
   activeTab: Screens,
   profilePicture: string | null,
   descend?: boolean,
-  onPressStreetPass?: () => void,
+  onPressStreetpass?: () => void,
   onPressChat?: () => void,
   onPressUser?: () => void,
 }
 const NavTabBar: React.FC<INavTabBarProps> = ({
-  systemStore, activeTab, profilePicture, descend, onPressStreetPass, onPressChat, onPressUser,
+  systemStore, activeTab, profilePicture, descend, onPressStreetpass, onPressChat, onPressUser,
 }) => {
   const { Colors, Fonts, } = systemStore
   const { isConnected, } = useNetInfo()
@@ -45,11 +45,11 @@ const NavTabBar: React.FC<INavTabBarProps> = ({
       >
         <View style={{flexDirection: 'row', alignItems: 'flex-start', width: '100%', height: '100%',}}>
           <TouchableOpacity
-            onPress={onPressStreetPass}
-            activeOpacity={activeTab === Screens.StreetPass ? 1 : Colors.activeOpacity}
+            onPress={onPressStreetpass}
+            activeOpacity={activeTab === Screens.Streetpass ? 1 : Colors.activeOpacity}
             style={{flex: 1, height: '100%', justifyContent: 'flex-start', alignItems: 'center', paddingTop: 8,}}
           >
-            <ConnectIcon fill={activeTab === Screens.StreetPass ? Colors.lightBlue : Colors.safeDark} width={24} height={24} />
+            <ConnectIcon fill={activeTab === Screens.Streetpass ? Colors.lightBlue : Colors.safeDark} width={24} height={24} />
           </TouchableOpacity>
 
           <TouchableOpacity

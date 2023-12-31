@@ -27,16 +27,16 @@ import GradientBackground from '../gradientBackground'
 import { IListGroupConfig } from '../listGroup'
 import { useSubscription } from '@apollo/client'
 // import { SUBSCRIBE_MESSAGES, apiRequest, baseUrl, protocol } from '../../api'
-import { IMessage } from '../../state/reducers/ChatsReducer'
+// import { IMessage } from '../../state/reducers/ChatsReducer'
 import { Screens } from '../../navigation'
 // import { ISetChatId, ISetReadChat } from '../../state/actions/ChatsActions'
 import { useIsFocused } from '@react-navigation/native'
 import { Lit, Locales, } from '../../utils/locale'
 import { FlashList, } from '@shopify/flash-list'
 import { IChatScreenState } from '../../screens/subScreens/ChatScreen'
-import { IMatch } from '../../state/reducers/MatchesReducer'
 import { baseUrl, protocol } from '../../api'
-import StreetPassModal from '../streetPassModal'
+import StreetpassModal from '../streetpassModal'
+import { IMatch } from '../../state/reducers/MatchesReducer'
 
 const MMKV = new MMKVLoader().withEncryption().withInstanceID(LocalStorage.AuthStore).initialize()
 
@@ -46,25 +46,13 @@ interface IChatBlockProps {
   systemStore: ISystemStore,
   userStore: IUserStore,
   state: IChatScreenState,
-  setMessage: (params: string) => void,
-  setMessageId: (params: string | null) => void,
-  setMessageIdTime: (params: string | null) => void,
-  setSelectionModalConfig: (params: IListGroupConfig | null) => void,
-  setNewMessage: (params: IMessage) => void,
-  loadMessages: () => void,
-  sendMessage: () => void,
-  removeMessage: (params: { chatId: string, messageId: string, pushDelete?: boolean, }) => void,
-  setMessageReaction: (params: { chatId: string, messageId: string, userId: string, reaction?: string, pushReact?: boolean, }) => void,
-  setNotifications: () => void,
-  setStreetPass: () => void,
+  setState: (params: any) => void,
   actions: {
-    // setChatId: (params: ISetChatId) => void,
-    // setReadChat: (params: ISetReadChat) => void,
+    //
   }
 }
 const ChatBlock: React.FC<IChatBlockProps> = ({
-  navigation, route, systemStore, userStore, state, setMessage, setMessageId, setMessageIdTime, setSelectionModalConfig,
-  setNewMessage, loadMessages, sendMessage, removeMessage, setMessageReaction, setNotifications, setStreetPass, actions,
+  navigation, route, systemStore, userStore, state, setState, actions,
 }) => {
   const { Colors, Fonts, } = systemStore
   const flatListRef = useRef(null)
@@ -110,22 +98,22 @@ const ChatBlock: React.FC<IChatBlockProps> = ({
 
   return (
     <>
-      {state.streetPass &&
-        <StreetPassModal
+      {state.streetpass &&
+        <StreetpassModal
           navigation={navigation}
           systemStore={systemStore}
-          streetPass={state.streetPass}
-          streetPassImageIndex={0}
+          streetpass={state.streetpass}
+          streetpassImageIndex={0}
           hideActions={true}
-          unsetStreetPass={setStreetPass}
+          unsetStreetpass={() => setState({ streetpass: state.streetpass ? null : state.match, })}
         />
       }
 
       <NavHeader
         systemStore={systemStore}
         navigation={navigation}
-        title={route.params.match.name}
-        thumbnail={route.params.match.media[0].image || null}
+        title={state.match.name}
+        thumbnail={state.match.media[0]?.thumbnail}
         EndIcon={EllipsisIcon}
         onPress={() => {
           // actions.setChatId(null)
@@ -134,20 +122,23 @@ const ChatBlock: React.FC<IChatBlockProps> = ({
         }}
         onPressEnd={() => {
           Keyboard.dismiss()
-          setSelectionModalConfig({
-            titleColor: Colors.safeLightest,
-            list: [
-              {
-                Icon: state.chat?.notifications || state.chat?.notifications === null ? BellIcon : BellSolidIcon,
-                title: state.chat?.notifications || state.chat?.notifications === null ? Lit[systemStore.Locale].Button.Mute : Lit[systemStore.Locale].Button.Unmute,
-                disabled: !state.messages?.length, noRight: true, onPress: setNotifications,
-              },
-              { Icon: ExclamationCircledIcon, title: Lit[systemStore.Locale].Button.Block, noRight: true, onPress: () => Linking.openURL(`${protocol[0]}${baseUrl}/help`), },
-              { Icon: ExclamationCircledIcon, title: Lit[systemStore.Locale].Button.Report, noRight: true, onPress: () => Linking.openURL(`${protocol[0]}${baseUrl}/help`), },
-            ],
+          setState({
+            selectionModalConfig: {
+              titleColor: Colors.safeLightest,
+              list: [
+                // {
+                //   Icon: state.chat?.notifications || state.chat?.notifications === null ? BellIcon : BellSolidIcon,
+                //   title: state.chat?.notifications || state.chat?.notifications === null ? Lit[systemStore.Locale].Button.Mute : Lit[systemStore.Locale].Button.Unmute,
+                //   disabled: !state.messages?.length, noRight: true, onPress: setNotifications,
+                // },
+                { Icon: ExclamationCircledIcon, title: Lit[systemStore.Locale].Button.Unmatch, noRight: true, onPress: () => null, },
+                { Icon: ExclamationCircledIcon, title: Lit[systemStore.Locale].Button.Block, noRight: true, onPress: () => null, },
+                { Icon: ExclamationCircledIcon, title: Lit[systemStore.Locale].Button.Report, noRight: true, onPress: () => Linking.openURL(`${protocol[0]}${baseUrl}/help`), },
+              ],
+            }
           })
         }}
-        onPressThumbnail={setStreetPass}
+        onPressThumbnail={() => setState({ streetpass: state.streetpass ? null : state.match, })}
       />
 
       <KeyboardAvoidingView
@@ -157,31 +148,34 @@ const ChatBlock: React.FC<IChatBlockProps> = ({
         <View style={{flex: 1,}}>
           <FlashList
             ref={flatListRef}
-            data={state.messages || []}
+            // data={state.messages || []}
+            data={[]}
             extraData={state}
             estimatedItemSize={51}
             renderItem={({ item, index, }) => {
               if (!item) return null
               return (
-                <Message
-                  item={item}
-                  index={index}
-                  messages={state.messages}
-                  messageId={state.messageId}
-                  messageIdTime={state.messageIdTime}
-                  setMessageId={setMessageId}
-                  setMessageIdTime={setMessageIdTime}
-                  removeMessage={removeMessage}
-                  setMessageReaction={setMessageReaction}
-                  systemStore={systemStore}
-                  userId={userStore.user.userId}
-                />
+                <>
+                </>
+                // <Message
+                //   item={item}
+                //   index={index}
+                //   messages={state.messages}
+                //   messageId={state.messageId}
+                //   messageIdTime={state.messageIdTime}
+                //   setMessageId={setMessageId}
+                //   setMessageIdTime={setMessageIdTime}
+                //   removeMessage={removeMessage}
+                //   setMessageReaction={setMessageReaction}
+                //   systemStore={systemStore}
+                //   userId={userStore.user.userId}
+                // />
               )
             }}
             ListHeaderComponent={
               <>
                 <View style={{height: state.keyboard ? 88 : 112,}} />
-                {state.messageId &&
+                {/* {state.messageId &&
                   <TouchableOpacity
                     onPress={() => setMessageId(null)}
                     style={{
@@ -191,28 +185,28 @@ const ChatBlock: React.FC<IChatBlockProps> = ({
                   >
                     <BlurView blurAmount={2} style={{position: 'absolute', zIndex: 0, width: '100%', height: '100%',}} />
                   </TouchableOpacity>
-                }
+                } */}
               </>
             }
             ListFooterComponent={
               <>
-                {state.messagesPage !== -1 && state.loading &&
+                {/* {state.messagesPage !== -1 && state.loading &&
                   <ActivityIndicator color={Colors.lighter} style={{position: 'absolute', width: '100%', marginTop: 16, alignSelf: 'center',}} />
-                }
+                } */}
                 <View pointerEvents={'none'} style={{height: 160,}} />
               </>
             }
             inverted={true}
             onScrollBeginDrag={() => {
-              if (state.messageId || state.messageIdTime) {
-                setMessageId(null)
-                setMessageIdTime(null)
-              }
+              // if (state.messageId || state.messageIdTime) {
+              //   setMessageId(null)
+              //   setMessageIdTime(null)
+              // }
             }}
             showsVerticalScrollIndicator={false}
             keyboardDismissMode={'interactive'}
             keyboardShouldPersistTaps={'handled'}
-            onEndReached={() => loadMessages()}
+            // onEndReached={() => loadMessages()}
             onEndReachedThreshold={0.2}
           />
         </View>
@@ -223,8 +217,8 @@ const ChatBlock: React.FC<IChatBlockProps> = ({
 
             <View style={{width: '100%', justifyContent: 'center', alignItems: 'center', flexDirection: 'row', marginBottom: state.keyboard ? 0 : 24,}}>
               <View style={{flex: 0, paddingLeft: 16,}}>
-                <View style={{marginRight: 16,}}>
-                  <Thumbnail systemStore={systemStore} uri={userStore.user.media[0]?.image || null} size={40} />
+                <View style={{marginRight: 8,}}>
+                  <Thumbnail systemStore={systemStore} uri={userStore.user.media[0]?.thumbnail} size={40} />
                 </View>
               </View>
 
@@ -234,7 +228,7 @@ const ChatBlock: React.FC<IChatBlockProps> = ({
                   value={state.message}
                   loading={state.messageLoading}
                   // disabled={(state.chat?.private && !state.messages?.length) || state.chat?.isBlocking || state.chat?.isBlocker || !route.params.userId}
-                  onChangeText={(text: string) => setMessage(text)}
+                  onChangeText={(text: string) => setState({ message: text, })}
                   // placeholder={(state.chat?.private && !state.messages?.length)
                   //   ? Lit[systemStore.Locale].Input.MessagesLimited
                   //   : state.chat?.isBlocking || state.chat?.isBlocker
@@ -245,7 +239,7 @@ const ChatBlock: React.FC<IChatBlockProps> = ({
                   EndIcon={SendIcon}
                   exceedChars={InputLimits.DescriptionMin}
                   limitChars={InputLimits.DescriptionMax}
-                  onPressEnd={() => state.messageLoading ? null : sendMessage()}
+                  // onPressEnd={() => state.messageLoading ? null : sendMessage()}
                 />
               </View>
             </View>
@@ -254,7 +248,7 @@ const ChatBlock: React.FC<IChatBlockProps> = ({
         </View>
 
         {state.selectionModalConfig &&
-          <SelectionModal systemStore={systemStore} config={state.selectionModalConfig} toggleModal={() => setSelectionModalConfig(null)} />
+          <SelectionModal systemStore={systemStore} config={state.selectionModalConfig} toggleModal={() => setState({ selectionModalConfig: null, })} />
         }
       </KeyboardAvoidingView>
     </>

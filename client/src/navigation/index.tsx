@@ -5,17 +5,15 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { connect } from 'react-redux'
 import { bindActionCreators, Dispatch, AnyAction, } from 'redux'
 import { IStores } from '../state/store'
-// import { ILoginUser, } from '../state/actions/UserActions'
 import { MMKVLoader } from 'react-native-mmkv-storage'
 import { AppVersion, AuthStore, LocalStorage, OS, } from '../utils/constants'
 import { getDeviceId, getCarrier, } from 'react-native-device-info'
 import { IUserStore } from '../state/reducers/UserReducer'
 import { ISystemStore } from '../state/reducers/SystemReducer'
 // import { getIP, getLocation, requestPushNotifications } from '../utils/services'
-// import { registerDevice } from '../api/user'
 
 // MAIN ROUTES
-import StreetPassScreen from '../screens/StreetPassScreen'
+import StreetpassScreen from '../screens/StreetpassScreen'
 import ChatsScreen from '../screens/ChatsScreen'
 import UserScreen from '../screens/UserScreen'
 // SUB ROUTES
@@ -34,20 +32,32 @@ import DeleteAccountScreen from '../screens/altScreens/DeleteAccountScreen'
 import { ISetSignIn, ISetUpdateUser, setSignIn, setUpdateUser, } from '../state/actions/UserActions'
 import { requestPushNotifications, signInCallback } from '../utils/services'
 import { registerDevice } from '../api/user'
+import { ISetMatch, ISetMatches, setMatch, setMatches } from '../state/actions/MatchesActions'
+import { setStreetpasses } from '../state/actions/StreetpassActions'
+import { useSubscription } from '@apollo/client'
+import { SUBSCRIBE_MATCHES, SUBSCRIBE_MESSAGES, SUBSCRIBE_STREETPASSES, apiRequest } from '../api'
+import { IMatch } from '../state/reducers/MatchesReducer'
+import { IStreetpassStore } from '../state/reducers/StreetpassReducer'
+import { ISetMessage, setMessage } from '../state/actions/ChatsActions'
+import { IMessage } from '../state/reducers/ChatsReducer'
 
 export const navigationRef = createNavigationContainerRef()
 
 const MMKV = new MMKVLoader().withEncryption().withInstanceID(LocalStorage.AuthStore).initialize()
 
 const mapStateToProps = (state: IStores) => {
-  const { userStore, systemStore, } = state
-  return { userStore, systemStore, }
+  const { systemStore, userStore, streetpassStore, } = state
+  return { systemStore, userStore, streetpassStore, }
 }
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => ({
   actions: bindActionCreators(Object.assign(
     {
       setSignIn,
       setUpdateUser,
+      setStreetpasses,
+      setMatches,
+      setMatch,
+      setMessage,
     }
   ), dispatch),
 })
@@ -56,7 +66,7 @@ const App = createNativeStackNavigator()
 
 export enum Screens {
   // MAIN ROUTES
-  StreetPass = 'STREETPASS',
+  Streetpass = 'STREETPASS',
   Chats = 'CHATS',
   User = 'USER',
   // SUB ROUTES
@@ -77,13 +87,18 @@ export enum Screens {
 interface IMapScreenProps {
   systemStore: ISystemStore,
   userStore: IUserStore,
+  streetpassStore: IStreetpassStore,
   actions: {
     setSignIn: (params: ISetSignIn) => Promise<any>,
     setUpdateUser: (params: ISetUpdateUser) => void,
+    setStreetpasses: () => void,
+    setMatches: (params: ISetMatches) => void,
+    setMatch: (params: ISetMatch) => void,
+    setMessage: (params: ISetMessage) => void,
   },
 }
 
-function AppNavigation({ systemStore, userStore, actions, }: IMapScreenProps) {
+function AppNavigation({ systemStore, userStore, streetpassStore, actions, }: IMapScreenProps) {
   const [initialized, setInitialized] = useState<boolean>(false)
   const accessToken = MMKV.getString(AuthStore.AccessToken)
   useEffect(() => {
@@ -92,6 +107,8 @@ function AppNavigation({ systemStore, userStore, actions, }: IMapScreenProps) {
         input: { appleAuth: '', }, callback: (code) => signInCallback(navigationRef, code),
       }).then(async () => {
         setInitialized(true)
+        actions.setStreetpasses()
+        actions.setMatches({ index: undefined, })
         await requestPushNotifications(async (deviceToken: string) => {
           await registerDevice({ manufacturer: OS[Platform.OS], deviceToken, })
         }, async (result) => {
@@ -99,7 +116,7 @@ function AppNavigation({ systemStore, userStore, actions, }: IMapScreenProps) {
             notificationPreferences: {
               messages: false,
               matches: false,
-              streetPasses: false,
+              streetpasses: false,
               emails: userStore.user.notificationPreferences.emails,
               newsletters: userStore.user.notificationPreferences.newsletters,
             }
@@ -114,15 +131,54 @@ function AppNavigation({ systemStore, userStore, actions, }: IMapScreenProps) {
     else setInitialized(true)
   }, [userStore.signedIn, accessToken, navigationRef])
 
+  useSubscription(SUBSCRIBE_STREETPASSES({ userId: userStore.user.userId, }), {
+    skip: !userStore.signedIn || !MMKV.getString(AuthStore.AccessToken),
+    shouldResubscribe: true,
+    onData: (data) => {
+      const streetpasses = data?.data?.data?.streetpasses as boolean
+      if (streetpasses && !streetpassStore.streetpasses) actions.setStreetpasses()
+    },
+    onError: async (error) => {
+      console.log('[SUBSCRIBE STREETPASSES ERROR]', error)
+      await apiRequest(null)
+    }
+  })
+
+  useSubscription(SUBSCRIBE_MATCHES({ userId: userStore.user.userId, }), {
+    skip: !userStore.signedIn || !MMKV.getString(AuthStore.AccessToken),
+    shouldResubscribe: true,
+    onData: (data) => {
+      const match = data?.data?.data?.matches as IMatch
+      if (match) actions.setMatch(match)
+    },
+    onError: async (error) => {
+      console.log('[SUBSCRIBE MATCHES ERROR]', error)
+      await apiRequest(null)
+    }
+  })
+
+  useSubscription(SUBSCRIBE_MESSAGES({ userId: userStore.user.userId, }), {
+    skip: !userStore.signedIn || !MMKV.getString(AuthStore.AccessToken),
+    shouldResubscribe: true,
+    onData: (data) => {
+      const message = data?.data?.data?.messages as IMessage
+      if (message) actions.setMessage(message)
+    },
+    onError: async (error) => {
+      console.log('[SUBSCRIBE MESSAGES ERROR]', error)
+      await apiRequest(null)
+    }
+  })
+
   return (
     <NavigationContainer ref={navigationRef}>
       {initialized ?
         <App.Navigator
-          initialRouteName={userStore.signedIn ? Screens.StreetPass : Screens.SignIn}
+          initialRouteName={userStore.signedIn ? Screens.Streetpass : Screens.SignIn}
           screenOptions={{ headerShown: false, }}
         >
           {/* MAIN ROUTES */}
-          <App.Screen name={Screens.StreetPass} component={StreetPassScreen}
+          <App.Screen name={Screens.Streetpass} component={StreetpassScreen}
             options={{
               animation: 'fade_from_bottom',
               gestureEnabled: false,

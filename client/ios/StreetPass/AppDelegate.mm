@@ -9,6 +9,8 @@
 #import <UserNotifications/UserNotifications.h>
 #import <RNCPushNotificationIOS.h>
 
+#import <TSBackgroundFetch/TSBackgroundFetch.h>
+
 #if RCT_NEW_ARCH_ENABLED
 #import <React/CoreModulesPlugins.h>
 #import <React/RCTCxxBridgeDelegate.h>
@@ -63,6 +65,8 @@ static NSString *const kRNConcurrentRoot = @"concurrentRoot";
 
   UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
   center.delegate = self;
+
+  [[TSBackgroundFetch sharedInstance] didFinishLaunching];
 
   return YES;
 }
@@ -167,8 +171,8 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
   NSDictionary *userInfo = notification.request.content.userInfo;
   [RNCPushNotificationIOS didReceiveRemoteNotification:userInfo];
   // completionHandler(UNNotificationPresentationOptionSound | UNNotificationPresentationOptionAlert | UNNotificationPresentationOptionBadge);
-  if (userInfo[@"chatId"] || userInfo[@"matchId"] || userInfo[@"streetPassId"]) {
-    // If chatId or matchId or streetPassId is present, do not present the notification
+  if (userInfo[@"chatId"] || userInfo[@"matchId"] || userInfo[@"streetpassId"]) {
+    // If chatId or matchId or streetpassId is present, do not present the notification
     completionHandler(UNNotificationPresentationOptionNone);
   } else {
     // If chatId is not present, present the notification

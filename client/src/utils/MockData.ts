@@ -1,12 +1,12 @@
 import { IMatch } from '../state/reducers/MatchesReducer'
-import { IStreetPass } from '../state/reducers/StreetPassReducer'
+import { IStreetpass } from '../state/reducers/StreetpassReducer'
 import { InputLimits } from './constants'
 
 const image1 = 'https://e00-marca.uecdn.es/assets/multimedia/imagenes/2023/04/20/16819946402834.jpg'
 const image2 = 'https://www.lofficielbaltic.com/_next/image?url=https%3A%2F%2Fwww.datocms-assets.com%2F59774%2F1643351623-1571501184449345-captura-de-tela-2019-10-18-a-s-17-06-16.png%3Fauto%3Dformat%252Ccompress%26cs%3Dsrgb&w=3840&q=75'
 const image3 = 'https://images.unsplash.com/photo-1524502397800-2eeaad7c3fe5?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGJlYXV0aWZ1bCUyMHdvbWFufGVufDB8fDB8fHww'
 
-export const mockStreetPasses: Array<IStreetPass> = [
+export const mockStreetpasses: Array<IStreetpass> = [
   {
     userId: '1',
     name: 'User one',
@@ -385,17 +385,17 @@ export const mockUserProfile = {
     { image: image1, },
     { image: image2, },
   ],
-  streetPass: true,
-  streetPassPreferences: {
+  streetpass: true,
+  streetpassPreferences: {
     discoverable: true,
     location: true,
     sex: null,
-    age: [InputLimits.StreetPassAgeMin, InputLimits.StreetPassAgeMax],
+    age: [InputLimits.StreetpassAgeMin, InputLimits.StreetpassAgeMax],
   },
   notificationPreferences: {
     messages: true,
     matches: true,
-    streetPasses: true,
+    streetpasses: true,
     emails: true,
     newsletters: true,
   },

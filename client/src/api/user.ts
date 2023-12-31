@@ -1,7 +1,6 @@
 import { apiRequest, DELETE_ACCOUNT, GET_USER, IGetUserQuery, IRemoveMediaMutation, ISendPinMutation, ISignInMutation, ISortMediaMutation, IUpdateUserMutation, IVerifyPhoneNumberMutation, REGISTER_DEVICE, REMOVE_MEDIA, SEND_PIN, SIGN_IN, SORT_MEDIA, UPDATE_USER, VERIFY_PHONE_NUMBER, } from '.'
 import { IUser, IUserProfile, } from '../state/reducers/UserReducer'
 import { ISignInErrors } from '../utils/constants'
-import { Locales } from '../utils/locale'
 
 export type ISignInReq = ISignInMutation
 export interface ISignInRes {

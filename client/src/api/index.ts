@@ -7,7 +7,7 @@ import { createClient, } from 'graphql-ws'
 import { getMainDefinition, } from '@apollo/client/utilities'
 import { AuthStore, Errors, LocalStorage, } from '../utils/constants'
 import { formatMultiline, } from '../utils/functions'
-import { INotificationPreferences, IStreetPassPreferences } from '../state/reducers/UserReducer'
+import { INotificationPreferences, IStreetpassPreferences } from '../state/reducers/UserReducer'
 
 const MMKV = new MMKVLoader().withEncryption().withInstanceID(LocalStorage.AuthStore).initialize()
 export const getAccessHeaders = () => { return { 'access-token': MMKV.getString(AuthStore.AccessToken), } }
@@ -125,6 +125,8 @@ export const REFRESH_TOKENS = () => gql`
   }
 `
 
+// AUTH
+
 export interface ISignInMutation {
   appleAuth?: string,
 }
@@ -149,8 +151,8 @@ export const SIGN_IN = (input: ISignInMutation) => {
           bio
           work
           school
-          streetPass
-          streetPassPreferences {
+          streetpass
+          streetpassPreferences {
             discoverable
             location
             sex
@@ -159,7 +161,7 @@ export const SIGN_IN = (input: ISignInMutation) => {
           notificationPreferences {
             messages
             matches
-            streetPasses
+            streetpasses
             emails
             newsletters
           }
@@ -238,6 +240,8 @@ export const DELETE_ACCOUNT = () => {
   return gql(mutation)
 }
 
+// USER
+
 export interface IGetUserQuery {
   userId?: string,
 }
@@ -276,8 +280,8 @@ export interface IUpdateUserMutation {
   bio?: string,
   work?: string,
   school?: string,
-  streetPass?: boolean,
-  streetPassPreferences?: IStreetPassPreferences,
+  streetpass?: boolean,
+  streetpassPreferences?: IStreetpassPreferences,
   notificationPreferences?: INotificationPreferences,
 }
 export const UPDATE_USER = (input: IUpdateUserMutation) => {
@@ -336,3 +340,301 @@ export const REMOVE_MEDIA = (input: IRemoveMediaMutation) => {
   `
   return gql(mutation)
 }
+
+// STREETPASS
+
+export interface IStreetpassMutation {
+  lat: number,
+  lon: number,
+}
+export const STREETPASS = (input: IStreetpassMutation) => {
+  let mutation = `
+    mutation {
+      streetpass(input: {
+  `
+  mutation = mutation + inputConstructor(input)
+  mutation = mutation + `
+      })
+    }
+  `
+  return gql(mutation)
+}
+
+export const GET_STREETPASSES = () => gql`
+  query {
+    getStreetpasses {
+      userId
+      name
+      bio
+      work
+      school
+      age
+      sex
+      date
+      media {
+        mediaId
+        image
+        video
+        thumbnail
+      }
+    }
+  }
+`
+
+export interface ISubscribeStreetpassesSubscription {
+  userId: string,
+}
+export const SUBSCRIBE_STREETPASSES = (input: ISubscribeStreetpassesSubscription) => gql`
+  subscription {
+    streetpasses(input: {
+      userId: "${input.userId}"
+    })
+  }
+`
+
+export interface IMatchMutation {
+  userId: string,
+  match: boolean,
+}
+export const MATCH = (input: IMatchMutation) => {
+  let mutation = `
+    mutation {
+      match(input: {
+  `
+  mutation = mutation + inputConstructor(input)
+  mutation = mutation + `
+      })
+    }
+  `
+  return gql(mutation)
+}
+
+export interface IGetMatchesQuery {
+  index?: number,
+}
+export const GET_MATCHES = (input: IGetMatchesQuery) => {
+  let query = `
+    query {
+      getMatches(input: {
+  `
+  query = query + inputConstructor(input)
+  query = query + `
+      }) {
+        matches {
+          userId
+          name
+          bio
+          work
+          school
+          age
+          sex
+          date
+          media {
+            mediaId
+            image
+            video
+            thumbnail
+          }
+          seen
+        }
+        continue
+      }
+    }
+  `
+  return gql(query)
+}
+
+export interface IUnmatchMutation {
+  userId: string,
+}
+export const UNMATCH = (input: IUnmatchMutation) => gql`
+  mutation {
+    unmatch(input: {
+      userId: "${input.userId}"
+    })
+  }
+`
+
+export interface ISeenMatchMutation {
+  userId: string,
+}
+export const SEEN_MATCH = (input: ISeenMatchMutation) => gql`
+  mutation {
+    seenMatch(input: {
+      userId: "${input.userId}"
+    })
+  }
+`
+
+export interface ISubscribeMatchesSubscription {
+  userId: string,
+}
+export const SUBSCRIBE_MATCHES = (input: ISubscribeMatchesSubscription) => gql`
+  subscription {
+    matches(input: {
+      userId: "${input.userId}"
+    }) {
+      userId
+      name
+      bio
+      work
+      school
+      age
+      sex
+      date
+      media {
+        mediaId
+        image
+        video
+        thumbnail
+      }
+      seen
+      unmatch
+    }
+  }
+`
+
+// CHATS
+
+export interface IGetChatsQuery {
+  index?: number,
+}
+export const GET_CHATS = (input: IGetChatsQuery) => {
+  let query = `
+    query {
+      getChats(input: {
+  `
+  query = query + inputConstructor(input)
+  query = query + `
+      }) {
+        chats {
+          userId
+          name
+          bio
+          work
+          school
+          age
+          sex
+          date
+          media {
+            mediaId
+            image
+            video
+            thumbnail
+          }
+          lastMessage
+          unread
+          notifications
+        }
+        continue
+      }
+    }
+  `
+  return gql(query)
+}
+
+export interface ISearchChatsQuery {
+  name: string,
+}
+export const SEARCH_CHATS = (input: ISearchChatsQuery) => {
+  let query = `
+    query {
+      searchChats(input: {
+  `
+  query = query + inputConstructor(input)
+  query = query + `
+      }) {
+        userId
+        name
+        bio
+        work
+        school
+        age
+        sex
+        date
+        media {
+          mediaId
+          image
+          video
+          thumbnail
+        }
+        lastMessage
+        unread
+        notifications
+      }
+    }
+  `
+  return gql(query)
+}
+
+export interface IReadChatMutation {
+  chatId: string,
+}
+export const READ_CHAT = (input: IReadChatMutation) => gql`
+  mutation {
+    readChat(input: {
+      chatId: "${input.chatId}"
+    })
+  }
+`
+
+export interface IChatNotificationsMutation {
+  chatId: string,
+  notifications: boolean,
+}
+export const CHAT_NOTIFICATIONS = (input: IChatNotificationsMutation) => {
+  let mutation = `
+    mutation {
+      chatNotifications(input: {
+  `
+  mutation = mutation + inputConstructor(input)
+  mutation = mutation + `
+      })
+    }
+  `
+  return gql(mutation)
+}
+
+export interface IGetMessagesQuery {
+  chatId: string,
+  index?: number,
+}
+export const GET_MESSAGES = (input: IGetMessagesQuery) => {
+  let query = `
+    query {
+      getMessages(input: {
+  `
+  query = query + inputConstructor(input)
+  query = query + `
+      }) {
+        messages {
+          messageId
+          userId
+          message
+          date
+        }
+        continue
+      }
+    }
+  `
+  return gql(query)
+}
+
+export interface ISubscribeMessagesSubscription {
+  chatId?: string,
+  userId: string,
+}
+export const SUBSCRIBE_MESSAGES = (input: ISubscribeMessagesSubscription) => gql`
+  subscription {
+    messages(input: {
+      chatId: "${input.chatId}"
+      userId: "${input.userId}"
+    }) {
+      chatId
+      messageId
+      userId
+      message
+      date
+    }
+  }
+`

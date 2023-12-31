@@ -72,7 +72,7 @@ class SignInScreen extends React.Component<ISignInScreenProps> {
               notificationPreferences: {
                 messages: false,
                 matches: false,
-                streetPasses: false,
+                streetpasses: false,
                 emails: this.props.userStore.user.notificationPreferences.emails,
                 newsletters: this.props.userStore.user.notificationPreferences.newsletters,
               }

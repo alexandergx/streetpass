@@ -24,25 +24,27 @@ import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler'
 import { timePassedSince } from '../../utils/functions'
 import { IListGroupConfig } from '../listGroup'
 import SelectionModal from '../selectionModal'
+import Video from 'react-native-video'
+import convertToProxyURL from 'react-native-video-cache'
 
-interface IStreetPassModalProps {
+interface IStreetpassModalProps {
   navigation: any,
   systemStore: ISystemStore,
-  streetPass: any,
-  streetPassCardRef?: RefObject<CardItemHandle> | null,
-  streetPassImageIndex: number | null,
+  streetpass: any,
+  streetpassCardRef?: RefObject<CardItemHandle> | null,
+  streetpassImageIndex: number | null,
   hideActions?: boolean,
-  unsetStreetPass: () => void,
+  unsetStreetpass: () => void,
 }
-const StreetPassModal: React.FC<IStreetPassModalProps> = ({
-  navigation, systemStore, streetPass, streetPassCardRef, streetPassImageIndex, hideActions, unsetStreetPass,
+const StreetpassModal: React.FC<IStreetpassModalProps> = ({
+  navigation, systemStore, streetpass, streetpassCardRef, streetpassImageIndex, hideActions, unsetStreetpass,
 }) => {
   const { Colors, Fonts, } = systemStore
-  const streetPassCarouselRef: RefObject<ICarouselInstance> = React.createRef()
-  const [imageIndex, setImageIndex] = useState<number>(streetPassImageIndex || 0)
+  const streetpassCarouselRef: RefObject<ICarouselInstance> = React.createRef()
+  const [imageIndex, setImageIndex] = useState<number>(streetpassImageIndex || 0)
   const [selectionModalConfig, setSelectionModalConfig] = useState<IListGroupConfig | null>(null)
-  const swipeLeft = streetPassCardRef?.current?.swipeLeft
-  const swipeRight = streetPassCardRef?.current?.swipeRight
+  const swipeLeft = streetpassCardRef?.current?.swipeLeft
+  const swipeRight = streetpassCardRef?.current?.swipeRight
 
   return (
     <>
@@ -50,27 +52,55 @@ const StreetPassModal: React.FC<IStreetPassModalProps> = ({
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={{marginTop: 64,}}>
             <Carousel
-              ref={streetPassCarouselRef}
-              enabled={streetPass.media.length > 1}
+              ref={streetpassCarouselRef}
+              enabled={streetpass.media.length > 1}
               panGestureHandlerProps={{ activeOffsetX: [-10, 10], }}
-              defaultIndex={streetPassImageIndex || 0}
+              defaultIndex={streetpassImageIndex || 0}
               loop={false}
               width={Dimensions.get('window').width}
               height={Dimensions.get('window').height * 0.65}
-              data={streetPass.media}
+              data={streetpass.media}
               onSnapToItem={index => setImageIndex(index)}
               renderItem={(item: any) => (
                 <>
-                  <FastImage key={item.index} source={{ uri: item.item.image, }} style={{width: '100%', height: '100%',}} />
+                  {item.item.thumbnail &&
+                    <FastImage source={{ uri: item.item.thumbnail, }} style={{position: 'absolute', zIndex: -1, width: '100%', height: '100%',}} />
+                  }
+
+                  {item.item.image &&
+                    <FastImage source={{ uri: item.item.image, }} style={{width: '100%', height: '100%',}} />
+                  }
+
+                  {item.item.video &&
+                    <Video
+                      source={{ uri: convertToProxyURL(item.item.video), }}
+                      paused={false}
+                      repeat={true}
+                      playInBackground={false}
+                      playWhenInactive={false}
+                      mixWithOthers={'mix'}
+                      ignoreSilentSwitch={'ignore'}
+                      muted={true}
+                      bufferConfig={{
+                        minBufferMs: 500,
+                        maxBufferMs: 30000,
+                        bufferForPlaybackMs: 500,
+                        bufferForPlaybackAfterRebufferMs: 1000,
+                      }}
+                      resizeMode={'cover'}
+                      style={{width: '100%', height: '100%',}}
+                    />
+                  }
+
                   <View style={{position: 'absolute', zIndex: 1, width: '100%', height: '100%', flexDirection: 'row',}}>
                     <TouchableWithoutFeedback onPress={() => {
-                      streetPassCarouselRef?.current?.prev()
+                      streetpassCarouselRef?.current?.prev()
                     }}>
                       <View style={{flex: 1,}} />
                     </TouchableWithoutFeedback>
 
                     <TouchableWithoutFeedback onPress={() => {
-                      streetPassCarouselRef?.current?.next()
+                      streetpassCarouselRef?.current?.next()
                     }}>
                       <View style={{flex: 1,}} />
                     </TouchableWithoutFeedback>
@@ -86,7 +116,7 @@ const StreetPassModal: React.FC<IStreetPassModalProps> = ({
               />
 
               <View style={{flexDirection: 'row', width: '100%', justifyContent: 'center',}}>
-                {streetPass.media.length > 1 && Array.from({ length: streetPass.media.length, }, (v, i) => {
+                {streetpass.media.length > 1 && Array.from({ length: streetpass.media.length, }, (v, i) => {
                   return imageIndex === i
                     ? <DotFillIcon key={i} fill={Colors.safeLightest} width={24} height={24} />
                     : <DotIcon key={i} fill={Colors.safeLightest} width={24} height={24} />
@@ -99,7 +129,7 @@ const StreetPassModal: React.FC<IStreetPassModalProps> = ({
                 <TouchableOpacity
                   activeOpacity={Colors.activeOpacity}
                   onPress={() => setSelectionModalConfig({
-                    title: streetPass.name,
+                    title: streetpass.name,
                     list: [
                       { Icon: DeleteIcon, title: 'Block', noRight: true, onPress: () => null, },
                       { Icon: ExclamationIcon, title: 'Report', noRight: true, onPress: () => null, },
@@ -115,7 +145,7 @@ const StreetPassModal: React.FC<IStreetPassModalProps> = ({
               <View style={{flex: 0, justifyContent: 'center',}}>
                 <TouchableOpacity
                   activeOpacity={Colors.activeOpacity}
-                  onPress={unsetStreetPass}
+                  onPress={unsetStreetpass}
                 >
                   <ChevronDownIcon fill={Colors.safeLightest} width={32} height={32} />
                 </TouchableOpacity>
@@ -125,15 +155,15 @@ const StreetPassModal: React.FC<IStreetPassModalProps> = ({
           
           <View style={{flex: 1, flexDirection: 'row', paddingHorizontal: 16, paddingTop: 24,}}>
             <View style={{flex: 1, marginBottom: 16,}}>
-              <Text style={{color: Colors.lightest, fontSize: Fonts.xl, fontWeight: Fonts.heavyWeight, textShadowColor: Colors.darkest, textShadowRadius: 2,}}>{streetPass.name} <Text style={{fontWeight: Fonts.lightWeight,}}>{streetPass.age}</Text></Text>
-              <Text numberOfLines={1} style={{color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.lightWeight, textShadowColor: Colors.darkest, textShadowRadius: 2}}>Streetpassed {timePassedSince(streetPass.date, systemStore.Locale)}</Text>
+              <Text style={{color: Colors.lightest, fontSize: Fonts.xl, fontWeight: Fonts.heavyWeight, textShadowColor: Colors.darkest, textShadowRadius: 2,}}>{streetpass.name} <Text style={{fontWeight: Fonts.lightWeight,}}>{streetpass.age}</Text></Text>
+              <Text numberOfLines={1} style={{color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.lightWeight, textShadowColor: Colors.darkest, textShadowRadius: 2}}>Streetpassed {timePassedSince(streetpass.date, systemStore.Locale)}</Text>
             </View>
 
-            {!hideActions &&
+            {/* {!hideActions &&
               <View style={{flex: 0, flexDirection: 'row',}}>
                 <TouchableOpacity
                   onPress={async () => {
-                    await unsetStreetPass()
+                    await unsetStreetpass()
                     swipeLeft && swipeLeft()
                   }}
                   activeOpacity={Colors.activeOpacity}
@@ -144,7 +174,7 @@ const StreetPassModal: React.FC<IStreetPassModalProps> = ({
 
                 <TouchableOpacity
                   onPress={async () => {
-                    await unsetStreetPass()
+                    await unsetStreetpass()
                     swipeRight && swipeRight()
                   }}
                   activeOpacity={Colors.activeOpacity}
@@ -153,25 +183,25 @@ const StreetPassModal: React.FC<IStreetPassModalProps> = ({
                   <HeartIcon fill={Colors.red} width={24} height={24} />
                 </TouchableOpacity>
               </View>
-            }
+            } */}
           </View>
 
-          {streetPass.work &&
+          {streetpass.work &&
             <View style={{flex: 1, flexDirection: 'row', paddingHorizontal: 16,}}>
               <WorkIcon fill={Colors.lightest} width={16} height={16} />
-              <Text style={{color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.welterWeight, marginLeft: 8,}}>{streetPass.work}</Text>
+              <Text style={{color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.welterWeight, marginLeft: 8,}}>{streetpass.work}</Text>
             </View>
           }
 
-          {streetPass.school &&
+          {streetpass.school &&
             <View style={{flex: 1, flexDirection: 'row', paddingHorizontal: 16, marginBottom: 8,}}>
               <SchoolIcon fill={Colors.lightest} width={16} height={16} />
-              <Text style={{color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.welterWeight, marginLeft: 8,}}>{streetPass.school}</Text>
+              <Text style={{color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.welterWeight, marginLeft: 8,}}>{streetpass.school}</Text>
             </View>
           }
 
           <View style={{flex: 1, paddingHorizontal: 16, marginTop: 8,}}>
-            <Text style={{color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.middleWeight, textShadowColor: Colors.darkest, textShadowRadius: 2}}>{streetPass.bio}</Text>
+            <Text style={{color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.middleWeight, textShadowColor: Colors.darkest, textShadowRadius: 2}}>{streetpass.bio}</Text>
           </View>
 
           <View style={{height: 128,}} />
@@ -185,4 +215,4 @@ const StreetPassModal: React.FC<IStreetPassModalProps> = ({
   )
 }
 
-export default StreetPassModal
+export default StreetpassModal

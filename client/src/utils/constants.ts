@@ -12,8 +12,8 @@ export const InputLimits = {
   EmailMax: 64,
   VideoLengthMax: 15,
   UploadBytesMax: 134217728,
-  StreetPassAgeMin: 18,
-  StreetPassAgeMax: 99,
+  StreetpassAgeMin: 18,
+  StreetpassAgeMax: 99,
   PhoneNumberMax: 16,
 }
 
@@ -55,10 +55,10 @@ export const Emojis: any = {
 }
 
 let ages: Array<number> = []
-for (let i = InputLimits.StreetPassAgeMin; i <= 40; i++) ages.push(i)
-for (let i = 45; i <= InputLimits.StreetPassAgeMax; i += 5) ages.push(i)
-ages.push(InputLimits.StreetPassAgeMax)
-export const streetPassAges = ages
+for (let i = InputLimits.StreetpassAgeMin; i <= 40; i++) ages.push(i)
+for (let i = 45; i <= InputLimits.StreetpassAgeMax; i += 5) ages.push(i)
+ages.push(InputLimits.StreetpassAgeMax)
+export const streetpassAges = ages
 
 export enum Errors {
   JwtExpired = 'jwt expired',
@@ -119,12 +119,12 @@ export enum OS {
 export enum NotificationType { // NotificationPreferences property names
   Message = 'messages',
   Match = 'matches',
-  StreetPass = 'streetPass',
+  Streetpass = 'streetpass',
 }
 
 // TODO - replace with localization
 export enum PushNotificationMessage {
   messages = 'messaged you',
   matches = 'You got a new match',
-  streetPass = 'New StreetPasses',
+  streetpass = 'New Streetpasses',
 }

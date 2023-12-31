@@ -60,19 +60,17 @@ class DOBScreen extends React.Component<IDOBScreenProps> {
 
   private keyboardWillShowListener: any
   private keyboardWillHideListener: any
+  keyboardWillShow = () => this.setState({ keyboard: true, })
+  keyboardWillHide = () => this.setState({ keyboard: false, })
+
   componentDidMount () {
     this.keyboardWillShowListener = Keyboard.addListener('keyboardWillShow', this.keyboardWillShow)
     this.keyboardWillHideListener = Keyboard.addListener('keyboardWillHide', this.keyboardWillHide)
   }
+
   componentWillUnmount () {
     this.keyboardWillShowListener.remove()
     this.keyboardWillHideListener.remove()
-  }
-  keyboardWillShow = () => {
-    this.setState({ keyboard: true, })
-  }
-  keyboardWillHide = () => {
-    this.setState({ keyboard: false, })
   }
 
   handleUpdatePersonalInfo = async () => {

@@ -78,6 +78,8 @@ class PhoneNumberScreen extends React.Component<IPhoneNumberScreenProps> {
 
   private keyboardWillShowListener: any
   private keyboardWillHideListener: any
+  keyboardWillShow = () => this.setState({ keyboard: true, })
+  keyboardWillHide = () => this.setState({ keyboard: false, })
 
   componentDidMount () {
     this.keyboardWillShowListener = Keyboard.addListener('keyboardWillShow', this.keyboardWillShow)
@@ -87,14 +89,6 @@ class PhoneNumberScreen extends React.Component<IPhoneNumberScreenProps> {
   componentWillUnmount () {
     this.keyboardWillShowListener.remove()
     this.keyboardWillHideListener.remove()
-  }
-
-  keyboardWillShow = () => {
-    this.setState({ keyboard: true, })
-  }
-
-  keyboardWillHide = () => {
-    this.setState({ keyboard: false, })
   }
 
   handleSendPin = async () => {

@@ -2,7 +2,7 @@ import { IGetUserRes } from '../../api/user'
 import { ISignInErrors, InputLimits, } from '../../utils/constants'
 import { ISetPhoneNumber, ISetSortMedia, ISetUpdateUser, } from '../actions/UserActions'
 
-export interface IStreetPassPreferences {
+export interface IStreetpassPreferences {
   discoverable: boolean,
   location: boolean,
   sex: boolean | null,
@@ -12,16 +12,16 @@ export interface IStreetPassPreferences {
 export interface INotificationPreferences {
   messages: boolean,
   matches: boolean,
-  streetPasses: boolean,
+  streetpasses: boolean,
   emails: boolean,
   newsletters: boolean,
 }
 
 export interface IMedia {
-  mediaId: string,
+  mediaId: string | null,
   image?: string,
   video?: string,
-  thumbnail: string,
+  thumbnail?: string,
 }
 
 export interface IUserProfile {
@@ -46,8 +46,8 @@ export interface IUser {
   school: string | null,
   dob: Date | null,
   sex: boolean | null,
-  streetPass: boolean,
-  streetPassPreferences: IStreetPassPreferences,
+  streetpass: boolean,
+  streetpassPreferences: IStreetpassPreferences,
   notificationPreferences: INotificationPreferences,
   media: Array<IMedia>,
   joinDate: Date | null,
@@ -57,6 +57,39 @@ export interface IUserStore {
   signedIn: boolean,
   user: IUser,
   error: boolean,
+}
+
+const INITIAL_STATE: IUserStore = {
+  signedIn: false,
+  user: {
+    userId: '',
+    phoneNumber: '',
+    countryCode: '',
+    email: '',
+    name: '',
+    bio: '',
+    work: '',
+    school: '',
+    dob: null,
+    sex: null,
+    streetpass: true,
+    streetpassPreferences: {
+      discoverable: true,
+      location: true,
+      sex: null,
+      age: [InputLimits.StreetpassAgeMin, InputLimits.StreetpassAgeMax],
+    },
+    notificationPreferences: {
+      messages: true,
+      matches: true,
+      streetpasses: true,
+      emails: true,
+      newsletters: true,
+    },
+    media: [],
+    joinDate: null,
+  },
+  error: false,
 }
 
 export enum UserActions {
@@ -77,39 +110,6 @@ type UserAction =
   | { type: UserActions.SetUpdateUser, payload: ISetUpdateUser, }
   | { type: UserActions.SetSortMedia, payload: ISetSortMedia, }
   | { type: UserActions.UserError, }
-
-const INITIAL_STATE: IUserStore = {
-  signedIn: false,
-  user: {
-    userId: '',
-    phoneNumber: '',
-    countryCode: '',
-    email: '',
-    name: '',
-    bio: '',
-    work: '',
-    school: '',
-    dob: null,
-    sex: null,
-    streetPass: true,
-    streetPassPreferences: {
-      discoverable: true,
-      location: true,
-      sex: null,
-      age: [InputLimits.StreetPassAgeMin, InputLimits.StreetPassAgeMax],
-    },
-    notificationPreferences: {
-      messages: true,
-      matches: true,
-      streetPasses: true,
-      emails: true,
-      newsletters: true,
-    },
-    media: [],
-    joinDate: null,
-  },
-  error: false,
-}
 
 const userStore = (state = INITIAL_STATE as IUserStore, action: UserAction) => {
   switch (action.type) {
@@ -145,9 +145,9 @@ const userStore = (state = INITIAL_STATE as IUserStore, action: UserAction) => {
         user: {
           ...state.user,
           ...action.payload,
-          streetPassPreferences: {
-            ...state.user.streetPassPreferences,
-            ...action.payload.streetPassPreferences,
+          streetpassPreferences: {
+            ...state.user.streetpassPreferences,
+            ...action.payload.streetpassPreferences,
           },
           notificationPreferences: {
             ...state.user.notificationPreferences,

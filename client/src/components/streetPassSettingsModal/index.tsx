@@ -8,14 +8,14 @@ import { BlurView } from '@react-native-community/blur'
 import NavHeader from '../navigation/NavHeader'
 import CrossIcon from '../../assets/icons/cross.svg'
 import Button from '../button'
-import { InputLimits, streetPassAges } from '../../utils/constants'
+import { InputLimits, streetpassAges } from '../../utils/constants'
 import Slider from '../slider'
 import { requestLocationAlways } from '../../utils/services'
 import MaleIcon from '../../assets/icons/male.svg'
 import FemaleIcon from '../../assets/icons/female.svg'
 import { ISetUpdateUser } from '../../state/actions/UserActions'
 
-interface IStreetPassSettingsModalProps {
+interface IStreetpassSettingsModalProps {
   navigation: any,
   systemStore: ISystemStore,
   userStore: IUserStore,
@@ -24,8 +24,8 @@ interface IStreetPassSettingsModalProps {
     setUpdateUser: (params: ISetUpdateUser) => void,
   }
 }
-export interface IStreetPassSettingsModalState {
-  streetPass: boolean,
+export interface IStreetpassSettingsModalState {
+  streetpass: boolean,
   discoverable: boolean,
   location: boolean,
   sex: boolean | null,
@@ -33,29 +33,29 @@ export interface IStreetPassSettingsModalState {
   loading: boolean,
   scroll: boolean,
 }
-class StreetPassSettingsModal extends React.Component<IStreetPassSettingsModalProps> {
-  state: IStreetPassSettingsModalState = {
-    streetPass: this.props.userStore.user.streetPass,
-    discoverable: this.props.userStore.user.streetPassPreferences.discoverable,
-    location: this.props.userStore.user.streetPassPreferences.location,
-    sex: this.props.userStore.user.streetPassPreferences.sex,
-    age: this.props.userStore.user.streetPassPreferences.age,
+class StreetpassSettingsModal extends React.Component<IStreetpassSettingsModalProps> {
+  state: IStreetpassSettingsModalState = {
+    streetpass: this.props.userStore.user.streetpass,
+    discoverable: this.props.userStore.user.streetpassPreferences.discoverable,
+    location: this.props.userStore.user.streetpassPreferences.location,
+    sex: this.props.userStore.user.streetpassPreferences.sex,
+    age: this.props.userStore.user.streetpassPreferences.age,
     loading: false,
     scroll: true,
   }
 
   updateSettings = async () => {
     if (true
-      // this.state.streetPass !== this.props.userStore.user.streetPass
-      // || this.state.discoverable !== this.props.userStore.user.streetPassPreferences.discoverable
-      // || this.state.location !== this.props.userStore.user.streetPassPreferences.location
-      // || this.state.sex !== this.props.userStore.user.streetPassPreferences.sex
-      // || this.state.age !== this.props.userStore.user.streetPassPreferences.age
+      // this.state.sp !== this.props.userStore.user.streetpass
+      // || this.state.discoverable !== this.props.userStore.user.streetpassPreferences.discoverable
+      // || this.state.location !== this.props.userStore.user.streetpassPreferences.location
+      // || this.state.sex !== this.props.userStore.user.streetpassPreferences.sex
+      // || this.state.age !== this.props.userStore.user.streetpassPreferences.age
     ) {
       this.setState({ loading: true, })
       await this.props.actions.setUpdateUser({
-        streetPass: this.state.streetPass,
-        streetPassPreferences: {
+        streetpass: this.state.streetpass,
+        streetpassPreferences: {
           discoverable: this.state.discoverable,
           location: this.state.location,
           sex: this.state.sex,
@@ -68,22 +68,22 @@ class StreetPassSettingsModal extends React.Component<IStreetPassSettingsModalPr
   }
 
   render() {
-    const { systemStore, toggleModal, }: IStreetPassSettingsModalProps = this.props
+    const { systemStore, toggleModal, }: IStreetpassSettingsModalProps = this.props
     const { Colors, } = systemStore
 
-    const streetPassConfig: IListGroupConfig = {
+    const streetpassConfig: IListGroupConfig = {
       title: Lit[this.props.systemStore.Locale].Title.ConnectWithOthers,
       list: [
         {
-          title: Lit[this.props.systemStore.Locale].Title.StreetPass, toggleValue: this.state.streetPass, onToggle: async () => {
-            if (!this.state.streetPass) {
+          title: Lit[this.props.systemStore.Locale].Title.Streetpass, toggleValue: this.state.streetpass, onToggle: async () => {
+            if (!this.state.streetpass) {
               await requestLocationAlways(this.props.systemStore.Locale).then(async result => {
                 if (!result) return
-                this.setState({ streetPass: !this.state.streetPass, })
+                this.setState({ streetpass: !this.state.streetpass, })
               })
-            } else this.setState({ streetPass: !this.state.streetPass, })
+            } else this.setState({ streetpass: !this.state.streetpass, })
           },
-          description: Lit[this.props.systemStore.Locale].Copywrite.StreetPassDescription,
+          description: Lit[this.props.systemStore.Locale].Copywrite.StreetpassDescription,
         },
       ],
     }
@@ -111,8 +111,8 @@ class StreetPassSettingsModal extends React.Component<IStreetPassSettingsModalPr
     //   title: Lit[systemStore.Locale].Title.VisibleOnMap,
     //   list: [
     //     {
-    //       title: Lit[systemStore.Locale].Title.StreetPassLocation, toggleValue: this.state.location, onToggle: () => this.setState({ location: !this.state.location, }),
-    //       description: Lit[systemStore.Locale].Copywrite.StreetPassLocationDescription,
+    //       title: Lit[systemStore.Locale].Title.StreetpassLocation, toggleValue: this.state.location, onToggle: () => this.setState({ location: !this.state.location, }),
+    //       description: Lit[systemStore.Locale].Copywrite.StreetpassLocationDescription,
     //     },
     //   ],
     // }
@@ -131,17 +131,17 @@ class StreetPassSettingsModal extends React.Component<IStreetPassSettingsModalPr
           >
             <View style={{flex: 1, width: '100%',}}>
               <ScrollView scrollEnabled={this.state.scroll} showsVerticalScrollIndicator={false}>
-                <ListGroup systemStore={systemStore} config={streetPassConfig} />
-                {this.state.streetPass &&
+                <ListGroup systemStore={systemStore} config={streetpassConfig} />
+                {this.state.streetpass &&
                   <>
                     <ListGroup systemStore={systemStore} config={sexConfig} />
                     <Slider
                       systemStore={systemStore}
-                      values={streetPassAges}
+                      values={streetpassAges}
                       minValue={this.state.age[0]}
                       maxValue={this.state.age[1]}
                       title={Lit[this.props.systemStore.Locale].Title.AgePreference}
-                      subtitle={`${this.state.age[0]}-${this.state.age[1] >= InputLimits.StreetPassAgeMax ? this.state.age[1] + '+' : this.state.age[1]}`}
+                      subtitle={`${this.state.age[0]}-${this.state.age[1] >= InputLimits.StreetpassAgeMax ? this.state.age[1] + '+' : this.state.age[1]}`}
                       setValues={(minValue, maxValue) => this.setState({ age: [minValue, maxValue], })}
                       onSlidingStart={() => this.setState({ scroll: false, })}
                       onSlidingEnd={() => this.setState({ scroll: true, })}
@@ -170,4 +170,4 @@ class StreetPassSettingsModal extends React.Component<IStreetPassSettingsModalPr
   }
 }
 
-export default StreetPassSettingsModal
+export default StreetpassSettingsModal

@@ -32,15 +32,17 @@ import GradientBackground from '../components/gradientBackground'
 import { Lit, } from '../utils/locale'
 import AnimatedBackground from '../components/animated/AnimatedBackground'
 import { ThemeTypes } from '../utils/themes'
+import { IMatchesStore } from '../state/reducers/MatchesReducer'
+import { IUnsetMatch, unsetMatch } from '../state/actions/MatchesActions'
 
 const mapStateToProps = (state: IStores) => {
-  const { systemStore, userStore, } = state
-  return { systemStore, userStore, }
+  const { systemStore, userStore, matchesStore, } = state
+  return { systemStore, userStore, matchesStore, }
 }
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => ({
   actions: bindActionCreators(Object.assign(
     {
-      //
+      unsetMatch,
     }
   ), dispatch),
 })
@@ -49,9 +51,10 @@ interface IChatsScreenProps {
   navigation: any,
   systemStore: ISystemStore,
   userStore: IUserStore,
+  matchesStore: IMatchesStore,
   // chatsStore: IChatsStore,
   actions: {
-    //
+    unsetMatch: (params: IUnsetMatch) => void,
   },
 }
 interface IChatsScreenState {
@@ -76,26 +79,23 @@ class ChatsScreen extends React.Component<IChatsScreenProps> {
 
   private keyboardWillShowListener: any
   private keyboardWillHideListener: any
+  keyboardWillShow = () => this.setState({ keyboard: true, })
+  keyboardWillHide = () => this.setState({ keyboard: false, })
+
   componentDidMount () {
     this.keyboardWillShowListener = Keyboard.addListener('keyboardWillShow', this.keyboardWillShow)
     this.keyboardWillHideListener = Keyboard.addListener('keyboardWillHide', this.keyboardWillHide)
   }
+
   componentWillUnmount () {
     this.keyboardWillShowListener.remove()
     this.keyboardWillHideListener.remove()
   }
-  keyboardWillShow = () => {
-    this.setState({ keyboard: true, })
-  }
-  keyboardWillHide = () => {
-    this.setState({ keyboard: false, })
-  }
 
   render() {
-    const { navigation, systemStore, userStore, actions, }: IChatsScreenProps = this.props
+    const { navigation, systemStore, userStore, matchesStore, actions, }: IChatsScreenProps = this.props
     const { Colors, Fonts, } = systemStore
 
-    const matches = mockMatches
     const chats = mockChats
 
     return (
@@ -106,69 +106,75 @@ class ChatsScreen extends React.Component<IChatsScreenProps> {
         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center',}}>
           <KeyboardAvoidingView
             behavior={'padding'}
-            style={{flex: 1,}}
+            style={{flex: 1, width: '100%',}}
           >            
             <ScrollView showsVerticalScrollIndicator={false} keyboardDismissMode={'interactive'} style={{flex: 1, width: '100%', height: '100%',}}>
               <View style={{flex: 1, width: '100%', marginTop: 72,}}>
-                <Text style={{paddingHorizontal: 16, marginBottom: 8, color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.cruiserWeight,}}>{Lit[systemStore.Locale].Title.Matches}</Text>
 
-                <View style={{minWidth: 112,}}>
-                  <FlashList
-                    data={matches}
-                    extraData={{ matchId: this.state.chatId, chatId: this.state.chatId, }}
-                    estimatedItemSize={112}
-                    horizontal={true}
-                    showsHorizontalScrollIndicator={false}
-                    renderItem={item => {
-                      return (
-                        <>
-                          <TouchableOpacity
-                            key={item.item.matchId}
-                            onPress={() => navigation.navigate(Screens.Chat, { match: item.item, })}
-                            onLongPress={() => this.setState({
-                              matchId: item.item.matchId,
-                              selectionModalConfig: {
-                                title: item.item.name,
-                                list: [
-                                  { Icon: DeleteIcon, title: Lit[systemStore.Locale].Button.Remove, noRight: true, onPress: () => null, },
-                                  { Icon: ExclamationIcon, title: Lit[systemStore.Locale].Button.Report, noRight: true, onPress: () => null, },
-                                ],
-                              }
-                            })}
-                            activeOpacity={Colors.activeOpacity}
-                            style={{marginLeft: item.index === 0 ? 16 : 0, marginRight: item.index === matches.length - 1 ? 16 : 8, width: 112, aspectRatio: 1/1.2, borderRadius: 16, overflow: 'hidden',}}
-                          >
-                            {(this.state.matchId || this.state.chatId) && this.state.matchId !== item.item.matchId &&
-                              <BlurView
+                <Text style={{paddingHorizontal: 16, marginBottom: 8, color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.cruiserWeight,}}>{matchesStore.matches?.length ? Lit[systemStore.Locale].Title.Matches : Lit[systemStore.Locale].Title.NoMatches}</Text>
+
+                {matchesStore.matches && matchesStore.matches.length > 0 &&
+                  <View style={{minWidth: 112,}}>
+                    <FlashList
+                      data={matchesStore.matches || []}
+                      extraData={{ matchId: this.state.chatId, chatId: this.state.chatId, }}
+                      estimatedItemSize={112}
+                      horizontal={true}
+                      showsHorizontalScrollIndicator={false}
+                      renderItem={item => {
+                        return (
+                          <>
+                            <TouchableOpacity
+                              key={item.item.userId}
+                              onPress={() => navigation.navigate(Screens.Chat, { match: item.item, })}
+                              onLongPress={() => this.setState({
+                                matchId: item.item.userId,
+                                selectionModalConfig: {
+                                  title: item.item.name,
+                                  list: [
+                                    { Icon: DeleteIcon, title: Lit[systemStore.Locale].Button.Unmatch, noRight: true, onPress: () => {
+                                      actions.unsetMatch({ userId: item.item.userId, })
+                                      this.setState({ matchId: null, selectionModalConfig: null, })
+                                    }, },
+                                    { Icon: ExclamationIcon, title: Lit[systemStore.Locale].Button.Report, noRight: true, onPress: () => null, },
+                                  ],
+                                }
+                              })}
+                              activeOpacity={Colors.activeOpacity}
+                              style={{marginLeft: item.index === 0 ? 16 : 0, marginRight: matchesStore.matches && item.index === matchesStore.matches.length - 1 ? 16 : 8, width: 112, aspectRatio: 1/1.2, borderRadius: 16, overflow: 'hidden',}}
+                              >
+                              {(this.state.matchId || this.state.chatId) && this.state.matchId !== item.item.userId &&
+                                <BlurView
                                 blurType={Colors.themeType === ThemeTypes.Dark ? undefined : Colors.safeLightBlur}
                                 blurAmount={2}
                                 style={{position: 'absolute', zIndex: 1, alignSelf: 'center', width: '100%', height: '100%', borderRadius: 16,}}
-                              />
-                            }
-                            <FastImage key={item.index} source={{ uri: item.item.media[0].image, }} style={{width: '100%', height: '100%', borderRadius: 16, overflow: 'hidden',}} />
+                                />
+                              }
+                              <FastImage key={item.index} source={{ uri: item.item.media[0].thumbnail, }} style={{width: '100%', height: '100%', borderRadius: 16, overflow: 'hidden',}} />
 
-                            {!item.item.seen && <View style={{position: 'absolute', top: 8, right: 8, width: 12, aspectRatio: 1/1, borderRadius: 32, marginLeft: 8, backgroundColor: Colors.red,}} />}
+                              {!item.item.seen && <View style={{position: 'absolute', top: 8, right: 8, width: 12, aspectRatio: 1/1, borderRadius: 32, marginLeft: 8, backgroundColor: Colors.red,}} />}
 
-                            <View style={{position: 'absolute', bottom: 8, alignSelf: 'center', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 8,}}>
-                              <BlurView
-                                blurType={Colors.safeLightBlur as any}
-                                style={{maxWidth: '100%', borderRadius: 8, overflow: 'hidden', paddingHorizontal: 8, height: 16, justifyContent: 'center', alignItems: 'center',}}
-                              >
-                                <Text numberOfLines={1} style={{textAlign: 'center', overflow: 'hidden', color: Colors.safeLightest, fontWeight: Fonts.middleWeight,}}>
-                                  {truncateString(item.item.name, 10, 9)}
-                                </Text>
-                              </BlurView>
-                            </View>
-                          </TouchableOpacity>
-                        </>
-                      )
-                    }}
-                    keyboardDismissMode={'interactive'}
-                    keyboardShouldPersistTaps={'handled'}
-                    onEndReached={() => null}
-                    // onEndReachedThreshold={0.2}
-                  />
-                </View>
+                              <View style={{position: 'absolute', bottom: 6, alignSelf: 'center', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 8,}}>
+                                <BlurView
+                                  blurType={Colors.safeLightBlur as any}
+                                  style={{maxWidth: '100%', borderRadius: 8, overflow: 'hidden', paddingHorizontal: 8, height: 16, justifyContent: 'center', alignItems: 'center',}}
+                                  >
+                                  <Text numberOfLines={1} style={{textAlign: 'center', overflow: 'hidden', color: Colors.safeLightest, fontWeight: Fonts.middleWeight,}}>
+                                    {truncateString(item.item.name, 10, 9)}
+                                  </Text>
+                                </BlurView>
+                              </View>
+                            </TouchableOpacity>
+                          </>
+                        )
+                      }}
+                      keyboardDismissMode={'interactive'}
+                      keyboardShouldPersistTaps={'handled'}
+                      onEndReached={() => null}
+                      // onEndReachedThreshold={0.2}
+                      />
+                  </View>
+                }
 
                 {/* <Text style={{paddingHorizontal: 16, marginTop: 16, marginBottom: 8, color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.cruiserWeight,}}>Chats</Text> */}
 
@@ -213,7 +219,7 @@ class ChatsScreen extends React.Component<IChatsScreenProps> {
                               selectionModalConfig: {
                                 title: item.item.name,
                                 list: [
-                                  { Icon: DeleteIcon, title: Lit[systemStore.Locale].Button.Remove, noRight: true, onPress: () => null, },
+                                  { Icon: DeleteIcon, title: Lit[systemStore.Locale].Button.Unmatch, noRight: true, onPress: () => null, },
                                   { Icon: ExclamationIcon, title: Lit[systemStore.Locale].Button.Report, noRight: true, onPress: () => null, },
                                 ],
                               }
@@ -291,8 +297,8 @@ class ChatsScreen extends React.Component<IChatsScreenProps> {
           <NavTabBar
             systemStore={systemStore}
             activeTab={Screens.Chats}
-            profilePicture={null}
-            onPressStreetPass={() => navigation.navigate(Screens.StreetPass)}
+            profilePicture={userStore.user.media[0]?.thumbnail || null}
+            onPressStreetpass={() => navigation.navigate(Screens.Streetpass)}
             onPressChat={() => null}
             onPressUser={() => navigation.navigate(Screens.User)}
           />

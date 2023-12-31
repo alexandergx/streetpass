@@ -39,7 +39,7 @@ export type ISetPhoneNumber = ISendPinReq
 export function setPhoneNumber(input: ISetPhoneNumber) {
   return async (dispatch: any) => {
     try {
-      const sendPinResult = await sendPin(input)
+      await sendPin(input)
       return dispatch({
         type: UserActions.SetPhoneNumber,
         payload: input,
@@ -55,10 +55,10 @@ export function setPhoneNumber(input: ISetPhoneNumber) {
 export function setUser() {
   return async (dispatch: any) => {
     try {
-      const getUserResult = await getUser({})
+      const result = await getUser({})
       return dispatch({
         type: UserActions.SetUser,
-        payload: getUserResult as IGetUserRes,
+        payload: result as IGetUserRes,
       })
     } catch (e) {
       return dispatch({
@@ -72,7 +72,7 @@ export type ISetUpdateUser = IUpdateUserReq
 export function setUpdateUser(input: ISetUpdateUser) {
   return async (dispatch: any) => {
     try {
-      const updateUserResult = await updateUser(input)
+      await updateUser(input)
       return dispatch({
         type: UserActions.SetUpdateUser,
         payload: input,
@@ -89,7 +89,7 @@ export type ISetSortMedia = Array<IUploadMedia>
 export function setSortMedia(input: ISetSortMedia) {
   return async (dispatch: any) => {
     try {
-      const sortMediaResult = await sortMedia({ mediaIds: input.map(media => media.mediaId), })
+      await sortMedia({ mediaIds: input.map(media => media.mediaId), })
       return dispatch({
         type: UserActions.SetUpdateUser,
         payload: input,

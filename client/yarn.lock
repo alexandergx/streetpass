@@ -6994,6 +6994,18 @@ react-is@^17.0.1:
   resolved "https://registry.npmjs.org/react-is/-/react-is-17.0.2.tgz"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
 
+react-native-background-fetch@^4.2.1, react-native-background-fetch@~4.2.1:
+  version "4.2.1"
+  resolved "https://registry.npmjs.org/react-native-background-fetch/-/react-native-background-fetch-4.2.1.tgz"
+  integrity sha512-UePBlP2Az6PWrIDCoGDYl0IlimvV+TFl/5XUmL4KIo7xPK7TSZru1nYHH7uskW2an5AW39ko3mbV2w/+1LxsnQ==
+
+react-native-background-geolocation@^4.14.4:
+  version "4.14.4"
+  resolved "https://registry.npmjs.org/react-native-background-geolocation/-/react-native-background-geolocation-4.14.4.tgz"
+  integrity sha512-BFd/tzPk0bfvWOqmE+kLZiJ/b/9Zc7FcxDRJr52Wc2BMHdQSo039g/yCu48DPS6sT2ZFapAQ1bok871dQry4+Q==
+  dependencies:
+    react-native-background-fetch "~4.2.1"
+
 react-native-background-upload@^6.6.0:
   version "6.6.0"
   resolved "https://registry.npmjs.org/react-native-background-upload/-/react-native-background-upload-6.6.0.tgz"

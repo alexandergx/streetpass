@@ -55,7 +55,7 @@ interface INotificationsScreenProps {
 interface INotificationsScreenState {
   messages: boolean,
   matches: boolean,
-  streetPasses: boolean,
+  streetpasses: boolean,
   emails: boolean,
   newsletters: boolean,
   loading: boolean,
@@ -64,7 +64,7 @@ class NotificationsScreen extends React.Component<INotificationsScreenProps> {
   state: INotificationsScreenState = {
     messages: this.props.userStore.user.notificationPreferences.messages,
     matches: this.props.userStore.user.notificationPreferences.matches,
-    streetPasses: this.props.userStore.user.notificationPreferences.streetPasses,
+    streetpasses: this.props.userStore.user.notificationPreferences.streetpasses,
     emails: this.props.userStore.user.notificationPreferences.emails,
     newsletters: this.props.userStore.user.notificationPreferences.newsletters,
     loading: false,
@@ -82,7 +82,7 @@ class NotificationsScreen extends React.Component<INotificationsScreenProps> {
       notificationPreferences: {
         messages: false,
         matches: false,
-        streetPasses: false,
+        streetpasses: false,
         emails: this.props.userStore.user.notificationPreferences.emails,
         newsletters: this.props.userStore.user.notificationPreferences.newsletters,
       }
@@ -90,7 +90,7 @@ class NotificationsScreen extends React.Component<INotificationsScreenProps> {
     this.setState({
       messages: false,
       matches: false,
-      streetPasses: false,
+      streetpasses: false,
     })
   }
 
@@ -106,7 +106,7 @@ class NotificationsScreen extends React.Component<INotificationsScreenProps> {
       notificationPreferences: {
         messages: this.props.userStore.user.notificationPreferences.messages,
         matches: this.props.userStore.user.notificationPreferences.matches,
-        streetPasses: this.props.userStore.user.notificationPreferences.streetPasses,
+        streetpasses: this.props.userStore.user.notificationPreferences.streetpasses,
         emails: false,
         newsletters: false,
       }
@@ -124,7 +124,7 @@ class NotificationsScreen extends React.Component<INotificationsScreenProps> {
       this.setState({ loading: false, })
       return
     }
-    if (this.state.messages || this.state.matches || this.state.streetPasses) {
+    if (this.state.messages || this.state.matches || this.state.streetpasses) {
       // const permissions = await PushNotificationIOS.requestPermissions()
       // if (permissions.authorizationStatus === 1) {
       //   this.unsetNotifications()
@@ -136,7 +136,7 @@ class NotificationsScreen extends React.Component<INotificationsScreenProps> {
       notificationPreferences: {
         messages: this.state.messages,
         matches: this.state.matches,
-        streetPasses: this.state.streetPasses,
+        streetpasses: this.state.streetpasses,
         emails: this.state.emails,
         newsletters: this.state.newsletters,
       }
@@ -153,7 +153,7 @@ class NotificationsScreen extends React.Component<INotificationsScreenProps> {
       list: [
         { Icon: MessageIcon, title: Lit[systemStore.Locale].Title.Messages, toggleValue: this.state.messages, onToggle: () => this.setState({ messages: !this.state.messages, }), },
         { Icon: MessageIcon, title: Lit[systemStore.Locale].Title.Matches, toggleValue: this.state.matches, onToggle: () => this.setState({ matches: !this.state.matches, }), },
-        { Icon: MessageIcon, title: Lit[systemStore.Locale].Title.StreetPasses, toggleValue: this.state.streetPasses, onToggle: () => this.setState({ streetPasses: !this.state.streetPasses, }), },
+        { Icon: MessageIcon, title: Lit[systemStore.Locale].Title.Streetpasses, toggleValue: this.state.streetpasses, onToggle: () => this.setState({ streetpasses: !this.state.streetpasses, }), },
       ],
     }
 

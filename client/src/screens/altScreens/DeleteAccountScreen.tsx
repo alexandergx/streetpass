@@ -65,6 +65,8 @@ class DeleteAccountScreen extends React.Component<IDeleteAccountScreenProps> {
 
   private keyboardWillShowListener: any
   private keyboardWillHideListener: any
+  keyboardWillShow = () => this.setState({ keyboard: true, })
+  keyboardWillHide = () => this.setState({ keyboard: false, })
 
   componentDidMount () {
     this.keyboardWillShowListener = Keyboard.addListener('keyboardWillShow', this.keyboardWillShow)
@@ -74,14 +76,6 @@ class DeleteAccountScreen extends React.Component<IDeleteAccountScreenProps> {
   componentWillUnmount () {
     this.keyboardWillShowListener.remove()
     this.keyboardWillHideListener.remove()
-  }
-
-  keyboardWillShow = () => {
-    this.setState({ keyboard: true, })
-  }
-
-  keyboardWillHide = () => {
-    this.setState({ keyboard: false, })
   }
 
   handleDeleteAccount = async () => {

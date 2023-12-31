@@ -254,8 +254,8 @@ class UserScreen extends React.Component<IUserScreenProps> {
           <NavTabBar
             systemStore={systemStore}
             activeTab={Screens.User}
-            profilePicture={null}
-            onPressStreetPass={() => navigation.navigate(Screens.StreetPass)}
+            profilePicture={userStore.user.media[0]?.thumbnail || null}
+            onPressStreetpass={() => navigation.navigate(Screens.Streetpass)}
             onPressChat={() => navigation.navigate(Screens.Chats)}
             onPressUser={() => null}
           />

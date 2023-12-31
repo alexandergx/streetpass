@@ -62,7 +62,7 @@ class DOBScreen extends React.Component<IDOBScreenProps> {
 
   handleUpdateSex = async () => {
     this.setState({ loading: true, })
-    await this.props.actions.setUpdateUser({ sex: this.state.sex, streetPassPreferences: { sex: this.state.showSex, }, })
+    await this.props.actions.setUpdateUser({ sex: this.state.sex, streetpassPreferences: { sex: this.state.showSex, }, })
     this.setState({ loading: false, editProfile: true, })
   }
 
@@ -99,7 +99,7 @@ class DOBScreen extends React.Component<IDOBScreenProps> {
             systemStore={systemStore}
             userStore={userStore}
             toggleModal={() => this.props.route?.params?.editProfile ? navigation.goBack() : this.setState({ editProfile: false, })}
-            onPress={() => navigation.navigate(Screens.StreetPass)}
+            onPress={() => navigation.navigate(Screens.Streetpass)}
             actions={{
               setUser: this.props.actions.setUser,
               setUpdateUser: this.props.actions.setUpdateUser,

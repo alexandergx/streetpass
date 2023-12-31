@@ -46,8 +46,8 @@ const ProfileMedia = forwardRef<ProfileMediaMethods, IProfileBlockProps>(({ syst
   const { Colors, } = systemStore
 
   const [loading, setLoading] = useState<number | null>(null)
-  const [uploadImage] = useMutation(UPLOAD_IMAGE(), { context: { headers: getAccessHeaders(), }, onError: e => { console.log('[UPLOAD ERROR]', e) }, })
-  const [updateVideo] = useMutation(UPLOAD_VIDEO(), { context: { headers: getAccessHeaders(), }, onError: e => { console.log('[UPLOAD ERROR]', e) }, })
+  const [uploadImage] = useMutation(UPLOAD_IMAGE(), { onError: e => { console.log('[UPLOAD ERROR]', e) }, })
+  const [updateVideo] = useMutation(UPLOAD_VIDEO(), { onError: e => { console.log('[UPLOAD ERROR]', e) }, })
 
   const save = async () => {
     try {
@@ -57,12 +57,18 @@ const ProfileMedia = forwardRef<ProfileMediaMethods, IProfileBlockProps>(({ syst
         if (media.image && media.new) {
           setLoading(media.key)
           const refreshed = await apiRequest(null)
-          const { data, } = await uploadImage({ variables: { file: new ReactNativeFile({ uri: media.image, name: 'file', }), }, })
+          const { data, } = await uploadImage({
+            variables: { file: new ReactNativeFile({ uri: media.image, name: 'file', }), },
+            context: { headers: getAccessHeaders(), },
+          })
           sortOrderMedia.push({ ...media, mediaId: data.uploadMedia, })
         } else if (media.video && media.new) {
           setLoading(media.key)
           const refreshed = await apiRequest(null)
-          const { data, } = await updateVideo({ variables: { file: new ReactNativeFile({ uri: media.video, name: 'file', }), }, })
+          const { data, } = await updateVideo({
+            variables: { file: new ReactNativeFile({ uri: media.video, name: 'file', }), },
+            context: { headers: getAccessHeaders(), },
+          })
           sortOrderMedia.push({ ...media, mediaId: data.uploadMedia, })
         } else sortOrderMedia.push(media)
       }
