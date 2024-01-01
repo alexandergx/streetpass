@@ -64,7 +64,7 @@ const TextInput: React.FC<ITextInputProps> = (props) => {
         }}
       >
         <BlurView
-          blurType={props.disabled ? Colors.lightBlur : Colors.darkestBlur as any}
+          blurType={Colors.darkestBlur as any}
           style={{position: 'absolute', zIndex: -1, width: '200%', height: '200%', backgroundColor: Colors.darkestBackground,}}
         />
 
@@ -115,6 +115,7 @@ const TextInput: React.FC<ITextInputProps> = (props) => {
               maxHeight: 128,
               padding: 2,
               bottom: props.multiline ? 2 : 0,
+              opacity: props.disabled ? 0.5 : undefined,
             }}
             {...props}
           />

@@ -19,6 +19,7 @@ import EditProfileModal from '../../components/editProfileModal'
 import MaleIcon from '../../assets/icons/male.svg'
 import FemaleIcon from '../../assets/icons/female.svg'
 import { ISetSortMedia, ISetUpdateUser, setSortMedia, setUpdateUser, setUser } from '../../state/actions/UserActions'
+import { InputLimits } from '../../utils/constants'
 
 const mapStateToProps = (state: IStores) => {
   const { systemStore, userStore, } = state
@@ -62,7 +63,7 @@ class DOBScreen extends React.Component<IDOBScreenProps> {
 
   handleUpdateSex = async () => {
     this.setState({ loading: true, })
-    await this.props.actions.setUpdateUser({ sex: this.state.sex, streetpassPreferences: { sex: this.state.showSex, }, })
+    await this.props.actions.setUpdateUser({ sex: this.state.sex, streetpassPreferences: { discoverable: true, location: true, sex: this.state.showSex, age: [InputLimits.StreetpassAgeMin, InputLimits.StreetpassAgeMax] }, })
     this.setState({ loading: false, editProfile: true, })
   }
 

@@ -1,5 +1,5 @@
 import { IChatNotificationsReq, IGetChatsReq, IGetChatsRes, IGetMessagesReq, IGetMessagesRes, IReadChatReq, IReadChatRes, ISearchChatsReq, ISearchChatsRes, chatNotifications, getChats, getMessages, readChat, searchChats } from '../../api/chats'
-import { ChatsActions, IMessage } from '../reducers/ChatsReducer'
+import { ChatsActions, IChat, IMessage } from '../reducers/ChatsReducer'
 
 export type ISetChats = IGetChatsReq
 export function setChats(input: ISetChats) {
@@ -15,6 +15,14 @@ export function setChats(input: ISetChats) {
         type: ChatsActions.ChatsError,
       })
     }
+  }
+}
+
+export type ISetChat = IChat
+export function setChat(input: ISetChat) {
+  return {
+    type: ChatsActions.SetChat,
+    payload: input,
   }
 }
 
@@ -86,10 +94,24 @@ export function setMessages(input: ISetMessages) {
   }
 }
 
-export type ISetMessage = IMessage
+export interface ISetMessage {
+  userId: string,
+  message: IMessage,
+}
 export function setMessage(input: ISetMessage) {
   return {
     type: ChatsActions.SetMessage,
+    payload: input,
+  }
+}
+
+export interface ISetChatMessage {
+  userId: string,
+  message: string,
+}
+export function setChatMessage(input: ISetChatMessage) {
+  return {
+    type: ChatsActions.SetChatMessage,
     payload: input,
   }
 }

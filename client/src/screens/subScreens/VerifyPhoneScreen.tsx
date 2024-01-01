@@ -81,12 +81,12 @@ class VerifyPhoneScreen extends React.Component<IVerifyPhoneScreenProps> {
   keyboardWillShow = () => this.setState({ keyboard: true, })
   keyboardWillHide = () => this.setState({ keyboard: false, })
 
-  componentDidMount () {
+  componentDidMount(): void {
     this.keyboardWillShowListener = Keyboard.addListener('keyboardWillShow', this.keyboardWillShow)
     this.keyboardWillHideListener = Keyboard.addListener('keyboardWillHide', this.keyboardWillHide)
   }
 
-  componentWillUnmount () {
+  componentWillUnmount(): void {
     this.keyboardWillShowListener.remove()
     this.keyboardWillHideListener.remove()
   }

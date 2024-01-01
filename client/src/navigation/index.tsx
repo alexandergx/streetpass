@@ -38,8 +38,8 @@ import { useSubscription } from '@apollo/client'
 import { SUBSCRIBE_MATCHES, SUBSCRIBE_MESSAGES, SUBSCRIBE_STREETPASSES, apiRequest } from '../api'
 import { IMatch } from '../state/reducers/MatchesReducer'
 import { IStreetpassStore } from '../state/reducers/StreetpassReducer'
-import { ISetMessage, setMessage } from '../state/actions/ChatsActions'
-import { IMessage } from '../state/reducers/ChatsReducer'
+import { ISetChat, ISetChats, ISetMessage, setChat, setChats, setMessage } from '../state/actions/ChatsActions'
+import { IChat, IMessage, IMessageMetadata } from '../state/reducers/ChatsReducer'
 
 export const navigationRef = createNavigationContainerRef()
 
@@ -57,6 +57,8 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => ({
       setStreetpasses,
       setMatches,
       setMatch,
+      setChats,
+      setChat,
       setMessage,
     }
   ), dispatch),
@@ -94,6 +96,8 @@ interface IMapScreenProps {
     setStreetpasses: () => void,
     setMatches: (params: ISetMatches) => void,
     setMatch: (params: ISetMatch) => void,
+    setChats: (params: ISetChats) => void,
+    setChat: (params: ISetChat) => void,
     setMessage: (params: ISetMessage) => void,
   },
 }
@@ -109,6 +113,7 @@ function AppNavigation({ systemStore, userStore, streetpassStore, actions, }: IM
         setInitialized(true)
         actions.setStreetpasses()
         actions.setMatches({ index: undefined, })
+        actions.setChats({ index: undefined, })
         await requestPushNotifications(async (deviceToken: string) => {
           await registerDevice({ manufacturer: OS[Platform.OS], deviceToken, })
         }, async (result) => {
@@ -161,8 +166,9 @@ function AppNavigation({ systemStore, userStore, streetpassStore, actions, }: IM
     skip: !userStore.signedIn || !MMKV.getString(AuthStore.AccessToken),
     shouldResubscribe: true,
     onData: (data) => {
-      const message = data?.data?.data?.messages as IMessage
-      if (message) actions.setMessage(message)
+      const { chat, message, metadata, } = data?.data?.data?.messages as { chat?: IChat, message: IMessage, metadata: IMessageMetadata, }
+      if (chat) actions.setChat(chat)
+      actions.setMessage({ userId: metadata.sender === userStore.user.userId ? metadata.recipient : metadata.sender, message: message, })
     },
     onError: async (error) => {
       console.log('[SUBSCRIBE MESSAGES ERROR]', error)

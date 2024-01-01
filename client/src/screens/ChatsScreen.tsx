@@ -13,7 +13,6 @@ import { bindActionCreators, Dispatch, AnyAction, } from 'redux'
 import { IStores, } from '../state/store'
 import { IUserStore, } from '../state/reducers/UserReducer'
 import { ISystemStore, } from '../state/reducers/SystemReducer'
-// import { IChatsStore, } from '../state/reducers/ChatsReducer'
 import { FlashList, } from '@shopify/flash-list'
 import { mockChats, mockMatches, } from '../utils/MockData'
 import { ScrollView } from 'react-native-gesture-handler'
@@ -34,10 +33,11 @@ import AnimatedBackground from '../components/animated/AnimatedBackground'
 import { ThemeTypes } from '../utils/themes'
 import { IMatchesStore } from '../state/reducers/MatchesReducer'
 import { IUnsetMatch, unsetMatch } from '../state/actions/MatchesActions'
+import { IChatsStore } from '../state/reducers/ChatsReducer'
 
 const mapStateToProps = (state: IStores) => {
-  const { systemStore, userStore, matchesStore, } = state
-  return { systemStore, userStore, matchesStore, }
+  const { systemStore, userStore, matchesStore, chatsStore, } = state
+  return { systemStore, userStore, matchesStore, chatsStore, }
 }
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => ({
   actions: bindActionCreators(Object.assign(
@@ -52,7 +52,7 @@ interface IChatsScreenProps {
   systemStore: ISystemStore,
   userStore: IUserStore,
   matchesStore: IMatchesStore,
-  // chatsStore: IChatsStore,
+  chatsStore: IChatsStore,
   actions: {
     unsetMatch: (params: IUnsetMatch) => void,
   },
@@ -82,21 +82,19 @@ class ChatsScreen extends React.Component<IChatsScreenProps> {
   keyboardWillShow = () => this.setState({ keyboard: true, })
   keyboardWillHide = () => this.setState({ keyboard: false, })
 
-  componentDidMount () {
+  componentDidMount(): void {
     this.keyboardWillShowListener = Keyboard.addListener('keyboardWillShow', this.keyboardWillShow)
     this.keyboardWillHideListener = Keyboard.addListener('keyboardWillHide', this.keyboardWillHide)
   }
 
-  componentWillUnmount () {
+  componentWillUnmount(): void {
     this.keyboardWillShowListener.remove()
     this.keyboardWillHideListener.remove()
   }
 
   render() {
-    const { navigation, systemStore, userStore, matchesStore, actions, }: IChatsScreenProps = this.props
+    const { navigation, systemStore, userStore, matchesStore, chatsStore, actions, }: IChatsScreenProps = this.props
     const { Colors, Fonts, } = systemStore
-
-    const chats = mockChats
 
     return (
       <>
@@ -132,10 +130,11 @@ class ChatsScreen extends React.Component<IChatsScreenProps> {
                                 selectionModalConfig: {
                                   title: item.item.name,
                                   list: [
-                                    { Icon: DeleteIcon, title: Lit[systemStore.Locale].Button.Unmatch, noRight: true, onPress: () => {
+                                    { Icon: DeleteIcon, image: item.item.media[0].thumbnail, title: Lit[systemStore.Locale].Button.Unmatch, noRight: true, onPress: () => {
                                       actions.unsetMatch({ userId: item.item.userId, })
                                       this.setState({ matchId: null, selectionModalConfig: null, })
                                     }, },
+                                    { Icon: DeleteIcon, title: Lit[systemStore.Locale].Button.Block, noRight: true, onPress: () => null, },
                                     { Icon: ExclamationIcon, title: Lit[systemStore.Locale].Button.Report, noRight: true, onPress: () => null, },
                                   ],
                                 }
@@ -204,7 +203,7 @@ class ChatsScreen extends React.Component<IChatsScreenProps> {
 
                 <View style={{minHeight: 72,}}>
                   <FlashList
-                    data={chats}
+                    data={chatsStore.chatsSearch.length ? chatsStore.chatsSearch : chatsStore.chats ? chatsStore.chats : []}
                     extraData={{ matchId: this.state.chatId, chatId: this.state.chatId, }}
                     estimatedItemSize={72}
                     showsVerticalScrollIndicator={false}
@@ -219,7 +218,11 @@ class ChatsScreen extends React.Component<IChatsScreenProps> {
                               selectionModalConfig: {
                                 title: item.item.name,
                                 list: [
-                                  { Icon: DeleteIcon, title: Lit[systemStore.Locale].Button.Unmatch, noRight: true, onPress: () => null, },
+                                  { Icon: DeleteIcon, image: item.item.media[0].thumbnail, title: Lit[systemStore.Locale].Button.Unmatch, noRight: true, onPress: () => {
+                                    actions.unsetMatch({ userId: item.item.userId, })
+                                    this.setState({ matchId: null, selectionModalConfig: null, })
+                                  }, },
+                                  { Icon: DeleteIcon, title: Lit[systemStore.Locale].Button.Block, noRight: true, onPress: () => null, },
                                   { Icon: ExclamationIcon, title: Lit[systemStore.Locale].Button.Report, noRight: true, onPress: () => null, },
                                 ],
                               }
@@ -251,14 +254,14 @@ class ChatsScreen extends React.Component<IChatsScreenProps> {
                                 onLongPress={() => null}
                                 style={{flex: 0, marginLeft: 8,}}
                               >
-                                <Thumbnail systemStore={systemStore} uri={item.item.media[0].image} size={48} />
+                                <Thumbnail systemStore={systemStore} uri={item.item.media[0].thumbnail} size={48} />
                               </TouchableOpacity>
                       
                               <View style={{flex: 1, justifyContent: 'center', marginHorizontal: 16,}}>
                                 <View style={{flexDirection: 'row',}}>
                                   <Text numberOfLines={1} style={{color: Colors.lightest, fontWeight: Fonts.cruiserWeight as any, marginRight: 8, flex: 1,}}>{item.item.name}</Text>
                                   <View style={{flexDirection: 'row', alignItems: 'center',}}>
-                                    <Text style={{color: Colors.lighter, fontWeight: Fonts.lightWeight as any,}}>{timePassedSince(item.item.updated, systemStore.Locale)}</Text>
+                                    <Text style={{color: Colors.lighter, fontWeight: Fonts.lightWeight as any,}}>{timePassedSince(item.item.date, systemStore.Locale)}</Text>
                                     {item.item.unread && <View style={{width: 8, aspectRatio: 1/1, borderRadius: 32, marginLeft: 8, backgroundColor: Colors.red,}} />}
                                   </View>
                                 </View>

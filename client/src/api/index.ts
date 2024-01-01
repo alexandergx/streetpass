@@ -597,6 +597,7 @@ export const CHAT_NOTIFICATIONS = (input: IChatNotificationsMutation) => {
 
 export interface IGetMessagesQuery {
   chatId: string,
+  userId: string,
   index?: number,
 }
 export const GET_MESSAGES = (input: IGetMessagesQuery) => {
@@ -608,6 +609,7 @@ export const GET_MESSAGES = (input: IGetMessagesQuery) => {
   query = query + `
       }) {
         messages {
+          chatId
           messageId
           userId
           message
@@ -620,21 +622,68 @@ export const GET_MESSAGES = (input: IGetMessagesQuery) => {
   return gql(query)
 }
 
+export interface ISendMessageMutation {
+  chatId?: string,
+  userId: string,
+  message: string,
+}
+export const SEND_MESSAGE = (input: ISendMessageMutation) => {
+  let mutation = `
+  mutation {
+      sendMessage(input: {
+  `
+  mutation = mutation + inputConstructor(input)
+  mutation = mutation + `
+      })
+    }
+  `
+  return gql(mutation)
+}
+
 export interface ISubscribeMessagesSubscription {
   chatId?: string,
   userId: string,
 }
-export const SUBSCRIBE_MESSAGES = (input: ISubscribeMessagesSubscription) => gql`
+export const SUBSCRIBE_MESSAGES = (input: ISubscribeMessagesSubscription) => {
+ let subscription = `
   subscription {
     messages(input: {
-      chatId: "${input.chatId}"
-      userId: "${input.userId}"
-    }) {
-      chatId
-      messageId
-      userId
-      message
-      date
-    }
-  }
-`
+ `
+ subscription = subscription + inputConstructor(input)
+ subscription = subscription + `
+     }) {
+      chat {
+        userId
+        name
+        bio
+        work
+        school
+        age
+        sex
+        date
+        media {
+          mediaId
+          image
+          video
+          thumbnail
+        }
+        lastMessage
+        unread
+        notifications
+      }
+      message {
+        chatId
+        messageId
+        userId
+        message
+        date
+      }
+      metadata {
+        sender
+        recipient
+      }
+     }
+   }
+ `
+ return gql(subscription)
+}

@@ -13,6 +13,7 @@ import { IMatch } from '../../state/reducers/MatchesReducer'
 import { IStreetpass } from '../../state/reducers/StreetpassReducer'
 import { ISetSeenMatch, setSeenMatch } from '../../state/actions/MatchesActions'
 import { IChat, IChatsStore, IMessages } from '../../state/reducers/ChatsReducer'
+import { ISetChatMessage, setChatMessage } from '../../state/actions/ChatsActions'
 
 const mapStateToProps = (state: IStores) => {
   const { systemStore, userStore, chatsStore, } = state
@@ -22,18 +23,20 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => ({
   actions: bindActionCreators(Object.assign(
     {
       setSeenMatch,
+      setChatMessage,
     }
   ), dispatch),
 })
 
 interface IChatScreenProps {
   navigation: any,
-  route: { params: { chatId?: string, match?: IMatch, }, } | any,
+  route: { params: { chat?: IChat, match?: IMatch, }, } | any,
   systemStore: ISystemStore,
   userStore: IUserStore,
   chatsStore: IChatsStore,
   actions: {
     setSeenMatch: (params: ISetSeenMatch) => void,
+    setChatMessage: (params: ISetChatMessage) => void,
   },
 }
 export interface IChatScreenState {
@@ -42,11 +45,11 @@ export interface IChatScreenState {
   appStateListener: any,
   match: IMatch | null,
   chat: IChat | null,
-  messages: IMessages | null,
+  userId: string,
   selectionModalConfig: IListGroupConfig | null,
   streetpass: IStreetpass | null,
-  message: string,
-  messageLoading: boolean,
+  sending: boolean,
+  paginating: boolean,
 }
 class ChatScreen extends React.Component<IChatScreenProps> {
   constructor(props: any) {
@@ -60,16 +63,12 @@ class ChatScreen extends React.Component<IChatScreenProps> {
     appState: null,
     appStateListener: null,
     match: this.props.route.params.match || null,
-    chat: this.props.route.params.chatId
-      ? this.props.chatsStore.chats
-        ? this.props.chatsStore.chats.find(chat => chat.chatId === this.props.route.params.chatId) || null
-        : null
-      : null,
-    messages: this.props.route.params.chatId ? this.props.chatsStore.messages[this.props.route.params.chatId] || null : null,
+    chat: this.props.chatsStore.chats?.find(chat => chat.userId === this.props.route.params.match?.userId || chat.userId === this.props.route.params.chat.userId) || null,
+    userId: this.props.route.params.match?.userId || this.props.route.params.chat.userId,
     selectionModalConfig: null,
     streetpass: null,
-    message: '',
-    messageLoading: false,
+    sending: false,
+    paginating: false,
   }
 
   private keyboardWillShowListener: any
@@ -84,19 +83,24 @@ class ChatScreen extends React.Component<IChatScreenProps> {
     this.blurListener = this.props.navigation.addListener('blur', () => this.setState({ active: false, }))
     const appStateListener = AppState.addEventListener('change', this.appStateChange)
     this.setState({ appStateListener, })
-    // TODO - if !this.state.chat and this.state.match, it means it's a first message
-      // on first message, remove match, add chat
-    // if this.state.chat and not this.state.messages, init messages
+    if (!this.props.chatsStore.messages[this.state.userId]) this.props.actions.setChatMessage({ userId: this.state.userId, message: '', })
   }
 
-  componentDidMount () {
+  componentDidMount(): void {
     this.keyboardWillShowListener = Keyboard.addListener('keyboardWillShow', this.keyboardWillShow)
     this.keyboardWillHideListener = Keyboard.addListener('keyboardWillHide', this.keyboardWillHide)
     if (this.state.match && this.state.match.seen === false) this.props.actions.setSeenMatch({ userId: this.state.match.userId, })
     // TODO - set read chat
   }
 
-  componentWillUnmount () {
+  componentDidUpdate(): void {
+    if (!this.state.chat) {
+      const chat = this.props.chatsStore.chats?.find(chat => chat.userId === this.state.userId)
+      if (chat) this.setState({ chat: chat, })
+    }
+  }
+
+  componentWillUnmount(): void {
     this.keyboardWillShowListener.remove()
     this.keyboardWillHideListener.remove()
     // TODO - set read chat
@@ -114,7 +118,7 @@ class ChatScreen extends React.Component<IChatScreenProps> {
   }
 
   render() {
-    const { navigation, route, systemStore, userStore, actions, }: IChatScreenProps = this.props
+    const { navigation, route, systemStore, userStore, chatsStore, actions, }: IChatScreenProps = this.props
 
     return (
       <>
@@ -126,10 +130,12 @@ class ChatScreen extends React.Component<IChatScreenProps> {
           route={this.props.route}
           systemStore={systemStore}
           userStore={userStore}
+          chatsStore={chatsStore}
           state={this.state}
+          messages={chatsStore.messages[this.state.userId]}
           setState={(params) => this.setState({ ...params, })}
           actions={{
-            //
+            setChatMessage: actions.setChatMessage,
           }}
         />
       </>
