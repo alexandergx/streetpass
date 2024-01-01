@@ -32,6 +32,9 @@ export class GetMessagesDto {
   @Field(() => String)
   chatId: string
 
+  @Field(() => String)
+  userId: string
+
   @Field(() => String, { nullable: true, })
   index?: string
 }
@@ -56,15 +59,6 @@ export class SendMessageDto {
   @Field(() => String)
   message: string
 }
-
-// @InputType()
-// export class DeleteMessageDto {
-//   @Field(() => String)
-//   chatId: string
-
-//   @Field(() => String)
-//   messageId: string
-// }
 
 // @InputType()
 // export class ReactMessageDto {

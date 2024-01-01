@@ -16,9 +16,6 @@ export class UserChat {
   @Prop({ required: false, })
   lastMessage: string
 
-  @Prop({ required: false, })
-  lastMessageId: string
-
   @Prop({ required: true, default: true, })
   unread: boolean
 
@@ -26,7 +23,7 @@ export class UserChat {
   notifications: boolean
 
   @Prop({ required: true, })
-  updated: string
+  date: Date
 }
 
 export type UserChatsDocument = HydratedDocument<UserChats>

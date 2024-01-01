@@ -27,8 +27,8 @@ export class UserChat {
   @Field(() => Boolean, { nullable: true, })
   sex: boolean
 
-  @Field(() => Date)
-  date: Date
+  @Field(() => String)
+  date: string
 
   @Field(() => [UserMedia])
   media: UserMedia[]
@@ -70,13 +70,7 @@ export class UserMessage {
   date: string
 
   // @Field(() => String, { nullable: true, })
-  // authUserReaction?: string
-
-  // @Field(() => String, { nullable: true, })
-  // userReaction?: string
-
-  // @Field(() => Boolean)
-  // deleted: boolean
+  // reaction?: string
 }
 
 @ObjectType()
@@ -86,4 +80,25 @@ export class MessagesPagination {
 
   @Field(() => Boolean)
   continue: boolean
+}
+
+@ObjectType()
+export class MessageMetadata {
+  @Field(() => String)
+  sender: string
+
+  @Field(() => String)
+  recipient: string
+}
+
+@ObjectType()
+export class MessagesSubscription {
+  @Field(() => UserChat, { nullable: true, })
+  chat?: UserChat
+
+  @Field(() => UserMessage)
+  message: UserMessage
+
+  @Field(() => MessageMetadata)
+  metadata: MessageMetadata
 }

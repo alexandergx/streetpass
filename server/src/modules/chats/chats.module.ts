@@ -12,6 +12,9 @@ import Redis from 'ioredis'
 import { PubSubOptions, Subscriptions, } from 'src/utils/constants'
 import { ChatsService, ChatsSubscriptionsService } from './chats.service'
 import { ChatsResolver } from './chats.resolver'
+import { Blocked, BlockedSchema } from 'src/schemas/blocked.schema'
+import { MatchSubscriptionsService } from '../matches/matches.service'
+import { Matches, MatchesSchema } from 'src/schemas/matches.schema'
 
 @Module({
   imports: [
@@ -19,6 +22,8 @@ import { ChatsResolver } from './chats.resolver'
       { name: User.name, collection: User.name, schema: UserSchema, },
       { name: Chat.name, collection: Chat.name, schema: ChatSchema, },
       { name: UserChats.name, collection: UserChats.name, schema: UserChatsSchema, },
+      { name: Matches.name, collection: Matches.name, schema: MatchesSchema, },
+      { name: Blocked.name, collection: Blocked.name, schema: BlockedSchema, },
     ]),
     JwtModule.register({ secret: process.env.JWT_SECRET, }),
     AuthModule,
@@ -32,6 +37,7 @@ import { ChatsResolver } from './chats.resolver'
     ChatsResolver,
     ChatsService,
     ChatsSubscriptionsService,
+    MatchSubscriptionsService,
   ],
 })
 export class ChatsModule {}

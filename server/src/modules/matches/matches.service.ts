@@ -26,10 +26,10 @@ export class MatchSubscriptionsService {
 export class MatchesService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
-    @InjectModel(Streetpasses.name) private streetpassesModel: Model<StreetpassesDocument>,
     @InjectModel(Streetpassed.name) private streetpassedModel: Model<StreetpassedDocument>,
-    @InjectModel(Matches.name) private matchesModel: Model<MatchesDocument>,
+    @InjectModel(Streetpasses.name) private streetpassesModel: Model<StreetpassesDocument>,
     @InjectModel(Matched.name) private matchedModel: Model<MatchedDocument>,
+    @InjectModel(Matches.name) private matchesModel: Model<MatchesDocument>,
     private readonly jwtService: JwtService,
     private readonly matchSubscriptionsService: MatchSubscriptionsService,
   ) {}
@@ -49,7 +49,7 @@ export class MatchesService {
           await this.streetpassesModel.updateOne({ userId: userId, }, { $pull: { streetpasses: { userId: input.userId, }, }, })
           const authUser = await this.userModel.findOne({ _id: new mongoose.mongo.ObjectId(userId), }).lean()
           const user = await this.userModel.findOne({ _id: new mongoose.mongo.ObjectId(input.userId), }).lean()
-          this.matchSubscriptionsService.publish({userId: userId, match: {
+          this.matchSubscriptionsService.publish({ userId: userId, match: {
             userId: input.userId,
             name: user.name,
             bio: user.bio,
@@ -62,7 +62,7 @@ export class MatchesService {
             seen: false,
             unmatch: false,
           }, })
-          this.matchSubscriptionsService.publish({userId: input.userId, match: {
+          this.matchSubscriptionsService.publish({ userId: input.userId, match: {
             userId: userId,
             name: authUser.name,
             bio: authUser.bio,
@@ -129,7 +129,7 @@ export class MatchesService {
     const { userId, } = this.jwtService.decode(context.req.headers['access-token']) as AuthDecodedToken
     await this.matchesModel.updateOne({ userId: userId, }, { $pull: { matches: { userId: input.userId, }, }, })
     await this.matchesModel.updateOne({ userId: input.userId, }, { $pull: { matches: { userId: userId, }, }, })
-    this.matchSubscriptionsService.publish({userId: input.userId, match: {
+    this.matchSubscriptionsService.publish({ userId: input.userId, match: {
       userId: userId,
       name: '',
       bio: '',

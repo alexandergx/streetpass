@@ -17,15 +17,15 @@ import Redis from 'ioredis'
   imports: [
     MongooseModule.forFeature([
       { name: User.name, collection: User.name, schema: UserSchema, },
-      { name: Streetpasses.name, collection: Streetpasses.name, schema: StreetpassesSchema, },
       { name: Streetpassed.name, collection: Streetpassed.name, schema: StreetpassedSchema, },
-      { name: Matches.name, collection: Matches.name, schema: MatchesSchema, },
+      { name: Streetpasses.name, collection: Streetpasses.name, schema: StreetpassesSchema, },
       { name: Matched.name, collection: Matched.name, schema: MatchedSchema, },
+      { name: Matches.name, collection: Matches.name, schema: MatchesSchema, },
     ]),
     JwtModule.register({ secret: process.env.JWT_SECRET, }),
     AuthModule,
   ],
-  exports: [MatchesService],
+  exports: [MatchesService, MatchSubscriptionsService],
   providers: [
     {
       provide: Subscriptions.PubSub,

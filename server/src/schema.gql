@@ -58,6 +58,7 @@ input GetMatchesDto {
 input GetMessagesDto {
   chatId: String!
   index: String
+  userId: String!
 }
 
 input GetUserDto {
@@ -88,9 +89,20 @@ type MatchesPagination {
   matches: [Match!]!
 }
 
+type MessageMetadata {
+  recipient: String!
+  sender: String!
+}
+
 type MessagesPagination {
   continue: Boolean!
   messages: [UserMessage!]!
+}
+
+type MessagesSubscription {
+  chat: UserChat
+  message: UserMessage!
+  metadata: MessageMetadata!
 }
 
 type Mutation {
@@ -101,6 +113,7 @@ type Mutation {
   registerDevice(input: RegisterDeviceDto!): Boolean!
   removeMedia(input: RemoveMediaDto!): Boolean!
   seenMatch(input: SeenMatchDto!): Boolean!
+  sendMessage(input: SendMessageDto!): Boolean!
   sendPin(input: SendPinDto!): Boolean!
   signIn(input: SignInDto!): Auth!
   sortMedia(input: SortMediaDto!): Boolean!
@@ -148,6 +161,12 @@ input SearchChatsDto {
 }
 
 input SeenMatchDto {
+  userId: String!
+}
+
+input SendMessageDto {
+  chatId: String
+  message: String!
   userId: String!
 }
 
@@ -203,7 +222,7 @@ input SubscribeStreetpassesDto {
 
 type Subscription {
   matches(input: SubscribeMatchesDto!): Match!
-  messages(input: SubscribeChatsDto!): UserMessage!
+  messages(input: SubscribeChatsDto!): MessagesSubscription!
   streetpasses(input: SubscribeStreetpassesDto!): Boolean!
 }
 
@@ -236,7 +255,7 @@ type UserChat {
   age: Float!
   bio: String!
   chatId: String!
-  date: DateTime!
+  date: String!
   lastMessage: String!
   media: [UserMedia!]!
   name: String!

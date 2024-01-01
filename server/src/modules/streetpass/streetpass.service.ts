@@ -77,7 +77,7 @@ export class StreetpassService {
       }
       if (streetpasses.length) {
         await this.streetpassesModel.updateOne({ userId: userId, }, { $push: { streetpasses: { $each: streetpasses, }, }, })
-        this.streetpassSubscriptionsService.publish({userId: userId, })
+        this.streetpassSubscriptionsService.publish({ userId: userId, })
         // TODO - push notification new streetpasses
       }
       console.log

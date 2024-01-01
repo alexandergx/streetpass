@@ -5,6 +5,7 @@ import { AuthGuard, } from '../auth/auth.service'
 import { GetMatchesDto, MatchDto, SeenMatchDto, SubscribeMatchesDto, UnmatchDto, } from './matches.dto'
 import { Subscriptions, } from 'src/utils/constants'
 import { Match, MatchesPagination, } from './matches.entities'
+import { SelfGuard } from '../users/users.service'
 
 @Resolver()
 export class MatchesResolver {
@@ -15,6 +16,7 @@ export class MatchesResolver {
 
   @Mutation(() => Boolean)
   @UseGuards(AuthGuard)
+  @UseGuards(SelfGuard)
   async match(@Args('input') input: MatchDto, @Context() context: any) {
     return this.matchesService.match(input, context)
   }

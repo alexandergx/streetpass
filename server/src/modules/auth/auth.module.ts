@@ -11,6 +11,7 @@ import { Streetpasses, StreetpassesSchema } from 'src/schemas/streetpasses.schem
 import { Streetpassed, StreetpassedSchema } from 'src/schemas/streetpassed.schema'
 import { Matches, MatchesSchema } from 'src/schemas/matches.schema'
 import { Matched, MatchedSchema } from 'src/schemas/matched.schema'
+import { UserChats, UserChatsSchema } from 'src/schemas/userChats.schema'
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { Matched, MatchedSchema } from 'src/schemas/matched.schema'
       { name: Streetpassed.name, collection: Streetpassed.name, schema: StreetpassedSchema, },
       { name: Matches.name, collection: Matches.name, schema: MatchesSchema, },
       { name: Matched.name, collection: Matched.name, schema: MatchedSchema, },
+      { name: UserChats.name, collection: UserChats.name, schema: UserChatsSchema, },
       { name: Blocked.name, collection: Blocked.name, schema: BlockedSchema, },
     ]),
     JwtModule.register({ secret: process.env.JWT_SECRET, }),

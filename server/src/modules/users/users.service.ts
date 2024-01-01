@@ -172,3 +172,24 @@ export class PrivacyGuard implements CanActivate {
     throw new GraphQLError(Errors.AuthError)
   }
 }
+
+@Injectable()
+export class SelfGuard implements CanActivate {
+  constructor(
+    private readonly jwtService: JwtService,
+  ) {}
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = GqlExecutionContext.create(context).getContext()
+    if (request.req.headers['access-token'] && request.req.headers['access-token'] !== 'null') {
+      const { userId, } = this.jwtService.decode(request.req.headers['access-token']) as AuthDecodedToken
+      const input = request.req.body?.query ? request.req.body.query.match(/userId:\s+"([^"]+)"/) : request.req.body.mutation.match(/userId:\s+"([^"]+)"/)
+      if (input && input.length) {
+        const inputUserId = input[1]
+        if (userId == inputUserId) return false
+      }
+      return true
+    }
+    throw new GraphQLError(Errors.AuthError)
+  }
+}

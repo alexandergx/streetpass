@@ -17,6 +17,7 @@ import { Streetpasses, StreetpassesDocument } from 'src/schemas/streetpasses.sch
 import { Streetpassed, StreetpassedDocument } from 'src/schemas/streetpassed.schema'
 import { Matches, MatchesDocument } from 'src/schemas/matches.schema'
 import { Matched, MatchedDocument } from 'src/schemas/matched.schema'
+import { UserChats, UserChatsDocument } from 'src/schemas/userChats.schema'
 
 @Injectable()
 export class AuthService {
@@ -27,6 +28,7 @@ export class AuthService {
     @InjectModel(Streetpassed.name) private streetpassedModel: Model<StreetpassedDocument>,
     @InjectModel(Matches.name) private matchesModel: Model<MatchesDocument>,
     @InjectModel(Matched.name) private matchedModel: Model<MatchedDocument>,
+    @InjectModel(UserChats.name) private userChatsModel: Model<UserChatsDocument>,
     @InjectModel(Blocked.name) private blockedModel: Model<BlockedDocument>,
     private readonly jwtService: JwtService,
   ) {}
@@ -57,6 +59,7 @@ export class AuthService {
       this.streetpassedModel.updateOne({ userId: user._id.toString(), }, { $setOnInsert: { streetpassed: [], }, }, { upsert: true, }).then(() => {})
       this.matchesModel.updateOne({ userId: user._id.toString(), }, { $setOnInsert: { matches: [], }, }, { upsert: true, }).then(() => {})
       this.matchedModel.updateOne({ userId: user._id.toString(), }, { $setOnInsert: { matched: [], }, }, { upsert: true, }).then(() => {})
+      this.userChatsModel.updateOne({ userId: user._id.toString(), }, { $setOnInsert: { chats: [], }, }, { upsert: true, }).then(() => {})
       this.blockedModel.updateOne({ userId: user._id.toString(), }, { $setOnInsert: { blocking: [], blockers: [], }, }, { upsert: true, }).then(() => {})
 
       let code = null
