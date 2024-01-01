@@ -13,7 +13,7 @@ import { IMatch } from '../../state/reducers/MatchesReducer'
 import { IStreetpass } from '../../state/reducers/StreetpassReducer'
 import { ISetSeenMatch, setSeenMatch } from '../../state/actions/MatchesActions'
 import { IChat, IChatsStore, IMessages } from '../../state/reducers/ChatsReducer'
-import { ISetChatMessage, setChatMessage } from '../../state/actions/ChatsActions'
+import { ISetChatMessage, ISetMessages, setChatMessage, setMessages } from '../../state/actions/ChatsActions'
 
 const mapStateToProps = (state: IStores) => {
   const { systemStore, userStore, chatsStore, } = state
@@ -23,6 +23,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => ({
   actions: bindActionCreators(Object.assign(
     {
       setSeenMatch,
+      setMessages,
       setChatMessage,
     }
   ), dispatch),
@@ -36,6 +37,7 @@ interface IChatScreenProps {
   chatsStore: IChatsStore,
   actions: {
     setSeenMatch: (params: ISetSeenMatch) => void,
+    setMessages: (params: ISetMessages) => void,
     setChatMessage: (params: ISetChatMessage) => void,
   },
 }
@@ -84,6 +86,9 @@ class ChatScreen extends React.Component<IChatScreenProps> {
     const appStateListener = AppState.addEventListener('change', this.appStateChange)
     this.setState({ appStateListener, })
     if (!this.props.chatsStore.messages[this.state.userId]) this.props.actions.setChatMessage({ userId: this.state.userId, message: '', })
+    if (this.state.chat && this.props.chatsStore.messages[this.state.userId]?.continue !== false) {
+      this.props.actions.setMessages({ chatId: this.state.chat.chatId, userId: this.state.userId, index: undefined, })
+    }
   }
 
   componentDidMount(): void {
@@ -130,11 +135,11 @@ class ChatScreen extends React.Component<IChatScreenProps> {
           route={this.props.route}
           systemStore={systemStore}
           userStore={userStore}
-          chatsStore={chatsStore}
           state={this.state}
           messages={chatsStore.messages[this.state.userId]}
           setState={(params) => this.setState({ ...params, })}
           actions={{
+            setMessages: actions.setMessages,
             setChatMessage: actions.setChatMessage,
           }}
         />

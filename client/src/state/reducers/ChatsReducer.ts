@@ -133,7 +133,7 @@ const chatsStore = (state = INITIAL_STATE, action: ChatsAction) => {
         messages: {
           ...state.messages,
           [action.payload.userId]: {
-            messages: state.messages[action.payload.userId] ? [...state.messages[action.payload.userId].messages, action.payload.message] : [action.payload.message],
+            messages: state.messages[action.payload.userId] ? [action.payload.message, ...state.messages[action.payload.userId].messages] : [action.payload.message],
             message: state.messages[action.payload.userId] ? state.messages[action.payload.userId].message : '',
             continue: state.messages[action.payload.userId] ? state.messages[action.payload.userId].continue : true,
           },

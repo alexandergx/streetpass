@@ -39,7 +39,7 @@ import StreetpassModal from '../streetpassModal'
 import { IMatch } from '../../state/reducers/MatchesReducer'
 import { IChat, IChatsStore, IMessage, IMessageMetadata, IMessages } from '../../state/reducers/ChatsReducer'
 import { sendMessage } from '../../api/chats'
-import { ISetChatMessage } from '../../state/actions/ChatsActions'
+import { ISetChatMessage, ISetMessages } from '../../state/actions/ChatsActions'
 
 const MMKV = new MMKVLoader().withEncryption().withInstanceID(LocalStorage.AuthStore).initialize()
 
@@ -48,38 +48,38 @@ interface IChatBlockProps {
   route: { params: { chatId?: string, match: IMatch, }, } | any,
   systemStore: ISystemStore,
   userStore: IUserStore,
-  chatsStore: IChatsStore,
   state: IChatScreenState,
   messages: IMessages,
   setState: (params: any) => void,
   actions: {
+    setMessages: (params: ISetMessages) => void,
     setChatMessage: (params: ISetChatMessage) => void,
   }
 }
 const ChatBlock: React.FC<IChatBlockProps> = ({
-  navigation, route, systemStore, userStore, chatsStore, state, messages, setState, actions,
+  navigation, route, systemStore, userStore, state, messages, setState, actions,
 }) => {
   const { Colors, Fonts, } = systemStore
   const flatListRef = useRef(null)
   const isFocused = useIsFocused()
 
-  useSubscription(SUBSCRIBE_MESSAGES({
-    chatId: state.chat?.chatId || undefined,
-    userId: userStore.user.userId,
-  }), {
-    skip: !state.chat || !MMKV.getString(AuthStore.AccessToken),
-    shouldResubscribe: true,
-    onData: (data) => {
-      const { message, metadata, } = data?.data?.data?.messages as { chat?: IChat, message: IMessage, metadata: IMessageMetadata, }
-      // if (isFocused) actions.setChatId(data.data.data.messageSent.chatId)
-      // else actions.setChatId(null)
-      // setNewMessage(data.data.data.messageSent)
-    },
-    onError: async (error) => {
-      console.log('[SUBSCRIBE MESSAGES ERROR]', error)
-      await apiRequest(null)
-    }
-  })
+  // useSubscription(SUBSCRIBE_MESSAGES({
+  //   chatId: state.chat?.chatId || undefined,
+  //   userId: userStore.user.userId,
+  // }), {
+  //   skip: !state.chat || !MMKV.getString(AuthStore.AccessToken),
+  //   shouldResubscribe: true,
+  //   onData: (data) => {
+  //     const { message, metadata, } = data?.data?.data?.messages as { chat?: IChat, message: IMessage, metadata: IMessageMetadata, }
+  //     // if (isFocused) actions.setChatId(data.data.data.messageSent.chatId)
+  //     // else actions.setChatId(null)
+  //     // setNewMessage(data.data.data.messageSent)
+  //   },
+  //   onError: async (error) => {
+  //     console.log('[SUBSCRIBE MESSAGES ERROR]', error)
+  //     await apiRequest(null)
+  //   }
+  // })
 
   return (
     <>
@@ -135,28 +135,24 @@ const ChatBlock: React.FC<IChatBlockProps> = ({
         <View style={{flex: 1,}}>
           <FlashList
             ref={flatListRef}
-            // data={state.messages || []}
-            data={[]}
+            data={messages?.messages || []}
             extraData={state}
             estimatedItemSize={51}
             renderItem={({ item, index, }) => {
               if (!item) return null
               return (
-                <>
-                </>
-                // <Message
-                //   item={item}
-                //   index={index}
-                //   messages={state.messages}
-                //   messageId={state.messageId}
-                //   messageIdTime={state.messageIdTime}
-                //   setMessageId={setMessageId}
-                //   setMessageIdTime={setMessageIdTime}
-                //   removeMessage={removeMessage}
-                //   setMessageReaction={setMessageReaction}
-                //   systemStore={systemStore}
-                //   userId={userStore.user.userId}
-                // />
+                <Message
+                  item={item}
+                  index={index}
+                  messages={messages.messages || []}
+                  // messageId={state.messageId}
+                  // messageIdTime={state.messageIdTime}
+                  // setMessageId={setMessageId}
+                  // setMessageIdTime={setMessageIdTime}
+                  // setMessageReaction={setMessageReaction}
+                  systemStore={systemStore}
+                  userId={userStore.user.userId}
+                />
               )
             }}
             ListHeaderComponent={
@@ -193,7 +189,11 @@ const ChatBlock: React.FC<IChatBlockProps> = ({
             showsVerticalScrollIndicator={false}
             keyboardDismissMode={'interactive'}
             keyboardShouldPersistTaps={'handled'}
-            // onEndReached={() => loadMessages()}
+            onEndReached={() => {
+              if (state.chat && messages && messages.continue !== false) {
+                actions.setMessages({ chatId: state.chat.chatId, userId: state.userId, index: messages.messages.length || 0, })
+              }
+            }}
             onEndReachedThreshold={0.2}
           />
         </View>

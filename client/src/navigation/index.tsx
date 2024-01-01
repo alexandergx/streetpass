@@ -169,6 +169,7 @@ function AppNavigation({ systemStore, userStore, streetpassStore, actions, }: IM
       const { chat, message, metadata, } = data?.data?.data?.messages as { chat?: IChat, message: IMessage, metadata: IMessageMetadata, }
       if (chat) actions.setChat(chat)
       actions.setMessage({ userId: metadata.sender === userStore.user.userId ? metadata.recipient : metadata.sender, message: message, })
+      // TODO - set update chat with message details
     },
     onError: async (error) => {
       console.log('[SUBSCRIBE MESSAGES ERROR]', error)
@@ -226,7 +227,6 @@ function AppNavigation({ systemStore, userStore, streetpassStore, actions, }: IM
           />
           <App.Screen name={Screens.Chat} component={ChatScreen}
             options={{
-              animation: 'fade_from_bottom',
             }}
           />
           {/* ALT ROUTES */}

@@ -508,6 +508,7 @@ export const GET_CHATS = (input: IGetChatsQuery) => {
   query = query + `
       }) {
         chats {
+          chatId
           userId
           name
           bio
@@ -544,6 +545,7 @@ export const SEARCH_CHATS = (input: ISearchChatsQuery) => {
   query = query + inputConstructor(input)
   query = query + `
       }) {
+        chatId
         userId
         name
         bio
@@ -653,6 +655,7 @@ export const SUBSCRIBE_MESSAGES = (input: ISubscribeMessagesSubscription) => {
  subscription = subscription + `
      }) {
       chat {
+        chatId
         userId
         name
         bio

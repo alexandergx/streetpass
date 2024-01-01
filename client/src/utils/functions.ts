@@ -80,7 +80,7 @@ export const getAge = (inputDate: Date | string | null) => {
   return age
 }
 
-export const withinTime = (inputDate1: string, inputDate2: string, timeFrame: number) => {
+export const withinTime = (inputDate1: Date | string, inputDate2: Date | string, timeFrame: number) => {
   const date1 = new Date(inputDate1)
   const date2 = new Date(inputDate2)
   const diffInMilliseconds = Math.abs(date1.getTime() - date2.getTime())
