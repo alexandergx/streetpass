@@ -10,7 +10,7 @@ import { AuthDecodedToken, } from '../auth/auth.entities'
 import { GraphQLError, } from 'graphql'
 import { Errors, NotificationType, PushNotificationMessage, Subscriptions, } from 'src/utils/constants'
 // import { NotificationsService } from '../notifications/notifications.service'
-import { Chat, ChatDocument, } from 'src/schemas/chat.schema'
+import { Chat, ChatDocument, MessageDocument, } from 'src/schemas/chat.schema'
 import { UserChatDocument, UserChats, UserChatsDocument, } from 'src/schemas/userChats.schema'
 import { RedisPubSub, } from 'graphql-redis-subscriptions'
 import { getAge } from 'src/utils/functions'
@@ -123,12 +123,24 @@ export class ChatsService {
   async getMessages(input: GetMessagesDto, @Context() context: any): Promise<MessagesPagination> {
     const { userId, } = this.jwtService.decode(context.req.headers['access-token']) as AuthDecodedToken
     const result = await this.chatModel.aggregate([
-      { $match: { _id: input.chatId, }, },
-      { $project: { participants: true, messages: { $slice: ['$messages', input.index || 0, 30], }, total: { $size: '$messages', }, }, },
+      { $match: { _id: new mongoose.mongo.ObjectId(input.chatId) } },
+      { $project: { participants: true, messages: true, total: { $size: '$messages', }, }, },
+      { $addFields: { startIndex: { $max: [{ $subtract: ['$total', (input.index || 0) + 30] }, 0], }, endIndex: { $min: [{ $subtract: ['$total', input.index || 0] }, '$total'], }, }, },
+      { $addFields: { messageSliceLength: { $max: [{ $subtract: ['$endIndex', '$startIndex'], }, 0], }, }, },
+      { $project: { participants: true, messages: { $slice: ['$messages', '$startIndex', '$messageSliceLength'], }, total: true, }, },
     ])
     if (result && result.length && result[0].participants.includes(userId)) {
-      const messages: UserMessage[] = result[0].messages
-      return { messages: messages, continue: input.index + 30 < result[0].total, }
+      const messages: MessageDocument[] = result[0].messages
+      const returnList = messages.map(message => {
+        return {
+          chatId: input.chatId,
+          messageId: message.messageId,
+          userId: message.userId,
+          message: message.message,
+          date: message.date.toISOString(),
+        }
+      }).reverse()
+      return { messages: returnList, continue: (input.index || 0) + 30 < result[0].total, }
     }
     return { messages: [], continue: false, }
   }
@@ -168,7 +180,6 @@ export class ChatsService {
         metadata: { sender: userId, recipient: input.userId, },
       })
     } else {
-      // TODO - remove match
       await this.matchesModel.updateOne({ userId: userId, }, { $pull: { matches: { userId: input.userId, }, }, })
       await this.matchesModel.updateOne({ userId: input.userId, }, { $pull: { matches: { userId: userId, }, }, })
       const authUser = await this.userModel.findOne({ _id: new mongoose.mongo.ObjectId(userId), }).lean()

@@ -2,8 +2,8 @@ import { InputType, Field, } from '@nestjs/graphql'
 
 @InputType()
 export class GetChatsDto {
-  @Field(() => String, { nullable: true, })
-  index?: string
+  @Field(() => Number, { nullable: true, })
+  index?: number
 }
 
 @InputType()
@@ -35,8 +35,8 @@ export class GetMessagesDto {
   @Field(() => String)
   userId: string
 
-  @Field(() => String, { nullable: true, })
-  index?: string
+  @Field(() => Number, { nullable: true, })
+  index?: number
 }
 
 @InputType()
