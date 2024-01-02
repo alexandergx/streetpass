@@ -78,11 +78,11 @@ export class UserMessage {
   @Field(() => String)
   message: string
 
+  @Field(() => String, { nullable: true, })
+  reaction?: string
+
   @Field(() => String)
   date: string
-
-  // @Field(() => String, { nullable: true, })
-  // reaction?: string
 }
 
 @ObjectType()

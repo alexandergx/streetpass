@@ -3,7 +3,7 @@ import { Context, } from '@nestjs/graphql'
 import { InjectModel, } from '@nestjs/mongoose'
 import mongoose, { Model, } from 'mongoose'
 import { User, UserDocument, } from 'src/schemas/user.schema'
-import { GetChatsDto, GetMessagesDto, ReadChatDto, SearchChatsDto, ChatNotificationsDto, SendMessageDto, } from './chats.dto'
+import { GetChatsDto, GetMessagesDto, ReadChatDto, SearchChatsDto, ChatNotificationsDto, SendMessageDto, ReactMessageDto, } from './chats.dto'
 import { ChatsPagination, MessageMetadata, MessagesPagination, UserChat, UserMessage } from './chats.entities'
 import { JwtService, } from '@nestjs/jwt'
 import { AuthDecodedToken, } from '../auth/auth.entities'
@@ -134,13 +134,6 @@ export class ChatsService {
 
   async getMessages(input: GetMessagesDto, @Context() context: any): Promise<MessagesPagination> {
     const { userId, } = this.jwtService.decode(context.req.headers['access-token']) as AuthDecodedToken
-    // const result = await this.chatModel.aggregate([
-    //   { $match: { _id: new mongoose.mongo.ObjectId(input.chatId) } },
-    //   { $project: { participants: true, messages: true, total: { $size: '$messages', }, }, },
-    //   { $addFields: { startIndex: { $max: [{ $subtract: ['$total', (input.index || 0) + 30] }, 0], }, endIndex: { $min: [{ $subtract: ['$total', input.index || 0] }, '$total'], }, }, },
-    //   { $addFields: { messageSliceLength: { $max: [{ $subtract: ['$endIndex', '$startIndex'], }, 0], }, }, },
-    //   { $project: { participants: true, messages: { $slice: ['$messages', '$startIndex', '$messageSliceLength'], }, total: true, }, },
-    // ])
     const result = await this.chatModel.aggregate([
       { $match: { _id: new mongoose.mongo.ObjectId(input.chatId), }, },
       { $project: { participants: true, messages: true, total: { $size: '$messages', }, }, },
@@ -156,6 +149,7 @@ export class ChatsService {
           messageId: message.messageId,
           userId: message.userId,
           message: message.message,
+          reaction: message.reaction,
           date: message.date.toISOString(),
         }
       }).reverse()
@@ -324,27 +318,17 @@ export class ChatsService {
     return true
   }
 
-  // async reactMessage(input: ReactMessageDto, @Context() context: any): Promise<boolean> {
-  //   const { userId, } = this.jwtService.decode(context.req.headers['access-token']) as AuthDecodedToken
-  //   const chat = await this.chatModel.findOneAndUpdate(
-  //     { _id: new mongoose.mongo.ObjectId(input.chatId), },
-  //     { $set: input.userId === userId
-  //       ? { 'messages.$[elem].authUserReaction': input?.reaction || null, }
-  //       : { 'messages.$[elem].userReaction': input?.reaction || null, }
-  //     },
-  //     { arrayFilters: [{ 'elem.messageId': input.messageId, 'elem.userId': input.userId, }], },
-  //   ).lean()
-  //   this.chatsSubscriptionsService.publish({
-  //     messageSent: {
-  //       chatId: input.chatId,
-  //       messageId: input.messageId,
-  //       userId: userId,
-  //       reaction: input.reaction,
-  //       date: new Date().toISOString(),
-  //     },
-  //     participants: chat.participants,
-  //   })
-  //   if (chat) return true
-  //   return false
-  // }
+  async reactMessage(input: ReactMessageDto, @Context() context: any): Promise<boolean> {
+    const { userId, } = this.jwtService.decode(context.req.headers['access-token']) as AuthDecodedToken
+    const chat = await this.chatModel.findOneAndUpdate(
+      { _id: new mongoose.mongo.ObjectId(input.chatId), 'messages.messageId': input.messageId, },
+      { $set: { 'messages.$.reaction': input.reaction || null, }, },
+    ).select('participants')
+    this.chatsSubscriptionsService.publish({
+      participants: chat.participants,
+      message: { chatId: input.chatId, messageId: input.messageId, userId: userId, message: '', date: new Date().toISOString(), reaction: input.reaction || 'null', },
+      metadata: { sender: userId, recipient: chat.participants.filter(participant => participant !== userId)[0], },
+    })
+    return false
+  }
 }

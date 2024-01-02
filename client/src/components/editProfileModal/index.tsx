@@ -1,17 +1,11 @@
 import React, { RefObject } from 'react'
-import { Animated, Dimensions, Keyboard, KeyboardAvoidingView, ScrollView, Text, TouchableOpacity, View, } from 'react-native'
-import { IMedia, IUserStore } from '../../state/reducers/UserReducer'
+import { Animated, Dimensions, Keyboard, KeyboardAvoidingView, ScrollView, Text, View, } from 'react-native'
+import { IUserStore, } from '../../state/reducers/UserReducer'
 import { ISystemStore } from '../../state/reducers/SystemReducer'
 import { BlurView } from '@react-native-community/blur'
 import NavHeader from '../navigation/NavHeader'
 import CrossIcon from '../../assets/icons/cross.svg'
-import CrossCircledIcon from '../../assets/icons/cross-circled.svg'
-import PlusIcon from '../../assets/icons/plus.svg'
-import ProfileIcon from '../../assets/icons/profile.svg'
-import PhotoIcon from '../../assets/icons/photo.svg'
 import Button from '../button'
-import { DraggableGrid } from 'react-native-draggable-grid'
-import FastImage from 'react-native-fast-image'
 import TextInput from '../textInput'
 import { InputLimits, } from '../../utils/constants'
 import { Lit, } from '../../utils/locale'
@@ -19,11 +13,10 @@ import { ISetSortMedia, ISetUpdateUser, } from '../../state/actions/UserActions'
 import ProfileMedia, { ProfileMediaMethods } from './profileMedia'
 import SelectionModal from '../selectionModal'
 import { IListGroupConfig } from '../listGroup'
-import { Screens } from '../../navigation'
 import CameraModal from '../cameraModal'
 
 export interface IUploadMedia {
-  key: number | null,
+  key: number,
   mediaId: string | null,
   image?: string,
   video?: string,
@@ -69,7 +62,7 @@ class EditProfileModal extends React.Component<IEditProfileModalProps> {
   profileMediaRef: RefObject<ProfileMediaMethods>
 
   state: IEditProfileModalState = {
-    media: [...(this.props.userStore.user.media || []).map((item, index) => { return { key: index, mediaId: item.mediaId, image: item.image, video: item.video, thumbnail: item.thumbnail, new: false, } }), { key: null, mediaId: null, new: false, }].slice(0, 9),
+    media: [...(this.props.userStore.user.media || []).map((item, index) => { return { key: index, mediaId: item.mediaId, image: item.image, video: item.video, thumbnail: item.thumbnail, new: false, } }), { key: -1, mediaId: null, new: false, }].slice(0, 9),
     deletedMedia: [],
     scroll: true,
     keyboard: false,
@@ -236,7 +229,7 @@ class EditProfileModal extends React.Component<IEditProfileModalProps> {
           <CameraModal
             systemStore={systemStore}
             toggleModal={() => this.setState({ camera: false, })}
-            onCapture={({ image, video, }) => this.setState({ camera: false, media: [...this.state.media.filter((i: IUploadMedia) => i.key !== null), { image: image, video: video, key: this.state.media.length, new: true, }, { key: null, }].slice(0, 9), })}
+            onCapture={({ image, video, }) => this.setState({ camera: false, media: [...this.state.media.filter((i: IUploadMedia) => i.key !== null), { image: image, video: video, key: this.state.media.length, new: true, }, { key: -1, }].slice(0, 9), })}
           />
         }
       </Animated.View>

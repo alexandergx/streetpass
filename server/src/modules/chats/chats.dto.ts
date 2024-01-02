@@ -60,17 +60,14 @@ export class SendMessageDto {
   message: string
 }
 
-// @InputType()
-// export class ReactMessageDto {
-//   @Field(() => String)
-//   chatId: string
+@InputType()
+export class ReactMessageDto {
+  @Field(() => String)
+  chatId: string
 
-//   @Field(() => String)
-//   messageId: string
+  @Field(() => String)
+  messageId: string
 
-//   @Field(() => String)
-//   userId: string
-
-//   @Field(() => String, { nullable: true, })
-//   reaction?: string
-// }
+  @Field(() => String, { nullable: true, })
+  reaction?: string
+}

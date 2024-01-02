@@ -38,7 +38,7 @@ import { useSubscription } from '@apollo/client'
 import { SUBSCRIBE_MATCHES, SUBSCRIBE_MESSAGES, SUBSCRIBE_STREETPASSES, apiRequest } from '../api'
 import { IMatch } from '../state/reducers/MatchesReducer'
 import { IStreetpassStore } from '../state/reducers/StreetpassReducer'
-import { ISetChat, ISetChats, ISetMessage, IUnsetChat, setChat, setChats, setMessage, unsetChat } from '../state/actions/ChatsActions'
+import { ISetChat, ISetChats, ISetMessage, ISetMessageReaction, IUnsetChat, setChat, setChats, setMessage, setMessageReaction, unsetChat } from '../state/actions/ChatsActions'
 import { IChat, IMessage, IMessageMetadata } from '../state/reducers/ChatsReducer'
 
 export const navigationRef = createNavigationContainerRef()
@@ -61,6 +61,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => ({
       setChat,
       unsetChat,
       setMessage,
+      setMessageReaction,
     }
   ), dispatch),
 })
@@ -101,6 +102,7 @@ interface IMapScreenProps {
     setChat: (params: ISetChat) => void,
     unsetChat: (params: IUnsetChat) => void,
     setMessage: (params: ISetMessage) => void,
+    setMessageReaction: (params: ISetMessageReaction) => void,
   },
 }
 
@@ -170,9 +172,12 @@ function AppNavigation({ systemStore, userStore, streetpassStore, actions, }: IM
     shouldResubscribe: true,
     onData: (data) => {
       const { chat, message, metadata, } = data?.data?.data?.messages as { chat?: IChat, message: IMessage, metadata: IMessageMetadata, }
+      if (message.reaction) {
+        actions.setMessageReaction({ userId: metadata.recipient, messageId: message.messageId, reaction: message.reaction === 'null' ? null : message.reaction, })
+        return
+      }
       if (chat) actions.setChat(chat)
       actions.setMessage({ userId: metadata.sender === userStore.user.userId ? metadata.recipient : metadata.sender, message: message, })
-      // TODO - set update chat with message details
     },
     onError: async (error) => {
       console.log('[SUBSCRIBE MESSAGES ERROR]', error)

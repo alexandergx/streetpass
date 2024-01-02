@@ -641,6 +641,7 @@ export const GET_MESSAGES = (input: IGetMessagesQuery) => {
           messageId
           userId
           message
+          reaction
           date
         }
         continue
@@ -659,6 +660,24 @@ export const SEND_MESSAGE = (input: ISendMessageMutation) => {
   let mutation = `
   mutation {
       sendMessage(input: {
+  `
+  mutation = mutation + inputConstructor(input)
+  mutation = mutation + `
+      })
+    }
+  `
+  return gql(mutation)
+}
+
+export interface IReactMessageMutation {
+  chatId: string,
+  messageId: string,
+  reaction: string | null,
+}
+export const REACT_MESSAGE = (input: IReactMessageMutation) => {
+  let mutation = `
+  mutation {
+      reactMessage(input: {
   `
   mutation = mutation + inputConstructor(input)
   mutation = mutation + `
@@ -709,6 +728,7 @@ export const SUBSCRIBE_MESSAGES = (input: ISubscribeMessagesSubscription) => {
         messageId
         userId
         message
+        reaction
         date
       }
       metadata {

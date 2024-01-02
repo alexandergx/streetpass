@@ -1,4 +1,4 @@
-import { CHAT_NOTIFICATIONS, GET_CHATS, GET_MESSAGES, IChatNotificationsMutation, IGetChatsQuery, IGetMessagesQuery, IReadChatMutation, ISearchChatsQuery, ISendMessageMutation, READ_CHAT, SEARCH_CHATS, SEND_MESSAGE, apiRequest } from '.'
+import { CHAT_NOTIFICATIONS, GET_CHATS, GET_MESSAGES, IChatNotificationsMutation, IGetChatsQuery, IGetMessagesQuery, IReactMessageMutation, IReadChatMutation, ISearchChatsQuery, ISendMessageMutation, REACT_MESSAGE, READ_CHAT, SEARCH_CHATS, SEND_MESSAGE, apiRequest } from '.'
 import { IChat, IMessage } from '../state/reducers/ChatsReducer'
 
 export type IGetChatsReq = IGetChatsQuery
@@ -73,3 +73,13 @@ export const sendMessage = async (input: ISendMessageReq): Promise<ISendMessageR
   }
 }
 
+export type IReactMessageReq = IReactMessageMutation
+export type IReactMessageRes = boolean
+export const reactMessage = async (input: IReactMessageReq): Promise<IReactMessageRes> => {
+  try {
+    const { data, } = await apiRequest(REACT_MESSAGE(input))
+    return data.sendMessage
+  } catch(e) {
+    throw new Error
+  }
+}

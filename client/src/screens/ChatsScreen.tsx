@@ -302,7 +302,7 @@ class ChatsScreen extends React.Component<IChatsScreenProps> {
                                   >
                                     {item.item.lastMessage}
                                   </Text>
-                                  {item.item.lastMessageUserId === userStore.user.userId &&
+                                  {item.item.lastMessageUserId !== userStore.user.userId &&
                                     <View style={{justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.lightBlue, borderRadius: 8, paddingHorizontal: 4,}}>
                                       <Text style={{color: Colors.safeLightest, fontSize: Fonts.sm, fontWeight: Fonts.heavyWeight,}}>Your turn</Text>
                                     </View>

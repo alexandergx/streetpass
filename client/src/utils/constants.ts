@@ -39,19 +39,21 @@ export const CameraPan = {
 }
 
 export const Emojis: any = {
-  Like: '👍',
   Heart: '❤',
+  Like: '👍',
   Laugh: '😂',
-  Surprise: '😮',
-  Cry: '🥲',
   Smile: '😄',
   Love: '🥰',
-  Anger: '😡',
-  Adore: '😍',
-  Praise: '🙏',
   Fire: '🔥',
-  Celebrate: '🎉',
+  Adore: '😍',
+  Surprise: '😮',
+  Anger: '😡',
+  Teary: '🥹',
+  Wink: '😜',
+  Cry: '🥲',
   Sparkle: '✨',
+  Praise: '🙏',
+  Celebrate: '🎉',
 }
 
 let ages: Array<number> = []

@@ -13,11 +13,11 @@ export class Message {
   @Prop({ required: true, })
   message: string
 
+  @Prop({ required: true, default: null, })
+  reaction: string | null
+
   @Prop({ required: true, })
   date: Date
-
-  // @Prop({ required: true, default: null, })
-  // reaction: string | null
 }
 
 export type ChatDocument = HydratedDocument<Chat>

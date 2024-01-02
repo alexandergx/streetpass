@@ -88,11 +88,11 @@ const ProfileMedia = forwardRef<ProfileMediaMethods, IProfileBlockProps>(({ syst
     const result = await launchImageLibrary({ mediaType: 'mixed', formatAsMp4: false, selectionLimit: 1, })
     if (result?.assets && result.assets.length > 0 && result.assets[0].duration) {
       if (result.assets[0].duration <= (InputLimits.VideoLengthMax + 1)) {
-        setState({ media: [...state.media.filter((i: IUploadMedia) => i.key !== null), { video: result.assets[0].uri, key: state.media.length, new: true, }, { key: null, }].slice(0, 9), })
+        setState({ media: [...state.media.filter((i: IUploadMedia) => i.key !== -1), { video: result.assets[0].uri, key: state.media.length, new: true, }, { key: -1, }].slice(0, 9), })
       } else Alert.alert(Lit[systemStore.Locale].Copywrite.VideoLength[0], Lit[systemStore.Locale].Copywrite.VideoLength[1])
       return
     }
-    if (result?.assets && result.assets.length > 0) setState({ media: [...state.media.filter((i: IUploadMedia) => i.key !== null), { image: result.assets[0].uri, key: state.media.length, new: true, }, { key: null, }].slice(0, 9), })
+    if (result?.assets && result.assets.length > 0) setState({ media: [...state.media.filter((i: IUploadMedia) => i.key !== -1), { image: result.assets[0].uri, key: state.media.length, new: true, }, { key: -1, }].slice(0, 9), })
   }
 
   return (
@@ -101,7 +101,7 @@ const ProfileMedia = forwardRef<ProfileMediaMethods, IProfileBlockProps>(({ syst
         numColumns={3}
         itemHeight={Dimensions.get('window').width * 0.36}
         renderItem={(item: any, index) => {
-          return (item.key !== null ?
+          return (item.key !== -1 ?
             <View
               key={item.key}
               style={{
@@ -193,9 +193,9 @@ const ProfileMedia = forwardRef<ProfileMediaMethods, IProfileBlockProps>(({ syst
             </TouchableOpacity>
           )
         }}
-        data={state.media }
+        data={state.media}
         onDragStart={() => setState({ scroll: false, })}
-        onDragRelease={(data) => setState({ media: [...data.filter(i => i.key !== null), { key: null, }].slice(0, 9), scroll: true, })}
+        onDragRelease={(data) => setState({ media: [...data.filter(i => i.key !== -1), { key: -1, }].slice(0, 9), scroll: true, })}
         style={{marginVertical: 16,}}
       />
     </>

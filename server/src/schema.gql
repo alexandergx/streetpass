@@ -115,6 +115,7 @@ type Mutation {
   chatNotifications(input: ChatNotificationsDto!): Boolean!
   deleteAccount: Boolean!
   match(input: MatchDto!): Boolean!
+  reactMessage(input: ReactMessageDto!): Boolean!
   readChat(input: ReadChatDto!): Boolean!
   registerDevice(input: RegisterDeviceDto!): Boolean!
   removeMedia(input: RemoveMediaDto!): Boolean!
@@ -146,6 +147,12 @@ type Query {
   getUser(input: GetUserDto!): UserProfile!
   refreshTokens: AuthTokens!
   searchChats(input: SearchChatsDto!): [UserChat!]!
+}
+
+input ReactMessageDto {
+  chatId: String!
+  messageId: String!
+  reaction: String
 }
 
 input ReadChatDto {
@@ -289,6 +296,7 @@ type UserMessage {
   date: String!
   message: String!
   messageId: String!
+  reaction: String
   userId: String!
 }
 

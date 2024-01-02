@@ -9,8 +9,6 @@ import {
 } from 'react-native'
 import { BlurView } from '@react-native-community/blur'
 import CopyIcon from '../../assets/icons/copy.svg'
-import DeleteIcon from '../../assets/icons/delete.svg'
-import PlayIcon from '../../assets/icons/play.svg'
 import { Emojis, Time } from '../../utils/constants'
 import ListGroup from '../listGroup'
 import { formatDate, withinTime } from '../../utils/functions'
@@ -18,11 +16,9 @@ import ReactionButton from './EmojiButton'
 import { softVibrate } from '../../utils/services'
 import { ISystemStore } from '../../state/reducers/SystemReducer'
 import { Lit } from '../../utils/locale'
-import FastImage from 'react-native-fast-image'
-import LinearGradient from 'react-native-linear-gradient'
 import Pretext from '../pretext'
-import Thumbnail from '../thumbnail'
 import { IMessage } from '../../state/reducers/ChatsReducer'
+import { reactMessage } from '../../api/chats'
 
 const emojis = Object.keys(Emojis)
 
@@ -35,18 +31,12 @@ interface IMessageProps {
   messageId: string | null,
   messageIdTime: string | null,
   setState: (params: any) => void,
-  // setMessageReaction: (params: { chatId: string, messageId: string, userId: string, reaction?: string, pushReact?: boolean, }) => void,
 }
-const Message: React.FC<IMessageProps>  = React.memo(({
-  systemStore, userId, item, index, messages, messageId, messageIdTime, setState,
-  // setMessageReaction,
-}) => {
+const Message: React.FC<IMessageProps>  = React.memo(({ systemStore, userId, item, index, messages, messageId, messageIdTime, setState, }) => {
   const { Colors, Fonts, } = systemStore
   const me = item.userId === userId
-  const prev = messages && messages[index + 1]?.userId === item.userId
-    && withinTime(item.date, messages[index + 1].date, Time.Minute * 10 * 1000) ? true : false
-  const next = messages && messages[index - 1]?.userId === item.userId
-    && withinTime(item.date, messages[index - 1].date, Time.Minute * 10 * 1000) ? true : false
+  const prev = messages && messages[index + 1]?.userId === item.userId && withinTime(item.date, messages[index + 1].date, Time.Minute * 10 * 1000) ? true : false
+  const next = messages && messages[index - 1]?.userId === item.userId && withinTime(item.date, messages[index - 1].date, Time.Minute * 10 * 1000) ? true : false
 
   return (
     <>
@@ -76,47 +66,44 @@ const Message: React.FC<IMessageProps>  = React.memo(({
               />
             </View>
 
-            <View style={{alignSelf: me ? 'flex-end' : 'flex-start', maxWidth: '85%', height: 52, borderRadius: 16, overflow: 'hidden',}}>
-              <BlurView blurType={Colors.darkestBlur } style={{position: 'absolute', zIndex: -1, height: '100%', width: '100%', display: 'flex', backgroundColor: Colors.darkerBackground,}} />
-              <ScrollView
-                horizontal={true}
-                showsHorizontalScrollIndicator={false}
-                keyboardDismissMode={'none'}
-                keyboardShouldPersistTaps={'always'}
-              >
-                <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center',}}>
-                  {emojis.map((emoji, index) =>
-                    <ReactionButton
-                      key={index}
-                      systemStore={systemStore}
-                      title={Emojis[emoji]}
-                      // active={me ? item.authUserReaction === Emojis[emoji] : item.userReaction === Emojis[emoji]}
-                      onPress={() => {
-                        // setMessageReaction({
-                        //   chatId: item.chatId,
-                        //   messageId: item.messageId,
-                        //   userId: item.userId,
-                        //   reaction: me
-                        //     ? item.authUserReaction === Emojis[emoji] ? null : Emojis[emoji]
-                        //     : item.userReaction === Emojis[emoji] ? null : Emojis[emoji],
-                        // })
-                        setState({ messageId: null, })
-                      }}
-                    />
-                  )}
-                </View>
-              </ScrollView>
-            </View>
+            {!me &&
+              <View style={{alignSelf: me ? 'flex-end' : 'flex-start', maxWidth: '85%', height: 52, borderRadius: 16, overflow: 'hidden',}}>
+                <BlurView blurType={Colors.darkestBlur } style={{position: 'absolute', zIndex: -1, height: '100%', width: '100%', display: 'flex', backgroundColor: Colors.darkerBackground,}} />
+
+                <ScrollView
+                  horizontal={true}
+                  showsHorizontalScrollIndicator={false}
+                  keyboardDismissMode={'none'}
+                  keyboardShouldPersistTaps={'always'}
+                >
+                  <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center',}}>
+                    {emojis.map((emoji, index) =>
+                      <ReactionButton
+                        key={index}
+                        systemStore={systemStore}
+                        title={Emojis[emoji]}
+                        active={item.reaction === Emojis[emoji]}
+                        onPress={async () => {
+                          await reactMessage({ chatId: item.chatId, messageId: item.messageId, reaction: item.reaction === Emojis[emoji] ? null : Emojis[emoji], })
+                          setState({ messageId: null, })
+                        }}
+                      />
+                    )}
+                  </View>
+                </ScrollView>
+              </View>
+            }
           </TouchableOpacity>
         </>
       }
 
       <TouchableOpacity
-        // onPress={() => setMessageId(null)}
+        onPress={() => setState({ messageId: null, })}
         activeOpacity={1}
         style={{width: '100%', alignItems: me ? 'flex-end' : 'flex-start', paddingHorizontal: 16,}}
       >
-        {!prev && <View style={{height: 6,}} />}
+        {!prev && messageId !== item.messageId && <View style={{height: 12,}} />}
+
         <TouchableOpacity
           onPress={() => messageId ? setState({ messageId: null, }) : setState({ messageIdTime: messageIdTime === item.messageId ? null : item.messageId, })}
           onLongPress={() => {
@@ -138,7 +125,9 @@ const Message: React.FC<IMessageProps>  = React.memo(({
                 style={{position: 'absolute', zIndex: 1, width: '100%', height: '100%',}}
               />
             }
+
             <BlurView blurType={me ? Colors.safeDarkestBlur : Colors.safeDarkerBlur } style={{position: 'absolute', zIndex: -1, height: '100%', width: '100%', display: 'flex',}} />
+
             <View style={{position: 'absolute', zIndex: -1, width: '100%', height: '100%', backgroundColor: me ? Colors.lightBlue : Colors.lightGrey,}} />
 
             <Pretext
@@ -153,9 +142,10 @@ const Message: React.FC<IMessageProps>  = React.memo(({
               }}
             />
           </View>
+
           <View
             style={{
-              position: 'absolute', zIndex: 1, alignSelf: me ? 'flex-start' : 'flex-end',
+              position: 'absolute', zIndex: 1, alignSelf: me ? 'flex-start' : 'flex-end', left: me ? -4 : undefined, right: me ? undefined : -4,
               flexDirection: 'row', bottom: -6, borderRadius: 16, overflow: 'hidden',
             }}
           >
@@ -165,15 +155,14 @@ const Message: React.FC<IMessageProps>  = React.memo(({
                 style={{position: 'absolute', zIndex: 1, width: '100%', height: '100%',}}
               />
             }
+
             <BlurView blurType={me ? Colors.safeDarkestBlur : Colors.safeDarkerBlur } style={{position: 'absolute', zIndex: -1, height: '100%', width: '100%', display: 'flex',}} />
+
             <View style={{position: 'absolute', zIndex: -1, width: '100%', height: '100%', backgroundColor: me ? Colors.lightBlue : Colors.lightGrey,}} />
 
-            {/* {item.userReaction &&
-              <View style={{padding: 4,}}><Text style={{color: Colors.lightest, fontSize: Fonts.sm,}}>{item.userReaction}</Text></View>
+            {item.reaction &&
+              <View style={{padding: 4,}}><Text style={{color: Colors.lightest, fontSize: Fonts.sm,}}>{item.reaction}</Text></View>
             }
-            {item.authUserReaction &&
-              <View style={{padding: 4,}}><Text style={{color: Colors.lightest, fontSize: Fonts.sm,}}>{item.authUserReaction}</Text></View>
-            } */}
           </View>
         </TouchableOpacity>
 

@@ -1,7 +1,7 @@
 import { Resolver, Query, Mutation, Args, Context, Subscription } from '@nestjs/graphql'
 import { ChatsService, ChatsSubscriptionsService, } from './chats.service'
 import { ChatsPagination, MessagesPagination, MessagesSubscription, UserChat, UserMessage, } from './chats.entities'
-import { GetChatsDto, GetMessagesDto, ReadChatDto, SearchChatsDto, ChatNotificationsDto, SubscribeChatsDto, SendMessageDto, } from './chats.dto'
+import { GetChatsDto, GetMessagesDto, ReadChatDto, SearchChatsDto, ChatNotificationsDto, SubscribeChatsDto, SendMessageDto, ReactMessageDto, } from './chats.dto'
 import { UseGuards } from '@nestjs/common'
 import { AuthGuard } from '../auth/auth.service'
 import { Errors, InputLimits, Subscriptions, Time } from 'src/utils/constants'
@@ -57,11 +57,11 @@ export class ChatsResolver {
     return this.chatsService.sendMessage(input, context)
   }
 
-  // @Mutation(() => Boolean)
-  // @UseGuards(AuthGuard)
-  // async reactMessage(@Args('input') input: ReactMessageDto, @Context() context: any) {
-  //   return this.chatsService.reactMessage(input, context)
-  // }
+  @Mutation(() => Boolean)
+  @UseGuards(AuthGuard)
+  async reactMessage(@Args('input') input: ReactMessageDto, @Context() context: any) {
+    return this.chatsService.reactMessage(input, context)
+  }
 
   @Subscription(() => MessagesSubscription, {
     name: Subscriptions.Messages,

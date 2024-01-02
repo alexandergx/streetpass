@@ -56,7 +56,7 @@ class SelectionModal extends React.Component<ISelectionModalProps> {
       <TouchableOpacity
         onPress={this.close}
         activeOpacity={1}
-        style={{position: 'absolute', zIndex: 3, width: '100%', height: '100%',}}
+        style={{position: 'absolute', zIndex: 1, width: '100%', height: '100%',}}
       >
         {!clear &&
           <Animated.View style={{position: 'absolute', zIndex: -1, width: '100%', height: '100%', opacity: this.fadeAnim,}}>

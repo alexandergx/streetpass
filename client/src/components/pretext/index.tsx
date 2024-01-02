@@ -28,18 +28,19 @@ const Pretext: React.FC<IPretextProps> = ({ systemStore, text, linkColor, textPr
     >
       <Text {...textProps} style={textStyle}>
         {tokens.map((token, index) => {
-          if (token.startsWith('@')) {
-            return (
-              <Text
-                key={index}
-                onPress={() => onPress(token.replace('@', '').trim())}
-                onLongPress={onLongPress}
-                style={{color: linkColor ? linkColor : Colors.lightBlue, fontWeight: Fonts.cruiserWeight,}}
-              >
-                {token}
-              </Text>
-            )
-          } else return <Text key={index} style={{fontWeight: Fonts.middleWeight,}}>{token}</Text>
+          // if (token.startsWith('@')) {
+          //   return (
+          //     <Text
+          //       key={index}
+          //       onPress={() => onPress(token.replace('@', '').trim())}
+          //       onLongPress={onLongPress}
+          //       style={{color: linkColor ? linkColor : Colors.lightBlue, fontWeight: Fonts.cruiserWeight,}}
+          //     >
+          //       {token}
+          //     </Text>
+          //   )
+          // } else
+          return <Text key={index} style={{fontWeight: Fonts.middleWeight,}}>{token}</Text>
         })}
       </Text>
     </Hyperlink>

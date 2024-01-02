@@ -1,5 +1,5 @@
 import { IGetChatsRes, IGetMessagesRes, ISearchChatsRes } from '../../api/chats'
-import { ISetChat, ISetChatMessage, ISetChatNotifications, ISetMessage, ISetMessages, IUnsetChat } from '../actions/ChatsActions'
+import { ISetChat, ISetChatMessage, ISetChatNotifications, ISetMessage, ISetMessageReaction, ISetMessages, IUnsetChat } from '../actions/ChatsActions'
 import { IMedia } from './UserReducer'
 
 export interface IMessageMetadata {
@@ -13,6 +13,7 @@ export interface IMessage {
   userId: string
   message: string
   date: Date
+  reaction?: string | null,
 }
 
 export interface IMessages {
@@ -62,6 +63,7 @@ export enum ChatsActions {
   SetChatNotifications = 'SET_CHAT_NOTIFICATIONS',
   SetMessages = 'SET_MESSAGES',
   SetMessage = 'SET_MESSAGE',
+  SetMessageReaction = 'SET_MESSAGE_REACTION',
   SetChatMessage = 'SET_CHAT_MESSAGE',
   ChatsError = 'CHATS_ERROR',
 }
@@ -77,6 +79,7 @@ type ChatsAction =
   | { type: ChatsActions.SetChatNotifications, payload: ISetChatNotifications, }
   | { type: ChatsActions.SetMessages, payload: IGetMessagesRes & ISetMessages, }
   | { type: ChatsActions.SetMessage, payload: ISetMessage, }
+  | { type: ChatsActions.SetMessageReaction, payload: ISetMessageReaction, }
   | { type: ChatsActions.SetChatMessage, payload: ISetChatMessage, }
   | { type: ChatsActions.ChatsError, }
 
@@ -151,7 +154,9 @@ const chatsStore = (state = INITIAL_STATE, action: ChatsAction) => {
         ...state,
         chats: state.chats ?
           [
-            ...state.chats.filter(chat => chat.userId === action.payload.userId).map(chat => ({ ...chat, date: action.payload.message.date, lastMessage: action.payload.message.message, unread: true, })),
+            ...state.chats.filter(chat => chat.userId === action.payload.userId).map(chat => ({
+              ...chat, date: action.payload.message.date, lastMessage: action.payload.message.message, lastMessageId: action.payload.message.messageId, lastMessageUserId: action.payload.message.userId, unread: true,
+            })),
             ...state.chats.filter(chat => chat.userId !== action.payload.userId),
           ]
         : state.chats,
@@ -162,6 +167,17 @@ const chatsStore = (state = INITIAL_STATE, action: ChatsAction) => {
             message: state.messages[action.payload.userId] ? state.messages[action.payload.userId].message : '',
             continue: state.messages[action.payload.userId] ? state.messages[action.payload.userId].continue : true,
           },
+        },
+      }
+    case ChatsActions.SetMessageReaction:
+      return {
+        ...state,
+        messages: {
+          ...state.messages,
+          [action.payload.userId]: state.messages[action.payload.userId] ? {
+            ...state.messages[action.payload.userId],
+            messages: state.messages[action.payload.userId].messages.map(message => message.messageId === action.payload.messageId ? { ...message, reaction: action.payload.reaction } : message),
+          } : undefined,
         },
       }
     case ChatsActions.SetChatMessage:

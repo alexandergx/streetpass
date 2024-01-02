@@ -19,9 +19,9 @@ const ReactionButton: React.FC<IReactionButtonProps> = ({ systemStore, title, ac
     <TouchableOpacity
       activeOpacity={Colors.activeOpacity}
       onPress={onPress}
-      style={{paddingHorizontal: 16,}}
+      style={{paddingHorizontal: 8,}}
     >
-      <View style={[{borderRadius: 32, overflow: 'hidden',}, active && {backgroundColor: Colors.lightBlue,}]}>
+      <View style={[{borderRadius: 24, overflow: 'hidden',}, active && {backgroundColor: Colors.lightBlue,}]}>
         <Text style={{padding: 4, fontSize: Fonts.xl,}}>{title}</Text>
       </View>
     </TouchableOpacity>

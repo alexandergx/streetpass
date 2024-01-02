@@ -119,6 +119,18 @@ export function setMessage(input: ISetMessage) {
   }
 }
 
+export interface ISetMessageReaction {
+  userId: string,
+  messageId: string,
+  reaction: string | null,
+}
+export function setMessageReaction(input: ISetMessageReaction) {
+  return {
+    type: ChatsActions.SetMessageReaction,
+    payload: input,
+  }
+}
+
 export interface ISetChatMessage {
   userId: string,
   message: string,

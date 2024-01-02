@@ -166,8 +166,8 @@ const ChatBlock: React.FC<IChatBlockProps> = ({
                 {messages?.continue !== false && state.paginating &&
                   <ActivityIndicator color={Colors.lighter} style={{position: 'absolute', width: '100%', marginTop: 16, alignSelf: 'center',}} />
                 }
-                <View pointerEvents={'none'} style={{height: 160,}} />
-                <View style={{width: '100%', justifyContent: 'center', alignItems: 'center', paddingVertical: 16,}}>
+                <View onTouchStart={() => setState({ messageId: null, messageIdTime: null, })} style={{height: 160,}} />
+                <View onTouchStart={() => setState({ messageId: null, messageIdTime: null, })} style={{width: '100%', justifyContent: 'center', alignItems: 'center', paddingVertical: 16,}}>
                   <Text style={{color: Colors.lighter, fontSize: Fonts.sm, fontWeight: Fonts.heavyWeight , textTransform: 'uppercase',}}>
                     {Lit[systemStore.Locale].Copywrite.MatchedWith} {route.params.chat?.name || route.params.match?.name} {timePassedSince(route.params.chat?.matchDate || route.params.match?.matchDate, systemStore.Locale)}
                   </Text>
