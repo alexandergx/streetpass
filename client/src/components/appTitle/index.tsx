@@ -15,7 +15,7 @@ const AppTitle: React.FC<IAppTitleProps> = ({ systemStore, fontSize, fontWeight,
   const { Colors, Fonts, } = systemStore
   return (
     <View style={{flexDirection: 'row',}}>
-      <Text style={{color: color || Colors.light, fontWeight: fontWeight || Fonts.middleWeight as any, fontSize: fontSize || Fonts.md,}}>{PackageJson.name}</Text>
+      <Text style={{color: color || Colors.light, fontWeight: fontWeight || Fonts.middleWeight , fontSize: fontSize || Fonts.md,}}>{PackageJson.name}</Text>
     </View>
   )
 }

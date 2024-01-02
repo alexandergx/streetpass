@@ -541,6 +541,8 @@ export const GET_CHATS = (input: IGetChatsQuery) => {
             thumbnail
           }
           lastMessage
+          lastMessageId
+          lastMessageUserId
           unread
           notifications
           streetpassDate
@@ -580,6 +582,8 @@ export const SEARCH_CHATS = (input: ISearchChatsQuery) => {
           thumbnail
         }
         lastMessage
+        lastMessageId
+        lastMessageUserId
         unread
         notifications
         streetpassDate
@@ -692,6 +696,8 @@ export const SUBSCRIBE_MESSAGES = (input: ISubscribeMessagesSubscription) => {
           thumbnail
         }
         lastMessage
+        lastMessageId
+        lastMessageUserId
         unread
         notifications
         streetpassDate

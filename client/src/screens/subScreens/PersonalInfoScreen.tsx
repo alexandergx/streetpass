@@ -108,7 +108,7 @@ class DOBScreen extends React.Component<IDOBScreenProps> {
 
             <View style={{width: '100%', alignItems: 'center', borderRadius: 16, overflow: 'hidden', marginTop: 16,}}>
               <BlurView
-                blurType={Colors.darkestBlur as any}
+                blurType={Colors.darkestBlur }
                 style={{position: 'absolute', zIndex: -1, width: '100%', height: '100%', backgroundColor: Colors.darkerBackground,}}
               />
 

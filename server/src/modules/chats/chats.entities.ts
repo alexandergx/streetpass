@@ -33,6 +33,12 @@ export class UserChat {
   @Field(() => String)
   lastMessage: string
 
+  @Field(() => String)
+  lastMessageId: string
+
+  @Field(() => String)
+  lastMessageUserId: string
+
   @Field(() => Boolean)
   unread: boolean
 

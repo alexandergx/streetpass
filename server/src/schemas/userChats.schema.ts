@@ -19,6 +19,12 @@ export class UserChat {
   @Prop({ required: false, })
   lastMessage: string
 
+  @Prop({ required: false, })
+  lastMessageId: string
+
+  @Prop({ required: false, })
+  lastMessageUserId: string
+
   @Prop({ required: true, default: true, })
   unread: boolean
 

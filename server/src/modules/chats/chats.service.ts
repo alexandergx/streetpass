@@ -63,6 +63,8 @@ export class ChatsService {
           sex: user.sex,
           media: user.media,
           lastMessage: chat.lastMessage,
+          lastMessageId: chat.lastMessageId,
+          lastMessageUserId: chat.lastMessageUserId,
           unread: chat.unread,
           notifications: chat.notifications,
           streetpassDate: chat.streetpassDate.toISOString(),
@@ -98,6 +100,8 @@ export class ChatsService {
           sex: user.sex,
           media: user.media,
           lastMessage: chat.lastMessage,
+          lastMessageId: chat.lastMessageId,
+          lastMessageUserId: chat.lastMessageUserId,
           unread: chat.unread,
           notifications: chat.notifications,
           streetpassDate: chat.streetpassDate.toISOString(),
@@ -179,11 +183,11 @@ export class ChatsService {
       )
       await this.userChatsModel.updateOne(
         { userId: userId, },
-        { $push: { chats: { $each:[{ ...authChat, lastMessage: input.message, unread: false, chatDate: date, }], $position: 0, }, }, },
+        { $push: { chats: { $each:[{ ...authChat, lastMessage: input.message, lastMessageId: messageId, lastMessageUserId: userId, unread: false, chatDate: date, }], $position: 0, }, }, },
       )
       await this.userChatsModel.updateOne(
         { userId: input.userId, },
-        { $push: { chats: { $each:[{ ...chat, lastMessage: input.message, unread: true, chatDate: date, }], $position: 0, }, }, },
+        { $push: { chats: { $each:[{ ...chat, lastMessage: input.message, lastMessageId: messageId, lastMessageUserId: userId, unread: true, chatDate: date, }], $position: 0, }, }, },
       )
       await this.chatModel.updateOne(
         { _id: new mongoose.mongo.ObjectId(chat.chatId), },
@@ -214,6 +218,8 @@ export class ChatsService {
           coordinates: match.coordinates,
           name: user.name,
           lastMessage: input.message,
+          lastMessageId: messageId,
+          lastMessageUserId: userId,
           unread: false,
           notifications: true,
           streetpassDate: match.streetpassDate,
@@ -229,6 +235,8 @@ export class ChatsService {
           coordinates: match.coordinates,
           name: authUser.name,
           lastMessage: input.message,
+          lastMessageId: messageId,
+          lastMessageUserId: userId,
           unread: true,
           notifications: true,
           streetpassDate: match.streetpassDate,
@@ -277,6 +285,8 @@ export class ChatsService {
           sex: user.sex,
           media: user.media,
           lastMessage: input.message,
+          lastMessageId: messageId,
+          lastMessageUserId: userId,
           unread: false,
           notifications: true,
           streetpassDate: match.streetpassDate.toISOString(),
@@ -299,6 +309,8 @@ export class ChatsService {
           sex: authUser.sex,
           media: authUser.media,
           lastMessage: input.message,
+          lastMessageId: messageId,
+          lastMessageUserId: userId,
           unread: true,
           notifications: true,
           streetpassDate: match.streetpassDate.toISOString(),

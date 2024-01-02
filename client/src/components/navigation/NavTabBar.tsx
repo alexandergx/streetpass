@@ -32,7 +32,7 @@ const NavTabBar: React.FC<INavTabBarProps> = ({
     <View style={{position: 'absolute', zIndex: descend ? 0 : 1, width: '100%', height: 72, bottom: 0,}}>
       <BlurView
         pointerEvents={'none'}
-        blurType={Colors.darkestBlur as any}
+        blurType={Colors.darkestBlur }
         blurAmount={8}
         style={{position: 'absolute', zIndex: 0, width: '100%', height: '100%', bottom: 0,}}
       />
@@ -72,7 +72,7 @@ const NavTabBar: React.FC<INavTabBarProps> = ({
 
       {!isConnected &&
         <View pointerEvents={'none'} style={{position: 'absolute', zIndex: 0, width: '100%', height: '100%', top: 8, justifyContent: 'center', alignItems: 'center',}}>
-          <Text style={{color: Colors.safeLight, fontWeight: Fonts.cruiserWeight as any,}}>{Lit[systemStore.Locale].Title.NotConnected}</Text>
+          <Text style={{color: Colors.safeLight, fontWeight: Fonts.cruiserWeight ,}}>{Lit[systemStore.Locale].Title.NotConnected}</Text>
         </View>
       }
     </View>

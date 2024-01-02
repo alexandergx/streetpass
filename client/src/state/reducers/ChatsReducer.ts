@@ -32,6 +32,8 @@ export interface IChat {
   sex: boolean
   media: IMedia[]
   lastMessage: string
+  lastMessageId: string,
+  lastMessageUserId: string,
   unread: boolean
   notifications: boolean
   streetpassDate: Date

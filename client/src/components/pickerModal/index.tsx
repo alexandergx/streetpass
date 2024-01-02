@@ -3,6 +3,8 @@ import {
   View,
   ScrollView,
   TouchableOpacity,
+  Animated,
+  Dimensions,
 } from 'react-native'
 import { ISystemStore } from '../../state/reducers/SystemReducer'
 import ListGroup, { IListGroupConfig } from '../listGroup'
@@ -22,8 +24,30 @@ interface IPickerModalState {
   settings: boolean,
 }
 class PickerModal extends React.Component<IPickerModalProps> {
+  constructor(props: IPickerModalProps) {
+    super(props)
+    this.fadeAnim = new Animated.Value(0)
+    this.heightAnim = new Animated.Value(Dimensions.get('window').height)
+  }
+  fadeAnim: Animated.Value
+  heightAnim: Animated.Value
+
   state: IPickerModalState = {
     settings: true,
+  }
+
+  componentDidMount() {
+    Animated.parallel([
+      Animated.timing(this.fadeAnim, { toValue: 1, duration: 200, useNativeDriver: true, }),
+      Animated.spring(this.heightAnim, { toValue: 0, speed: 12, bounciness: 6, useNativeDriver: true, }),
+    ]).start()
+  }
+
+  close = () => {
+    Animated.parallel([
+      Animated.timing(this.fadeAnim, { toValue: 0, duration: 100, useNativeDriver: true, }),
+      Animated.timing(this.heightAnim, { toValue: Dimensions.get('window').height, duration: 200, useNativeDriver: true, }),
+    ]).start(() => this.props.toggleModal())
   }
 
   render() {
@@ -31,16 +55,18 @@ class PickerModal extends React.Component<IPickerModalProps> {
 
     return (
       <TouchableOpacity
-        onPress={this.props.toggleModal}
+        onPress={this.close}
         activeOpacity={1}
         style={{position: 'absolute', zIndex: 1, width: '100%', height: '100%', justifyContent: 'flex-end',}}
       >
-        <BlurView blurAmount={2} style={{position: 'absolute', zIndex: -1, height: '100%', width: '100%', display: 'flex',}} />
+        <Animated.View style={{position: 'absolute', zIndex: -1, width: '100%', height: '100%', opacity: this.fadeAnim,}}>
+          <BlurView blurAmount={2} style={{width: '100%', height: '100%',}} />
+        </Animated.View>
 
-        <View
+        <Animated.View
           style={{
-            flex: 0, width: '100%', justifyContent: 'flex-end',
-            marginTop: 96, marginBottom: this.props.onPress ? 16 : 80, padding: 16,
+            width: '100%', justifyContent: 'flex-end', transform: [{ translateY: this.heightAnim }],
+            flex: 0, paddingBottom: 16, marginTop: 96, padding: 16, marginBottom: this.props.onPress ? 16 : 80,
           }}
         >
           <ScrollView
@@ -61,7 +87,7 @@ class PickerModal extends React.Component<IPickerModalProps> {
               onPress={this.props.onPress}
             />
           }
-        </View>
+        </Animated.View>
       </TouchableOpacity>
     )
   }

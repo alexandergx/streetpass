@@ -31,7 +31,7 @@ const CreateMediaModalSwitch: React.FC<ICreateMediaModalSwitchProps> = ({ system
         borderColor: active ? Colors.safeLightest : Colors.safeDark, borderWidth: 1,
       }}
     >
-      <BlurView blurType={active ? Colors.safeLightBlur : Colors.safeDarkBlur as any} style={{position: 'absolute', zIndex: -1, width: '200%', height: '200%',}} />
+      <BlurView blurType={active ? Colors.safeLightBlur : Colors.safeDarkBlur } style={{position: 'absolute', zIndex: -1, width: '200%', height: '200%',}} />
 
       <Icon fill={active ? Colors.safeLightest : Colors.safeLight} width={24} height={24} />
 

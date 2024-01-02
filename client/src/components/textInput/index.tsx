@@ -64,7 +64,7 @@ const TextInput: React.FC<ITextInputProps> = (props) => {
         }}
       >
         <BlurView
-          blurType={Colors.darkestBlur as any}
+          blurType={Colors.darkestBlur }
           style={{position: 'absolute', zIndex: -1, width: '200%', height: '200%', backgroundColor: Colors.darkestBackground,}}
         />
 
@@ -109,7 +109,7 @@ const TextInput: React.FC<ITextInputProps> = (props) => {
             onTouchStart={props.onStartEditing}
             style={{
               color: props.textColor !== undefined ? props.textColor : Colors.lightest,
-              fontWeight: props.disabled ? Fonts.welterWeight : Fonts.middleWeight as any,
+              fontWeight: props.disabled ? Fonts.welterWeight : Fonts.middleWeight ,
               width: '100%',
               minHeight: 16,
               maxHeight: 128,

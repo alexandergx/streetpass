@@ -6,10 +6,10 @@ import { connect } from 'react-redux'
 import { bindActionCreators, Dispatch, AnyAction, } from 'redux'
 import { IStores } from '../state/store'
 import { MMKVLoader } from 'react-native-mmkv-storage'
-import { AppVersion, AuthStore, LocalStorage, OS, } from '../utils/constants'
-import { getDeviceId, getCarrier, } from 'react-native-device-info'
 import { IUserStore } from '../state/reducers/UserReducer'
 import { ISystemStore } from '../state/reducers/SystemReducer'
+import { AppVersion, AuthStore, LocalStorage, OS, } from '../utils/constants'
+// import { getDeviceId, getCarrier, } from 'react-native-device-info'
 // import { getIP, getLocation, requestPushNotifications } from '../utils/services'
 
 // MAIN ROUTES

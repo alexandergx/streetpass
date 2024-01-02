@@ -44,7 +44,7 @@ const ProfileItem: React.FC<IProfileItemProps> = ({ systemStore, profile, loadin
       }
       <View style={{position: 'absolute', zIndex: -1, width: '100%', height: '100%', borderRadius: 16, overflow: 'hidden',}}>
         <BlurView
-          blurType={blur ? 'light' : Colors.darkestBlur as any}
+          blurType={blur ? 'light' : Colors.darkestBlur }
           style={{
             position: 'absolute', zIndex: -1, width: '100%', height: '100%',
             backgroundColor: blur ? undefined : active? Colors.darkerBackground : Colors.darkBackground,
@@ -63,8 +63,8 @@ const ProfileItem: React.FC<IProfileItemProps> = ({ systemStore, profile, loadin
         </View>
 
         <View style={{flex: 1, justifyContent: 'center', marginLeft: 16,}}>
-            <Text numberOfLines={1} style={{color: Colors.lightest, fontWeight: Fonts.cruiserWeight as any,}}>{profile.username}</Text>
-            <Text numberOfLines={1} style={{color: Colors.lightest, fontWeight: Fonts.lightWeight as any,}}>{profile.name}</Text>
+            <Text numberOfLines={1} style={{color: Colors.lightest, fontWeight: Fonts.cruiserWeight ,}}>{profile.username}</Text>
+            <Text numberOfLines={1} style={{color: Colors.lightest, fontWeight: Fonts.lightWeight ,}}>{profile.name}</Text>
         </View>
       </TouchableOpacity>
 

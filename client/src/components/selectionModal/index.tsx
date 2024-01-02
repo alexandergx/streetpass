@@ -37,7 +37,7 @@ class SelectionModal extends React.Component<ISelectionModalProps> {
   componentDidMount() {
     Animated.parallel([
       Animated.timing(this.fadeAnim, { toValue: 1, duration: 200, useNativeDriver: true, }),
-      Animated.timing(this.heightAnim, { toValue: 0, duration: 200, useNativeDriver: true, }),
+      Animated.spring(this.heightAnim, { toValue: 0, speed: 12, bounciness: 4, useNativeDriver: true, }),
     ]).start()
   }
 
@@ -65,15 +65,14 @@ class SelectionModal extends React.Component<ISelectionModalProps> {
         }
 
         <Animated.View style={{flex: 1, width: '100%', height: '100%', justifyContent: 'flex-end', marginBottom: 16, paddingBottom: 16, transform: [{ translateY: this.heightAnim }],}}>            
-          <View>
+          <View style={{zIndex: 1,}}>
             <LinearGradient
-              style={{position: 'absolute', zIndex: 0, width: '100%', height: '150%', bottom: -64,}}
+              style={{position: 'absolute', zIndex: 0, width: '100%', height: '130%', bottom: -64,}}
               colors={['rgba(0,0,0,0.7)', 'rgba(0,0,0,0.5)', 'rgba(0,0,0,0.35)', 'rgba(0,0,0,0)']} start={{ x: 1, y: 1 }} end={{ x: 1, y: 0 }}
             />
 
-            <View style={{zIndex: 1, paddingHorizontal: 16,}}>
+            <View style={{paddingHorizontal: 16,}}>              
               <ListGroup systemStore={systemStore} config={{ ...config, titleShadow: true, titleColor: Colors.safeLightest, }} />
-
               <View style={{marginTop: 16,}}>
                 <Button
                   systemStore={systemStore}

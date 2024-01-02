@@ -193,7 +193,7 @@ const ProfileMedia = forwardRef<ProfileMediaMethods, IProfileBlockProps>(({ syst
             </TouchableOpacity>
           )
         }}
-        data={state.media as any}
+        data={state.media }
         onDragStart={() => setState({ scroll: false, })}
         onDragRelease={(data) => setState({ media: [...data.filter(i => i.key !== null), { key: null, }].slice(0, 9), scroll: true, })}
         style={{marginVertical: 16,}}

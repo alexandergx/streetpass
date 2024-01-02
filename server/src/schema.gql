@@ -263,6 +263,8 @@ type UserChat {
   chatDate: String!
   chatId: String!
   lastMessage: String!
+  lastMessageId: String!
+  lastMessageUserId: String!
   matchDate: String!
   media: [UserMedia!]!
   name: String!

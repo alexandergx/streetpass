@@ -40,14 +40,14 @@ const NavHeader: React.FC<INavHeaderProps> = ({
     <>
       <View
         style={{
-          zIndex: 2, flex: 0, height: shorten ? 56 : 96, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end',
+          zIndex: 4, flex: 0, height: shorten ? 56 : 96, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end',
           shadowRadius: 3, shadowOpacity: 0.1, shadowOffset: { width: 0, height: -0.5, },
           backgroundColor: Colors.darkerBackground,
           // borderBottomWidth: 2, borderBottomColor: Colors.middleGrey,
         }}
       >
         <BlurView
-          blurType={Colors.darkestBlur as any}
+          blurType={Colors.darkestBlur }
           blurAmount={8}
           style={{position: 'absolute', zIndex: -1, width: '100%', height: '100%',}}
         />
@@ -83,8 +83,8 @@ const NavHeader: React.FC<INavHeaderProps> = ({
             padding: 16, top: subtitle ? 8 : 0,
           }}
         >
-          <Text numberOfLines={1} style={{color: color ? color : Colors.lightest, fontSize: Fonts.lg, fontWeight: Fonts.heavyWeight as any,}}>{title && title}</Text>
-          {subtitle && <Text numberOfLines={1} style={{color: color ? color : Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.welterWeight as any,}}>{subtitle}</Text>}
+          <Text numberOfLines={1} style={{color: color ? color : Colors.lightest, fontSize: Fonts.lg, fontWeight: Fonts.heavyWeight ,}}>{title && title}</Text>
+          {subtitle && <Text numberOfLines={1} style={{color: color ? color : Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.welterWeight ,}}>{subtitle}</Text>}
         </TouchableOpacity>
 
         <View style={{flex: 1,}} />
@@ -117,7 +117,7 @@ const NavHeader: React.FC<INavHeaderProps> = ({
             backgroundColor: bannerColor ? bannerColor : Colors.lightBlue, paddingVertical: 12,
           }}
         >
-          <Text numberOfLines={1} style={{color: Colors.safeLightest, fontSize: Fonts.md, fontWeight: Fonts.cruiserWeight as any,}}>{bannerTitle}</Text>
+          <Text numberOfLines={1} style={{color: Colors.safeLightest, fontSize: Fonts.md, fontWeight: Fonts.cruiserWeight ,}}>{bannerTitle}</Text>
         </TouchableOpacity>
       }
     </>

@@ -59,7 +59,7 @@ class ListGroup extends React.Component<IListGroupProps> {
           {config?.title &&
             <Text
               style={[
-                {color: config.titleColor ? config.titleColor : Colors.lightest, fontSize: Fonts.lg, fontWeight: Fonts.heavyWeight as any,},
+                {color: config.titleColor ? config.titleColor : Colors.lightest, fontSize: Fonts.lg, fontWeight: Fonts.heavyWeight ,},
                 config.titleShadow && {shadowRadius: 2, shadowOpacity: 0.5, shadowOffset: { width: 0, height: 0, },},
               ]}
             >
@@ -69,7 +69,7 @@ class ListGroup extends React.Component<IListGroupProps> {
           {config?.subtitle &&
             <Text
               style={[
-                {color: config.titleColor ? config.titleColor : Colors.lightest, fontSize: Fonts.lg, fontWeight: Fonts.cruiserWeight as any,},
+                {color: config.titleColor ? config.titleColor : Colors.lightest, fontSize: Fonts.lg, fontWeight: Fonts.cruiserWeight ,},
                 config.titleShadow && {shadowRadius: 2, shadowOpacity: 0.5, shadowOffset: { width: 0, height: 0, },},
               ]}
             >
@@ -78,7 +78,7 @@ class ListGroup extends React.Component<IListGroupProps> {
           }
         </View>
 
-        <BlurView blurType={Colors.darkestBlur as any} style={{borderRadius: 16, backgroundColor: Colors.darkerBackground,}}>
+        <BlurView blurType={Colors.darkestBlur } style={{borderRadius: 16, backgroundColor: Colors.darkerBackground,}}>
           {configList.map(({Icon, iconColor, image, title, color, content, description, toggleValue, disabled, blur, loading, noRight, onPress, onToggle,}, index: number) => {
             return (
               <View
@@ -103,10 +103,10 @@ class ListGroup extends React.Component<IListGroupProps> {
                     flex: 1, flexDirection: 'row', width: '100%', marginLeft: 16, justifyContent: 'center', alignItems: 'center',
                   }}>
                     <View style={{flex: 1,}}>
-                      <Text numberOfLines={1} style={{color: color ? color : disabled || blur ? Colors.light : Colors.lightest, fontWeight: Fonts.cruiserWeight as any, fontSize: Fonts.lg,}}>{title && title}</Text>
+                      <Text numberOfLines={1} style={{color: color ? color : disabled || blur ? Colors.light : Colors.lightest, fontWeight: Fonts.cruiserWeight , fontSize: Fonts.lg,}}>{title && title}</Text>
                     </View>
                     <View style={{flex: 0, marginRight: 16, maxWidth: '50%',}}>
-                      <Text numberOfLines={1} style={{color: color ? color : disabled || blur ? Colors.light : Colors.lightest, fontWeight: Fonts.welterWeight as any, fontSize: Fonts.md,}}>{content && content}</Text>
+                      <Text numberOfLines={1} style={{color: color ? color : disabled || blur ? Colors.light : Colors.lightest, fontWeight: Fonts.welterWeight , fontSize: Fonts.md,}}>{content && content}</Text>
                     </View>
                     <View style={{flex: 0,}}>
                       {loading

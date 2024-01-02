@@ -31,10 +31,10 @@ const CreateMediaModalButton: React.FC<ICreateMediaModalButtonProps> = ({ system
         opacity: disabled ? 0.3 : 1,
       }}
     >
-      <BlurView blurType={Colors.safeDarkBlur as any} style={{position: 'absolute', zIndex: -1, width: '100%', height: '100%',}} />
+      <BlurView blurType={Colors.safeDarkBlur } style={{position: 'absolute', zIndex: -1, width: '100%', height: '100%',}} />
       {text && !loading &&
         <View style={{paddingLeft: 12,}}>
-          <Text style={{color: Colors.safeLightest, fontWeight: Fonts.heavyWeight as any,}}>{text}</Text>
+          <Text style={{color: Colors.safeLightest, fontWeight: Fonts.heavyWeight ,}}>{text}</Text>
         </View>
       }
       <View style={{width: 40, aspectRatio: 1/1, justifyContent: 'center', alignItems: 'center',}}>

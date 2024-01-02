@@ -33,7 +33,7 @@ const Slider: React.FC<ISliderProps> = ({
   return (
     <>
       <ListGroup systemStore={systemStore} config={ageConfig} />
-      <BlurView blurType={Colors.darkestBlur as any} style={{borderRadius: 16, backgroundColor: Colors.darkerBackground, paddingHorizontal: 16, paddingVertical: 4, }}>
+      <BlurView blurType={Colors.darkestBlur } style={{borderRadius: 16, backgroundColor: Colors.darkerBackground, paddingHorizontal: 16, paddingVertical: 4, }}>
         <RNSlider
           value={[values.indexOf(minValue), values.indexOf(maxValue)]}
           minimumValue={0}

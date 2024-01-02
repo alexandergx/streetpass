@@ -77,7 +77,7 @@ const Message: React.FC<IMessageProps>  = React.memo(({
             </View>
 
             <View style={{alignSelf: me ? 'flex-end' : 'flex-start', maxWidth: '85%', height: 52, borderRadius: 16, overflow: 'hidden',}}>
-              <BlurView blurType={Colors.darkestBlur as any} style={{position: 'absolute', zIndex: -1, height: '100%', width: '100%', display: 'flex', backgroundColor: Colors.darkerBackground,}} />
+              <BlurView blurType={Colors.darkestBlur } style={{position: 'absolute', zIndex: -1, height: '100%', width: '100%', display: 'flex', backgroundColor: Colors.darkerBackground,}} />
               <ScrollView
                 horizontal={true}
                 showsHorizontalScrollIndicator={false}
@@ -138,7 +138,7 @@ const Message: React.FC<IMessageProps>  = React.memo(({
                 style={{position: 'absolute', zIndex: 1, width: '100%', height: '100%',}}
               />
             }
-            <BlurView blurType={me ? Colors.safeDarkestBlur : Colors.safeDarkerBlur as any} style={{position: 'absolute', zIndex: -1, height: '100%', width: '100%', display: 'flex',}} />
+            <BlurView blurType={me ? Colors.safeDarkestBlur : Colors.safeDarkerBlur } style={{position: 'absolute', zIndex: -1, height: '100%', width: '100%', display: 'flex',}} />
             <View style={{position: 'absolute', zIndex: -1, width: '100%', height: '100%', backgroundColor: me ? Colors.lightBlue : Colors.lightGrey,}} />
 
             <Pretext
@@ -165,7 +165,7 @@ const Message: React.FC<IMessageProps>  = React.memo(({
                 style={{position: 'absolute', zIndex: 1, width: '100%', height: '100%',}}
               />
             }
-            <BlurView blurType={me ? Colors.safeDarkestBlur : Colors.safeDarkerBlur as any} style={{position: 'absolute', zIndex: -1, height: '100%', width: '100%', display: 'flex',}} />
+            <BlurView blurType={me ? Colors.safeDarkestBlur : Colors.safeDarkerBlur } style={{position: 'absolute', zIndex: -1, height: '100%', width: '100%', display: 'flex',}} />
             <View style={{position: 'absolute', zIndex: -1, width: '100%', height: '100%', backgroundColor: me ? Colors.lightBlue : Colors.lightGrey,}} />
 
             {/* {item.userReaction &&

@@ -69,7 +69,7 @@ const StreetpassModal: React.FC<IStreetpassModalProps> = ({ navigation, systemSt
   const swipeRight = streetpassCardRef?.current?.swipeRight
 
   return (
-    <Animated.View style={{position: 'absolute', zIndex: 3, width: '100%', height: '100%', opacity: fadeAnim, transform: [{ translateY: heightAnim }],}}>
+    <Animated.View style={{position: 'absolute', zIndex: 5, width: '100%', height: '100%', opacity: fadeAnim, transform: [{ translateY: heightAnim }],}}>
       <BlurView blurType={Colors.darkBlur} style={{width: '100%', height: '100%',}}>
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={{marginTop: 64,}}>

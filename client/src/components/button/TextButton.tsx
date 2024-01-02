@@ -23,7 +23,7 @@ const TextButton: React.FC<ITextButtonProps> = ({ systemStore, title, color, fon
       onPress={disabled ? undefined : onPress}
       style={{paddingVertical: noPadding ? 0 : 16,}}
     >
-      <Text style={{color: color ? color : Colors.lighter, fontWeight: fontWeight ? fontWeight : Fonts.welterWeight as any,}}>{title}</Text>
+      <Text style={{color: color ? color : Colors.lighter, fontWeight: fontWeight ? fontWeight : Fonts.welterWeight ,}}>{title}</Text>
     </TouchableOpacity>
   )
 }

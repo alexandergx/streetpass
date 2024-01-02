@@ -31,7 +31,7 @@ const Button: React.FC<IButtonProps> = ({ systemStore, Icon, title, color, loadi
       }}
     >
       <BlurView
-        blurType={Colors.darkestBlur as any }
+        blurType={Colors.darkestBlur  }
         style={{
           position: 'absolute', zIndex: -1, width: '100%', height: '100%',
           backgroundColor: color ? color : Colors.darkBackground,
@@ -46,7 +46,7 @@ const Button: React.FC<IButtonProps> = ({ systemStore, Icon, title, color, loadi
             numberOfLines={1}
             style={{
               color: disabled ? Colors.light : Colors.lightest,
-              fontWeight: Fonts.middleWeight as any,
+              fontWeight: Fonts.middleWeight ,
               fontSize: Fonts.lg,
               flexDirection: 'row', justifyContent: 'center', alignItems: 'center',
               paddingHorizontal: 8,

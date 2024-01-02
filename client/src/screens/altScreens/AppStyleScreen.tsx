@@ -88,7 +88,7 @@ class AppStyleScreen extends React.Component<IAppStyleScreenProps> {
         >
           <View style={{flex: 1, width: '100%', marginVertical: 16, borderRadius: 16, overflow: 'hidden',}}>
             <BlurView
-              blurType={Colors.darkestBlur as any}
+              blurType={Colors.darkestBlur }
               style={{position: 'absolute', zIndex: -1, width: '100%', height: '100%',}}
             />
 

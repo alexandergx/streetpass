@@ -199,7 +199,7 @@ class VerifyPhoneScreen extends React.Component<IVerifyPhoneScreenProps> {
               <View style={{marginTop: 8, marginBottom: 16,}}>
 
                 <View>
-                  <Text style={{color: Colors.lighter, fontWeight: Fonts.lightWeight as any,}}>
+                  <Text style={{color: Colors.lighter, fontWeight: Fonts.lightWeight ,}}>
                     {Lit[systemStore.Locale].Copywrite.EnterPin} {`*******${this.state.phonenumberPreview}`}
                   </Text>
                 </View>

@@ -168,7 +168,7 @@ const ChatBlock: React.FC<IChatBlockProps> = ({
                 }
                 <View pointerEvents={'none'} style={{height: 160,}} />
                 <View style={{width: '100%', justifyContent: 'center', alignItems: 'center', paddingVertical: 16,}}>
-                  <Text style={{color: Colors.lighter, fontSize: Fonts.sm, fontWeight: Fonts.heavyWeight as any, textTransform: 'uppercase',}}>
+                  <Text style={{color: Colors.lighter, fontSize: Fonts.sm, fontWeight: Fonts.heavyWeight , textTransform: 'uppercase',}}>
                     {Lit[systemStore.Locale].Copywrite.MatchedWith} {route.params.chat?.name || route.params.match?.name} {timePassedSince(route.params.chat?.matchDate || route.params.match?.matchDate, systemStore.Locale)}
                   </Text>
                 </View>
@@ -194,7 +194,7 @@ const ChatBlock: React.FC<IChatBlockProps> = ({
 
         <View>
           <View style={{position: 'absolute', bottom: 0, flex: 0, width: '100%', minHeight: 64,}}>
-            <BlurView blurType={Colors.darkBlur as any} style={{position: 'absolute', zIndex: -1, height: '100%', width: '100%', display: 'flex',}} />
+            <BlurView blurType={Colors.darkBlur } style={{position: 'absolute', zIndex: -1, height: '100%', width: '100%', display: 'flex',}} />
 
             <View style={{width: '100%', justifyContent: 'center', alignItems: 'center', flexDirection: 'row', marginBottom: state.keyboard ? 0 : 24,}}>
               <View style={{flex: 0, paddingLeft: 16,}}>
@@ -209,7 +209,10 @@ const ChatBlock: React.FC<IChatBlockProps> = ({
                   value={messages?.message || ''}
                   loading={state.sending}
                   disabled={state.sending}
-                  onChangeText={(text: string) => actions.setChatMessage({ userId: state.userId, message: text, })}
+                  onChangeText={(text: string) => {
+                    actions.setChatMessage({ userId: state.userId, message: text, })
+                    setState({ messageId: null, messageIdTime: null, })
+                  }}
                   placeholder={`${Lit[systemStore.Locale].Button.Message}...`}
                   multiline={true}
                   EndIcon={SendIcon}

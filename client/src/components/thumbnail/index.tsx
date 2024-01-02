@@ -33,7 +33,7 @@ class Thumbnail extends React.Component<IThumbnailProps> {
           activeOpacity={onPress ? Colors.activeOpacity : 1}
           style={{width: '100%', height: '100%',}}
         >
-          <BlurView blurType={Colors.lightBlur as any} style={{position: 'absolute', zIndex: -1, width: '100%', height: '100%',}}/>
+          <BlurView blurType={Colors.lightBlur } style={{position: 'absolute', zIndex: -1, width: '100%', height: '100%',}}/>
           {uri &&
             <FastImage
               source={{uri: uri}}

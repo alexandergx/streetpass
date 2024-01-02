@@ -332,7 +332,7 @@ const CameraModal: React.FC<ICameraModalProps> = ({ systemStore, toggleModal, on
 
       {/* CAMERA SETTINGS LAYER */}
       {settings && !capturedPhoto && !capturedVideo &&
-        <BlurView blurType={Colors.safeDarkBlur as any} style={{position: 'absolute', zIndex: 4, width: '100%', height: '100%',}}>
+        <BlurView blurType={Colors.safeDarkBlur } style={{position: 'absolute', zIndex: 4, width: '100%', height: '100%',}}>
           <ScrollView>
             <View
               style={{
@@ -625,7 +625,7 @@ const CameraModal: React.FC<ICameraModalProps> = ({ systemStore, toggleModal, on
       }
 
       <BlurView
-        blurType={Colors.safeDarkBlur as any}
+        blurType={Colors.safeDarkBlur }
         style={{position: 'absolute', zIndex: 0, width: '100%', height: '100%',}}
       />
     </View>

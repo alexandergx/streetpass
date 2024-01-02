@@ -129,7 +129,7 @@ class EditProfileModal extends React.Component<IEditProfileModalProps> {
 
     return (
       <Animated.View style={{position: 'absolute', zIndex: 3, width: '100%', height: '100%', opacity: this.fadeAnim, transform: [{ translateY: this.heightAnim }],}}>
-        <BlurView blurType={Colors.darkBlur as any} style={{position: 'absolute', zIndex: 3, width: '100%', height: '100%',}}>
+        <BlurView blurType={Colors.darkBlur } style={{position: 'absolute', zIndex: 3, width: '100%', height: '100%',}}>
           <NavHeader
             systemStore={systemStore}
             title={`${userStore.user.name}`}
@@ -156,14 +156,14 @@ class EditProfileModal extends React.Component<IEditProfileModalProps> {
 
                 <View style={{zIndex: -1, width: '100%', borderRadius: 16, overflow: 'hidden',}}>
                   <BlurView
-                    blurType={Colors.darkestBlur as any}
+                    blurType={Colors.darkestBlur }
                     style={{position: 'absolute', zIndex: -1, width: '100%', height: '100%', backgroundColor: Colors.darkBackground,}}
                   />
 
                   <View style={{padding: 16,}}>
                     <View style={{flexDirection: 'row', alignItems: 'center',}}>
                       <View style={{flex: 1, marginRight: 8,}}>
-                        <Text style={{color: Colors.lightest, fontWeight: Fonts.cruiserWeight as any, fontSize: Fonts.md,}}>{Lit[systemStore.Locale].Title.Bio}</Text>
+                        <Text style={{color: Colors.lightest, fontWeight: Fonts.cruiserWeight , fontSize: Fonts.md,}}>{Lit[systemStore.Locale].Title.Bio}</Text>
                       </View>
                       <View style={{flex: 5,}}>
                         <TextInput
@@ -180,7 +180,7 @@ class EditProfileModal extends React.Component<IEditProfileModalProps> {
 
                     <View style={{flexDirection: 'row', alignItems: 'center',}}>
                       <View style={{flex: 2, marginRight: 8,}}>
-                        <Text style={{color: Colors.lightest, fontWeight: Fonts.cruiserWeight as any, fontSize: Fonts.md,}}>{Lit[systemStore.Locale].Title.Work}</Text>
+                        <Text style={{color: Colors.lightest, fontWeight: Fonts.cruiserWeight , fontSize: Fonts.md,}}>{Lit[systemStore.Locale].Title.Work}</Text>
                       </View>
                       <View style={{flex: 5,}}>
                         <TextInput
@@ -196,7 +196,7 @@ class EditProfileModal extends React.Component<IEditProfileModalProps> {
 
                     <View style={{flexDirection: 'row', alignItems: 'center',}}>
                       <View style={{flex: 2, marginRight: 8,}}>
-                        <Text style={{color: Colors.lightest, fontWeight: Fonts.cruiserWeight as any, fontSize: Fonts.md,}}>{Lit[systemStore.Locale].Title.School}</Text>
+                        <Text style={{color: Colors.lightest, fontWeight: Fonts.cruiserWeight , fontSize: Fonts.md,}}>{Lit[systemStore.Locale].Title.School}</Text>
                       </View>
                       <View style={{flex: 5,}}>
                         <TextInput
@@ -226,6 +226,10 @@ class EditProfileModal extends React.Component<IEditProfileModalProps> {
               />
             </View>
           </KeyboardAvoidingView>
+
+          {this.state.selectionModalConfig &&
+            <SelectionModal systemStore={systemStore} config={this.state.selectionModalConfig} toggleModal={() => this.setState({ selectionModalConfig: null, })} />
+          }
         </BlurView>
 
         {this.state.camera &&
@@ -234,10 +238,6 @@ class EditProfileModal extends React.Component<IEditProfileModalProps> {
             toggleModal={() => this.setState({ camera: false, })}
             onCapture={({ image, video, }) => this.setState({ camera: false, media: [...this.state.media.filter((i: IUploadMedia) => i.key !== null), { image: image, video: video, key: this.state.media.length, new: true, }, { key: null, }].slice(0, 9), })}
           />
-        }
-
-        {this.state.selectionModalConfig &&
-          <SelectionModal systemStore={systemStore} config={this.state.selectionModalConfig} toggleModal={() => this.setState({ selectionModalConfig: null, })} />
         }
       </Animated.View>
     )

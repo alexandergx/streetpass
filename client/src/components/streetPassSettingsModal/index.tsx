@@ -131,7 +131,7 @@ class StreetpassSettingsModal extends React.Component<IStreetpassSettingsModalPr
 
     return (
       <Animated.View style={{position: 'absolute', zIndex: 3, width: '100%', height: '100%', opacity: this.fadeAnim, transform: [{ translateY: this.heightAnim }],}}>
-        <BlurView blurType={Colors.darkBlur as any} style={{width: '100%', height: '100%',}}>
+        <BlurView blurType={Colors.darkBlur } style={{width: '100%', height: '100%',}}>
           <NavHeader systemStore={systemStore} color={Colors.lightest} StartIcon={CrossIcon} onPress={this.close} />
 
           <KeyboardAvoidingView

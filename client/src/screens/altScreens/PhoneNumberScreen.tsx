@@ -129,15 +129,6 @@ class PhoneNumberScreen extends React.Component<IPhoneNumberScreenProps> {
             onPress={() => navigation.goBack()}
           />
 
-          {/* <View style={{flex: 1, padding: 16,}}>
-
-            <CodeInput
-              systemStore={systemStore}
-              onPress={() => null}
-              onChangeText={text => this.setState({ securityPin: text, })}
-            />
-
-          </View> */}
           <KeyboardAvoidingView
             behavior={'padding'}
             style={{flex: 1, padding: 16,}}
@@ -195,7 +186,7 @@ class PhoneNumberScreen extends React.Component<IPhoneNumberScreenProps> {
               <View style={{marginTop: 8, marginBottom: 16,}}>
 
                 <View>
-                  <Text style={{color: Colors.lighter, fontWeight: Fonts.lightWeight as any,}}>
+                  <Text style={{color: Colors.lighter, fontWeight: Fonts.lightWeight ,}}>
                     {Lit[systemStore.Locale].Copywrite.EnterPin} {`*******${this.state.phonenumberPreview}`}
                   </Text>
                 </View>
@@ -224,84 +215,12 @@ class PhoneNumberScreen extends React.Component<IPhoneNumberScreenProps> {
               />
             </View>
           </KeyboardAvoidingView>
+
+          {this.state.pickerModalConfig &&
+            <PickerModal systemStore={systemStore} config={this.state.pickerModalConfig} toggleModal={() => this.setState({ pickerModalConfig: null, })} />
+          }
         </View>
-
-        {this.state.pickerModalConfig &&
-          <PickerModal systemStore={systemStore} config={this.state.pickerModalConfig} toggleModal={() => this.setState({ pickerModalConfig: null, })} />
-        }
       </>
-      // <>
-      //   <GradientBackground systemStore={systemStore} />
-      //   <AnimatedBackground systemStore={systemStore} />
-
-      //   <NavHeader systemStore={systemStore} navigation={navigation} title={Lit[systemStore.Locale].ScreenTitle.PhoneNumberScreen} />
-
-      //   <KeyboardAvoidingView
-      //     behavior={'padding'}
-      //     style={{
-      //       flex: 1, display: 'flex',
-      //       justifyContent: 'center', alignItems: 'center', paddingHorizontal: 16,
-      //     }}
-      //   >
-      //     <View style={{flex: 1, marginTop: 8,}}>
-      //       <ButtonInput
-      //         systemStore={systemStore}
-      //         inputRef={this.inputRef}
-      //         childInputRef={this.childRef}
-      //         buttonTitle={`+${this.state.countryCode}`}
-      //         value={this.state.phoneNumber}
-      //         placeholder={phoneNumberPlaceholders[this.state.countryCode] || phoneNumberPlaceholders['n']}
-      //         keyboardType={'numeric'}
-      //         onPress={() => {
-      //           this.childRef.blur()
-      //           const configList = Object.keys(countryData).map((c: string) => {
-      //             return {
-      //               title: `${countryData[c].name.eng}`,
-      //               content: ` ${c} +${countryData[c].callingCode}`,
-      //               noRight: true,
-      //               onPress: () => {
-      //                 this.setState({ countryCode: countryData[c].callingCode, })
-      //                 this.setState({ pickerModalConfig: null, })
-      //               },
-      //             }
-      //           })
-      //           const config = { list: configList, }
-      //           this.setState({ pickerModalConfig: config, })
-      //         }}
-      //         onChangeText={(text: string) => this.setState({ phonenumber: formatPhonenumber(this.state.countryCode, text), })}
-      //       />
-
-      //       <Button
-      //         systemStore={systemStore}
-      //         title={Lit[systemStore.Locale].Button.SendPin}
-      //         disabled={true}
-      //         onPress={() => null}
-      //       />
-
-      //       <View style={{height: 32,}} />
-
-      //       <CodeInput
-      //         systemStore={systemStore}
-      //         disabled={true}
-      //         onChangeText={text => this.setState({ securityPin: text, })}
-      //       />
-      //     </View>
-
-      //     <View style={{flex: 0, width: '100%', marginBottom: this.state.keyboard ? 8 : 32,}}>
-      //       <Button
-      //         systemStore={systemStore}
-      //         onPress={this.handleUpdatePhonenumber}
-      //         title={Lit[systemStore.Locale].Button.Save}
-      //         loading={this.state.loading}
-      //         disabled={(!this.state.countryCode || !this.state.phoneNumber || !validatePhoneNumber(this.state.phoneNumber)) && this.state.phoneNumber.length !== 0}
-      //       />
-      //     </View>
-      //   </KeyboardAvoidingView>
-
-      //   {this.state.pickerModalConfig &&
-      //     <PickerModal systemStore={systemStore} config={this.state.pickerModalConfig} toggleModal={() => this.setState({ pickerModalConfig: null, })} />
-      //   }
-      // </>
     )
   }
 }

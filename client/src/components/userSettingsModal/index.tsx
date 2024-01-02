@@ -113,7 +113,7 @@ class UserSettingsModal extends React.Component<IProfileSettingsModalProps> {
 
     return (
       <Animated.View style={{position: 'absolute', zIndex: 2, width: '100%', height: '100%', opacity: this.fadeAnim, transform: [{ translateY: this.heightAnim }],}}>
-        <BlurView blurType={Colors.darkBlur as any} style={{width: '100%', height: '100%',}}>
+        <BlurView blurType={Colors.darkBlur } style={{width: '100%', height: '100%',}}>
           <NavHeader
             systemStore={systemStore}
             title={Lit[systemStore.Locale].Title.Settings}
@@ -132,7 +132,7 @@ class UserSettingsModal extends React.Component<IProfileSettingsModalProps> {
               <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginVertical: 32,}}>
                 <AppTitle systemStore={systemStore} fontSize={Fonts.sm} fontWeight={Fonts.lightWeight} />
                 <Text
-                  style={{color: Colors.light, fontWeight: Fonts.lightWeight as any, fontSize: Fonts.sm,}}
+                  style={{color: Colors.light, fontWeight: Fonts.lightWeight , fontSize: Fonts.sm,}}
                 > v{AppVersion}</Text>
               </View>
 

@@ -58,7 +58,7 @@ class ButtonInput extends React.Component<IButtonInputProps> {
         }}
       >
         <BlurView
-          blurType={Colors.darkestBlur as any}
+          blurType={Colors.darkestBlur }
           style={{position: 'absolute', zIndex: -1, width: '100%', height: '100%',}}
         />
 
@@ -70,7 +70,7 @@ class ButtonInput extends React.Component<IButtonInputProps> {
               marginRight: 8, backgroundColor: Colors.darkBackground,
             }}
           >
-            <Text style={{color: Colors.lightest, fontWeight: Fonts.middleWeight as any, fontSize: Fonts.lg,}}>
+            <Text style={{color: Colors.lightest, fontWeight: Fonts.middleWeight , fontSize: Fonts.lg,}}>
               {this.props.buttonTitle}
             </Text>
           </TouchableOpacity>
@@ -126,7 +126,7 @@ class ButtonInput extends React.Component<IButtonInputProps> {
               autoCapitalize={'none'}
               style={{
                 color: this.props.textColor ? this.props.textColor : Colors.lightest,
-                fontWeight: this.props.disabled ? Fonts.welterWeight : Fonts.middleWeight as any,
+                fontWeight: this.props.disabled ? Fonts.welterWeight : Fonts.middleWeight ,
                 fontSize: Fonts.lg,
                 width: '100%', height: '100%', opacity: this.props.editable === false ? 0.4 : 1,
                 ...this.props.style,

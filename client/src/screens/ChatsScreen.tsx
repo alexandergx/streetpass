@@ -174,7 +174,7 @@ class ChatsScreen extends React.Component<IChatsScreenProps> {
 
                               <View style={{position: 'absolute', bottom: 6, alignSelf: 'center', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 8,}}>
                                 <BlurView
-                                  blurType={Colors.safeLightBlur as any}
+                                  blurType={Colors.safeLightBlur}
                                   style={{maxWidth: '100%', borderRadius: 8, overflow: 'hidden', paddingHorizontal: 8, height: 16, justifyContent: 'center', alignItems: 'center',}}
                                   >
                                   <Text numberOfLines={1} style={{textAlign: 'center', overflow: 'hidden', color: Colors.safeLightest, fontWeight: Fonts.middleWeight,}}>
@@ -269,7 +269,7 @@ class ChatsScreen extends React.Component<IChatsScreenProps> {
                             }
                             <View style={{position: 'absolute', zIndex: -1, width: '100%', height: '100%', borderRadius: 16, overflow: 'hidden',}}>
                               <BlurView
-                                blurType={Colors.darkestBlur as any}
+                                blurType={Colors.darkestBlur}
                                 style={{
                                   position: 'absolute', zIndex: -1, width: '100%', height: '100%',
                                   backgroundColor: this.state.chatId === item.item.chatId
@@ -289,19 +289,24 @@ class ChatsScreen extends React.Component<IChatsScreenProps> {
                       
                               <View style={{flex: 1, justifyContent: 'center', marginHorizontal: 16,}}>
                                 <View style={{flexDirection: 'row',}}>
-                                  <Text numberOfLines={1} style={{color: Colors.lightest, fontWeight: Fonts.cruiserWeight as any, marginRight: 8, flex: 1,}}>{item.item.name}</Text>
+                                  <Text numberOfLines={1} style={{color: Colors.lightest, fontWeight: Fonts.cruiserWeight, marginRight: 8, flex: 1,}}>{item.item.name}</Text>
                                   <View style={{flexDirection: 'row', alignItems: 'center',}}>
-                                    <Text style={{color: Colors.lighter, fontWeight: Fonts.lightWeight as any,}}>{timePassedSince(item.item.chatDate, systemStore.Locale)}</Text>
+                                    <Text style={{color: Colors.lighter, fontWeight: Fonts.lightWeight,}}>{timePassedSince(item.item.chatDate, systemStore.Locale)}</Text>
                                     {item.item.unread && <View style={{width: 8, aspectRatio: 1/1, borderRadius: 32, marginLeft: 8, backgroundColor: Colors.red,}} />}
                                   </View>
                                 </View>
-                                <View style={{marginTop: 4,}}>
+                                <View style={{flexDirection: 'row', justifyContent: 'space-between', marginTop: 4,}}>
                                   <Text
                                     numberOfLines={1} ellipsizeMode={'tail'}
-                                    style={{color: Colors.lightest, fontWeight: Fonts.lightWeight as any,}}
+                                    style={{color: Colors.lightest, fontWeight: Fonts.lightWeight,}}
                                   >
                                     {item.item.lastMessage}
                                   </Text>
+                                  {item.item.lastMessageUserId === userStore.user.userId &&
+                                    <View style={{justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.lightBlue, borderRadius: 8, paddingHorizontal: 4,}}>
+                                      <Text style={{color: Colors.safeLightest, fontSize: Fonts.sm, fontWeight: Fonts.heavyWeight,}}>Your turn</Text>
+                                    </View>
+                                  }
                                 </View>
                               </View>
                             </View>

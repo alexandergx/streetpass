@@ -34,7 +34,7 @@ const NotFound: React.FC<INotFoundProps> = ({ systemStore, empty, loading, termi
           >
             {loading
               ? <ActivityIndicator color={Colors.lighter} />
-              : <Text style={{color: clear ? Colors.safeLightest : Colors.lighter, fontWeight: Fonts.welterWeight as any,}}>{Lit[systemStore.Locale].Copywrite.NotFound}</Text>
+              : <Text style={{color: clear ? Colors.safeLightest : Colors.lighter, fontWeight: Fonts.welterWeight ,}}>{Lit[systemStore.Locale].Copywrite.NotFound}</Text>
             }
           </View>
         )
