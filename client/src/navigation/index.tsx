@@ -38,7 +38,7 @@ import { useSubscription } from '@apollo/client'
 import { SUBSCRIBE_MATCHES, SUBSCRIBE_MESSAGES, SUBSCRIBE_STREETPASSES, apiRequest } from '../api'
 import { IMatch } from '../state/reducers/MatchesReducer'
 import { IStreetpassStore } from '../state/reducers/StreetpassReducer'
-import { ISetChat, ISetChats, ISetMessage, setChat, setChats, setMessage } from '../state/actions/ChatsActions'
+import { ISetChat, ISetChats, ISetMessage, IUnsetChat, setChat, setChats, setMessage, unsetChat } from '../state/actions/ChatsActions'
 import { IChat, IMessage, IMessageMetadata } from '../state/reducers/ChatsReducer'
 
 export const navigationRef = createNavigationContainerRef()
@@ -59,6 +59,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => ({
       setMatch,
       setChats,
       setChat,
+      unsetChat,
       setMessage,
     }
   ), dispatch),
@@ -98,6 +99,7 @@ interface IMapScreenProps {
     setMatch: (params: ISetMatch) => void,
     setChats: (params: ISetChats) => void,
     setChat: (params: ISetChat) => void,
+    unsetChat: (params: IUnsetChat) => void,
     setMessage: (params: ISetMessage) => void,
   },
 }
@@ -155,6 +157,7 @@ function AppNavigation({ systemStore, userStore, streetpassStore, actions, }: IM
     onData: (data) => {
       const match = data?.data?.data?.matches as IMatch
       if (match) actions.setMatch(match)
+      if (match.unmatch) actions.unsetChat(match.userId)
     },
     onError: async (error) => {
       console.log('[SUBSCRIBE MATCHES ERROR]', error)

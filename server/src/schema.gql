@@ -32,6 +32,10 @@ type AuthUser {
   work: String
 }
 
+input BlockUserDto {
+  userId: String!
+}
+
 input ChatNotificationsDto {
   chatId: String!
   notifications: Boolean!
@@ -68,12 +72,13 @@ input GetUserDto {
 type Match {
   age: Float!
   bio: String
-  date: String
+  matchDate: String
   media: [UserMedia!]!
   name: String!
   school: String
   seen: Boolean!
   sex: Boolean
+  streetpassDate: String
   unmatch: Boolean
   userId: String!
   work: String
@@ -106,10 +111,11 @@ type MessagesSubscription {
 }
 
 type Mutation {
+  blockUser(input: BlockUserDto!): Boolean!
   chatNotifications(input: ChatNotificationsDto!): Boolean!
   deleteAccount: Boolean!
   match(input: MatchDto!): Boolean!
-  readChat(input: ReadChatDto!): [UserChat!]!
+  readChat(input: ReadChatDto!): Boolean!
   registerDevice(input: RegisterDeviceDto!): Boolean!
   removeMedia(input: RemoveMediaDto!): Boolean!
   seenMatch(input: SeenMatchDto!): Boolean!
@@ -186,11 +192,11 @@ input SortMediaDto {
 type Streetpass {
   age: Float!
   bio: String
-  date: DateTime!
   media: [UserMedia!]!
   name: String!
   school: String
   sex: Boolean
+  streetpassDate: DateTime!
   userId: String!
   work: String
 }
@@ -254,14 +260,16 @@ input UploadMediaDto {
 type UserChat {
   age: Float!
   bio: String!
+  chatDate: String!
   chatId: String!
-  date: String!
   lastMessage: String!
+  matchDate: String!
   media: [UserMedia!]!
   name: String!
   notifications: Boolean!
   school: String!
   sex: Boolean
+  streetpassDate: String!
   unread: Boolean!
   userId: String!
   work: String!

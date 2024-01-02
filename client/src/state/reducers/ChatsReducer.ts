@@ -1,5 +1,5 @@
 import { IGetChatsRes, IGetMessagesRes, ISearchChatsRes } from '../../api/chats'
-import { ISetChat, ISetChatMessage, ISetChatNotifications, ISetMessage, ISetMessages } from '../actions/ChatsActions'
+import { ISetChat, ISetChatMessage, ISetChatNotifications, ISetMessage, ISetMessages, IUnsetChat } from '../actions/ChatsActions'
 import { IMedia } from './UserReducer'
 
 export interface IMessageMetadata {
@@ -30,11 +30,13 @@ export interface IChat {
   school: string
   age: number
   sex: boolean
-  date: Date
   media: IMedia[]
   lastMessage: string
   unread: boolean
   notifications: boolean
+  streetpassDate: Date
+  matchDate: Date
+  chatDate: Date
 }
 
 export interface IChatsStore {
@@ -51,6 +53,7 @@ export enum ChatsActions {
   Init = 'INIT',
   SetChats = 'SET_CHATS',
   SetChat = 'SET_CHAT',
+  UnsetChat = 'UNSET_CHAT',
   SetChatsSearch = 'SET_CHATS_SEARCH',
   SetReadChat = 'SET_READ_CHAT',
   SetChatNotifications = 'SET_CHAT_NOTIFICATIONS',
@@ -64,6 +67,7 @@ type ChatsAction =
   | { type: ChatsActions.Init, }
   | { type: ChatsActions.SetChats, payload: IGetChatsRes, }
   | { type: ChatsActions.SetChat, payload: ISetChat, }
+  | { type: ChatsActions.UnsetChat, payload: IUnsetChat, }
   | { type: ChatsActions.SetChatsSearch, payload: ISearchChatsRes, }
   | { type: ChatsActions.SetReadChat, payload: string, }
   | { type: ChatsActions.SetChatNotifications, payload: ISetChatNotifications, }
@@ -97,6 +101,15 @@ const chatsStore = (state = INITIAL_STATE, action: ChatsAction) => {
         ...state,
         chats: state.chats ? [action.payload, ...state.chats.filter(chat => chat.chatId !== action.payload.chatId)] : [action.payload],
       }
+    case ChatsActions.UnsetChat:
+      return {
+        ...state,
+        chats: state.chats ? state.chats.filter(chat => chat.userId !== action.payload) : state.chats,
+        messages: {
+          ...state.messages,
+          [action.payload]: undefined,
+        }
+      }
     case ChatsActions.SetChatsSearch:
       return {
         ...state,
@@ -127,9 +140,12 @@ const chatsStore = (state = INITIAL_STATE, action: ChatsAction) => {
     case ChatsActions.SetMessage:
       return {
         ...state,
-        chats: state.chats
-          ? state.chats.map(chat => chat.userId === action.payload.userId ? { ...chat, date: action.payload.message.date, lastMessage: action.payload.message.message, unread: true, } : chat)
-          : state.chats, // TODO - sort chats, new message chat is 0th
+        chats: state.chats ?
+          [
+            ...state.chats.filter(chat => chat.userId === action.payload.userId).map(chat => ({ ...chat, date: action.payload.message.date, lastMessage: action.payload.message.message, unread: true, })),
+            ...state.chats.filter(chat => chat.userId !== action.payload.userId),
+          ]
+        : state.chats,
         messages: {
           ...state.messages,
           [action.payload.userId]: {

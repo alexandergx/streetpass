@@ -29,11 +29,14 @@ export function setMatch(input: ISetMatch) {
   }
 }
 
-export type IUnsetMatch = IUnmatchReq
+export interface IUnsetMatch {
+  userId: string,
+  pass?: boolean,
+}
 export function unsetMatch(input: IUnsetMatch) {
   return async (dispatch: any) => {
     try {
-      unmatch(input)
+      if (!input.pass) unmatch(input)
       return dispatch({
         type: MatchesActions.UnsetMatch,
         payload: input,

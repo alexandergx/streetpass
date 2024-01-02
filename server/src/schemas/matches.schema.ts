@@ -9,12 +9,15 @@ export class Match {
 
   @Prop({ required: true, type: Object, })
   coordinates: { lat: number, lon: number, }
-
-  @Prop({ required: true, })
-  date: Date
-
+  
   @Prop({ required: true, default: false, })
   seen: boolean
+
+  @Prop({ required: true, })
+  streetpassDate: Date
+
+  @Prop({ required: true, })
+  matchDate: Date
 }
 
 export type MatchesDocument = HydratedDocument<Matches>

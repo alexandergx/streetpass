@@ -30,7 +30,7 @@ export class ChatsResolver {
     return this.chatsService.searchChats(input, context)
   }
 
-  @Mutation(() => [UserChat])
+  @Mutation(() => Boolean)
   @UseGuards(AuthGuard)
   async readChat(@Args('input') input: ReadChatDto, @Context() context: any) {
     return this.chatsService.readChat(input, context)

@@ -12,6 +12,7 @@ import { Matched, MatchedSchema } from 'src/schemas/matched.schema'
 import { PubSubOptions, Subscriptions } from 'src/utils/constants'
 import { RedisPubSub } from 'graphql-redis-subscriptions'
 import Redis from 'ioredis'
+import { UserChats, UserChatsSchema } from 'src/schemas/userChats.schema'
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import Redis from 'ioredis'
       { name: Streetpasses.name, collection: Streetpasses.name, schema: StreetpassesSchema, },
       { name: Matched.name, collection: Matched.name, schema: MatchedSchema, },
       { name: Matches.name, collection: Matches.name, schema: MatchesSchema, },
+      { name: UserChats.name, collection: UserChats.name, schema: UserChatsSchema, },
     ]),
     JwtModule.register({ secret: process.env.JWT_SECRET, }),
     AuthModule,

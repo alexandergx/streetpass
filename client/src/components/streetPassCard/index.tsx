@@ -1,4 +1,4 @@
-import React, { RefObject, useState } from 'react'
+import React, { ForwardedRef, RefObject, useState, } from 'react'
 import {
   Dimensions,
   StyleSheet,
@@ -14,6 +14,7 @@ import CrossIcon from '../../assets/icons/cross.svg'
 import HeartIcon from '../../assets/icons/heart.svg'
 import DotIcon from '../../assets/icons/dot.svg'
 import DotFillIcon from '../../assets/icons/dot-fill.svg'
+import EllipsisIcon from '../../assets/icons/ellipsis.svg'
 import ChevronUpIcon from '../../assets/icons/chevron-up.svg'
 import FastImage from 'react-native-fast-image'
 import { IStreetpass } from '../../state/reducers/StreetpassReducer'
@@ -26,14 +27,19 @@ interface IStreetpassCardProps {
   navigation: any,
   systemStore: ISystemStore,
   streetpass: IStreetpass,
-  setStreetpass: (params: { streetpassCardRef: RefObject<CardItemHandle>, streetpassImageIndex: number, }) => void,
+  streetpassLoading: string | null,
+  setStreetpass: (params: { streetpassImageIndex: number, }) => void,
+  setSelectionModalConfig: (params: IStreetpass) => void,
+  setStreetpassLoading: (params: string | null) => void,
   actions: {
     setStreetpass: () => void,
   }
 }
-const StreetpassCard: React.FC<IStreetpassCardProps> = ({ navigation, systemStore, streetpass, setStreetpass, actions, }) => {
+const StreetpassCard = React.forwardRef<CardItemHandle, IStreetpassCardProps>(({
+  navigation, systemStore, streetpass, streetpassLoading, setStreetpass, setSelectionModalConfig, setStreetpassLoading, actions,
+}, ref: ForwardedRef<CardItemHandle>) => {
   const { Colors, Fonts, } = systemStore
-  const streetpassCardRef: RefObject<CardItemHandle> = React.createRef()
+  const streetpassCardRef = ref as React.RefObject<CardItemHandle>
   const streetpassCarouselRef: RefObject<ICarouselInstance> = React.createRef()
   const [streetpassImageIndex, setStreetpassImageIndex] = useState<number>(0)
 
@@ -49,27 +55,17 @@ const StreetpassCard: React.FC<IStreetpassCardProps> = ({ navigation, systemStor
         cardHeight={Dimensions.get('window').height * 0.72}
         disableTopSwipe={true}
         disableBottomSwipe={true}
-        OverlayLabelLeft={() => {
-          return (
-            <View style={{width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.lightBlue, opacity: 0.5,}}>
-              {/* <Text style={{color: 'white', fontSize: 32, fontWeight: 'bold',}}>Dislike</Text> */}
-            </View>
-          )
-        }}
-        OverlayLabelRight={() => {
-          return (
-            <View style={{width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.lightRed, opacity: 0.5,}}>
-              {/* <Text style={{color: 'white', fontSize: 32, fontWeight: 'bold',}}>Like</Text> */}
-            </View>
-          )
-        }}
-        onSwipedRight={() => {
+        OverlayLabelLeft={() => <View style={{width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.lightBlue, opacity: 0.5,}} />}
+        OverlayLabelRight={() => <View style={{width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.lightRed, opacity: 0.5,}} />}
+        onSwipedRight={async () => {
+          setStreetpassLoading(streetpass.userId)
           actions.setStreetpass()
-          match({ userId: streetpass.userId, match: true, })
+          await match({ userId: streetpass.userId, match: true, }).then(() => setStreetpassLoading(null))
         }}
-        onSwipedLeft={() => {
+        onSwipedLeft={async () => {
+          setStreetpassLoading(streetpass.userId)
           actions.setStreetpass()
-          match({ userId: streetpass.userId, match: false, })
+          await match({ userId: streetpass.userId, match: false, }).then(() => setStreetpassLoading(null))
         }}
         cardStyle={{borderRadius: 32, overflow: 'hidden',}}
       >
@@ -89,10 +85,10 @@ const StreetpassCard: React.FC<IStreetpassCardProps> = ({ navigation, systemStor
           <View style={{position: 'absolute', width: '100%',}}>
             <LinearGradient
               style={{position: 'absolute', width: '100%', height: '140%', top: 0,}}
-              colors={['rgba(0,0,0,0.0)', 'rgba(0,0,0,0.05)', 'rgba(0,0,0,0.1)', 'rgba(0,0,0,0.2)']} start={{ x: 1, y: 1 }} end={{ x: 1, y: 0 }}
+              colors={['rgba(0,0,0,0.0)', 'rgba(0,0,0,0.05)', 'rgba(0,0,0,0.1)', 'rgba(0,0,0,0.2)']} start={{ x: 1, y: 1, }} end={{ x: 1, y: 0, }}
             />
 
-            <View style={{flexDirection: 'row', width: '100%', justifyContent: 'center',}}>
+            <View style={{flexDirection: 'row', width: '100%', justifyContent: 'center', marginTop: 8,}}>
               {Array.from({ length: streetpass.media.length, }, (v, i) => {
                 return streetpassImageIndex === i
                   ? <DotFillIcon key={i} fill={Colors.safeLightest} width={24} height={24} />
@@ -119,6 +115,17 @@ const StreetpassCard: React.FC<IStreetpassCardProps> = ({ navigation, systemStor
             </View> */}
           </View>
 
+          <View style={{position: 'absolute', top: 0, right: 0, paddingVertical: 8, paddingHorizontal: 24,}}>
+            <View style={{flex: 0, justifyContent: 'center',}}>
+              <TouchableOpacity
+                activeOpacity={Colors.activeOpacity}
+                onPress={() => setSelectionModalConfig(streetpass)}
+              >
+                <EllipsisIcon fill={Colors.safeLightest} width={32} height={32} />
+              </TouchableOpacity>
+            </View>
+          </View>
+
           <View style={{position: 'absolute', width: '100%', bottom: 0,}}>
             <LinearGradient
               style={{position: 'absolute', width: '100%', height: '120%', bottom: 0,}}
@@ -138,12 +145,12 @@ const StreetpassCard: React.FC<IStreetpassCardProps> = ({ navigation, systemStor
                   </>
                 }
                 {streetpassImageIndex > 1 &&
-                  <Text numberOfLines={1} style={{color: Colors.safeLightest, fontSize: Fonts.md, fontWeight: Fonts.welterWeight, textShadowColor: Colors.safeDarkest, textShadowRadius: 2}}>Streetpassed {timePassedSince(streetpass.date, systemStore.Locale)}</Text>
+                  <Text numberOfLines={1} style={{color: Colors.safeLightest, fontSize: Fonts.md, fontWeight: Fonts.welterWeight, textShadowColor: Colors.safeDarkest, textShadowRadius: 2}}>Streetpassed {timePassedSince(streetpass.streetpassDate, systemStore.Locale)}</Text>
                 }
               </View>
 
               <TouchableOpacity
-                onPress={() => setStreetpass({ streetpassCardRef, streetpassImageIndex, })}
+                onPress={() => setStreetpass({ streetpassImageIndex, })}
                 activeOpacity={Colors.activeOpacity}
                 style={{flex: 0, justifyContent: 'flex-end',}}
               >
@@ -216,6 +223,6 @@ const StreetpassCard: React.FC<IStreetpassCardProps> = ({ navigation, systemStor
       </TinderCard>
     </View>
   )
-}
+})
 
 export default StreetpassCard

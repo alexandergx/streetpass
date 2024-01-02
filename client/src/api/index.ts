@@ -341,6 +341,22 @@ export const REMOVE_MEDIA = (input: IRemoveMediaMutation) => {
   return gql(mutation)
 }
 
+export interface IBlockUserMutation {
+  userId: string,
+}
+export const BLOCK_USER = (input: IBlockUserMutation) => {
+  let mutation = `
+    mutation {
+      blockUser(input: {
+  `
+  mutation = mutation + inputConstructor(input)
+  mutation = mutation + `
+      })
+    }
+  `
+  return gql(mutation)
+}
+
 // STREETPASS
 
 export interface IStreetpassMutation {
@@ -370,13 +386,13 @@ export const GET_STREETPASSES = () => gql`
       school
       age
       sex
-      date
       media {
         mediaId
         image
         video
         thumbnail
       }
+      streetpassDate
     }
   }
 `
@@ -428,7 +444,6 @@ export const GET_MATCHES = (input: IGetMatchesQuery) => {
           school
           age
           sex
-          date
           media {
             mediaId
             image
@@ -436,6 +451,8 @@ export const GET_MATCHES = (input: IGetMatchesQuery) => {
             thumbnail
           }
           seen
+          streetpassDate
+          matchDate
         }
         continue
       }
@@ -481,7 +498,6 @@ export const SUBSCRIBE_MATCHES = (input: ISubscribeMatchesSubscription) => gql`
       school
       age
       sex
-      date
       media {
         mediaId
         image
@@ -489,6 +505,8 @@ export const SUBSCRIBE_MATCHES = (input: ISubscribeMatchesSubscription) => gql`
         thumbnail
       }
       seen
+      streetpassDate
+      matchDate
       unmatch
     }
   }
@@ -516,7 +534,6 @@ export const GET_CHATS = (input: IGetChatsQuery) => {
           school
           age
           sex
-          date
           media {
             mediaId
             image
@@ -526,6 +543,9 @@ export const GET_CHATS = (input: IGetChatsQuery) => {
           lastMessage
           unread
           notifications
+          streetpassDate
+          matchDate
+          chatDate
         }
         continue
       }
@@ -553,7 +573,6 @@ export const SEARCH_CHATS = (input: ISearchChatsQuery) => {
         school
         age
         sex
-        date
         media {
           mediaId
           image
@@ -563,6 +582,9 @@ export const SEARCH_CHATS = (input: ISearchChatsQuery) => {
         lastMessage
         unread
         notifications
+        streetpassDate
+        matchDate
+        chatDate
       }
     }
   `
@@ -663,7 +685,6 @@ export const SUBSCRIBE_MESSAGES = (input: ISubscribeMessagesSubscription) => {
         school
         age
         sex
-        date
         media {
           mediaId
           image
@@ -673,6 +694,9 @@ export const SUBSCRIBE_MESSAGES = (input: ISubscribeMessagesSubscription) => {
         lastMessage
         unread
         notifications
+        streetpassDate
+        matchDate
+        chatDate
       }
       message {
         chatId

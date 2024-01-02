@@ -24,9 +24,9 @@ export class Streetpass {
   @Field(() => Boolean, { nullable: true, })
   sex?: boolean
   
-  @Field(() => Date)
-  date: Date
-
   @Field(() => [UserMedia])
   media: UserMedia[]
+  
+  @Field(() => Date)
+  streetpassDate: Date
 }

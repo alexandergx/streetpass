@@ -2,6 +2,7 @@ import React, { RefObject } from 'react'
 import {
   ActivityIndicator,
   AppState,
+  Text,
   View,
 } from 'react-native'
 import NavTabBar from '../components/navigation/NavTabBar'
@@ -14,6 +15,8 @@ import { ISystemStore, } from '../state/reducers/SystemReducer'
 import GradientBackground from '../components/gradientBackground'
 import NavHeader from '../components/navigation/NavHeader'
 import SlidersIcon from '../assets/icons/sliders.svg'
+import DeleteIcon from '../assets/icons/delete.svg'
+import ExclamationIcon from '../assets/icons/exclamation-circled.svg'
 import StreetpassCard from '../components/streetpassCard'
 import StreetpassSettingsModal from '../components/streetpassSettingsModal'
 import StreetpassModal from '../components/streetpassModal'
@@ -26,6 +29,12 @@ import { Errors, Time } from '../utils/constants'
 import { apiRequest, baseUrl, getAccessHeaders, protocol } from '../api'
 import { IStreetpassStore } from '../state/reducers/StreetpassReducer'
 import { setStreetpass, setStreetpasses } from '../state/actions/StreetpassActions'
+import { IListGroupConfig } from '../components/listGroup'
+import SelectionModal from '../components/selectionModal'
+import { ICarouselInstance } from 'react-native-reanimated-carousel'
+import { blockUser } from '../api/user'
+import { IUnsetMatch, unsetMatch } from '../state/actions/MatchesActions'
+import { IUnsetChat, unsetChat } from '../state/actions/ChatsActions'
 
 const mapStateToProps = (state: IStores) => {
   const { systemStore, userStore, streetpassStore, } = state
@@ -37,6 +46,8 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => ({
       setUpdateUser,
       setStreetpasses,
       setStreetpass,
+      unsetMatch,
+      unsetChat,
     }
   ), dispatch),
 })
@@ -50,27 +61,34 @@ interface IStreetpassScreenProps {
     setUpdateUser: (params: ISetUpdateUser) => void,
     setStreetpasses: () => void,
     setStreetpass: () => void,
+    unsetMatch: (params: IUnsetMatch) => void,
+    unsetChat: (params: IUnsetChat) => void,
   },
 }
 interface IStreetpassScreenState {
   streetpass: any | null,
+  streetpassLoading: string | null,
   streetpassSettings: boolean,
-  streetpassCardRef: RefObject<CardItemHandle> | null,
   streetpassImageIndex: number | null,
+  selectionModalConfig: IListGroupConfig | null,
   appState: string | null,
   appStateListener: any,
 }
 class StreetpassScreen extends React.Component<IStreetpassScreenProps> {
   constructor(props: IStreetpassScreenProps) {
     super(props)
+    this.backgroundLocationSubscriptions = []
+    this.streetpassCardRefs = {}
   }
   backgroundLocationSubscriptions: Subscription[] = []
+  streetpassCardRefs: Record<string, React.RefObject<CardItemHandle>> = {}
 
   state: IStreetpassScreenState = {
     streetpass: null,
+    streetpassLoading: null,
     streetpassSettings: false,
-    streetpassCardRef: null,
     streetpassImageIndex: null,
+    selectionModalConfig: null,
     appState: null,
     appStateListener: null,
   }
@@ -91,7 +109,9 @@ class StreetpassScreen extends React.Component<IStreetpassScreenProps> {
   }
 
   componentDidUpdate(): void {
-    if (this.props.streetpassStore.streetpasses?.length === this.props.streetpassStore.count) this.props.actions.setStreetpasses()
+    if (this.props.streetpassStore.streetpasses?.length === this.props.streetpassStore.count && !this.state.streetpassLoading) {
+      this.props.actions.setStreetpasses()
+    }
   }
 
   handleAppStateChange = async (nextAppState: any) => {
@@ -151,7 +171,7 @@ class StreetpassScreen extends React.Component<IStreetpassScreenProps> {
 
   render() {
     const { navigation, systemStore, userStore, streetpassStore, actions, }: IStreetpassScreenProps = this.props
-    const { Colors, Fonts, } = systemStore
+    const { Colors, } = systemStore
 
     return (
       <>
@@ -175,9 +195,13 @@ class StreetpassScreen extends React.Component<IStreetpassScreenProps> {
             navigation={navigation}
             systemStore={systemStore}
             streetpass={this.state.streetpass}
-            streetpassCardRef={this.state.streetpassCardRef}
+            streetpassCardRef={this.streetpassCardRefs[this.state.streetpass.userId]}
             streetpassImageIndex={this.state.streetpassImageIndex}
-            unsetStreetpass={() => this.setState({ streetpass: null, streetpassCardRef: null, streetpassImageIndex: null, })}
+            unsetStreetpass={() => this.setState({ streetpass: null, streetpassImageIndex: null, })}
+            actions={{
+              unsetMatch: actions.unsetMatch,
+              unsetChat: actions.unsetChat,
+            }}
           />
         }
 
@@ -198,23 +222,36 @@ class StreetpassScreen extends React.Component<IStreetpassScreenProps> {
                 {/* TODO - replace with better loader */}
               </View>
               : streetpassStore.streetpasses ? streetpassStore.streetpasses.map(streetpass => {
+                if (!this.streetpassCardRefs[streetpass.userId]) this.streetpassCardRefs[streetpass.userId] = React.createRef()
                 return (
                   <StreetpassCard
+                    ref={this.streetpassCardRefs[streetpass.userId]}
                     key={streetpass.userId}
                     navigation={navigation}
                     systemStore={systemStore}
                     streetpass={streetpass}
-                    setStreetpass={({ streetpassCardRef, streetpassImageIndex, }) => {
-                      this.setState({ streetpass: streetpass, streetpassCardRef, streetpassImageIndex, })
-                    }}
+                    streetpassLoading={this.state.streetpassLoading}
+                    setStreetpass={({ streetpassImageIndex, }) => this.setState({ streetpass: streetpass, streetpassImageIndex, })}
+                    setSelectionModalConfig={(streetpass) => this.setState({ selectionModalConfig: {
+                      title: streetpass.name,
+                      list: [
+                        { Icon: DeleteIcon, title: 'Block', noRight: true, onPress: () => {
+                          blockUser({ userId: streetpass.userId, })
+                          this.streetpassCardRefs[streetpass.userId].current?.swipeLeft()
+                          this.setState({ selectionModalConfig: null, })
+                        }, },
+                        { Icon: ExclamationIcon, title: 'Report', noRight: true, onPress: () => null, },
+                      ],
+                    }, })}
+                    setStreetpassLoading={(userId) => this.setState({ streetpassLoading: userId, })}
                     actions={{
                       setStreetpass: actions.setStreetpass,
                     }}
                   />
                 )})
-                : <>
-                  {/* TODO - show GET OUTSIDE */}
-                </>
+                : <View style={{flex: 1, justifyContent: 'center', alignItems: 'center',}}>
+                <Text>START STREETPASSING!</Text>
+              </View>
               }
           </View>
 
@@ -227,6 +264,10 @@ class StreetpassScreen extends React.Component<IStreetpassScreenProps> {
             onPressUser={() => navigation.navigate(Screens.User)}
           />
         </View>
+
+        {this.state.selectionModalConfig &&
+          <SelectionModal systemStore={systemStore} config={this.state.selectionModalConfig} toggleModal={() => this.setState({ selectionModalConfig: null, })} />
+        }
       </>
     )
   }

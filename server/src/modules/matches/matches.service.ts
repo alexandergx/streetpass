@@ -10,11 +10,12 @@ import { GetMatchesDto, MatchDto, SeenMatchDto, UnmatchDto, } from './matches.dt
 import { Errors, Subscriptions, } from 'src/utils/constants'
 import { Streetpasses, StreetpassesDocument, } from 'src/schemas/streetpasses.schema'
 import { Streetpassed, StreetpassedDocument, } from 'src/schemas/streetpassed.schema'
-import { Matches, MatchesDocument, } from 'src/schemas/matches.schema'
+import { MatchDocument, Matches, MatchesDocument, } from 'src/schemas/matches.schema'
 import { Matched, MatchedDocument, } from 'src/schemas/matched.schema'
 import { Match, MatchesPagination, } from './matches.entities'
 import { getAge, } from 'src/utils/functions'
 import { RedisPubSub, } from 'graphql-redis-subscriptions'
+import { UserChats, UserChatsDocument } from 'src/schemas/userChats.schema'
 
 @Injectable()
 export class MatchSubscriptionsService {
@@ -30,6 +31,7 @@ export class MatchesService {
     @InjectModel(Streetpasses.name) private streetpassesModel: Model<StreetpassesDocument>,
     @InjectModel(Matched.name) private matchedModel: Model<MatchedDocument>,
     @InjectModel(Matches.name) private matchesModel: Model<MatchesDocument>,
+    @InjectModel(UserChats.name) private userChatsModel: Model<UserChatsDocument>,
     private readonly jwtService: JwtService,
     private readonly matchSubscriptionsService: MatchSubscriptionsService,
   ) {}
@@ -43,8 +45,9 @@ export class MatchesService {
         const { matched, } = await this.matchedModel.findOne({ userId: input.userId, }, { matched: { $elemMatch: { userId: userId, }, }, }).lean()
         if (matched) {
           const [match] = matched
-          await this.matchesModel.updateOne({ userId: userId, }, { $push: { matches: { $each: [{ ...streetpass, seen: false, }], $position: 0, }, }, })
-          await this.matchesModel.updateOne({ userId: input.userId, }, { $push: { matches: { $each: [{ ...streetpass, userId: userId, seen: false, }], $position: 0, }, }, })
+          const date = new Date()
+          await this.matchesModel.updateOne({ userId: userId, }, { $push: { matches: { $each: [{ ...streetpass, seen: false, matchDate: date, }], $position: 0, }, }, })
+          await this.matchesModel.updateOne({ userId: input.userId, }, { $push: { matches: { $each: [{ ...streetpass, userId: userId, seen: false, matchDate: date, }], $position: 0, }, }, })
           await this.matchedModel.updateOne({ userId: input.userId, }, { $pull: { matched: { userId: userId, }, }, })
           await this.streetpassesModel.updateOne({ userId: userId, }, { $pull: { streetpasses: { userId: input.userId, }, }, })
           const authUser = await this.userModel.findOne({ _id: new mongoose.mongo.ObjectId(userId), }).lean()
@@ -57,9 +60,10 @@ export class MatchesService {
             school: user.school,
             age: getAge(user.dob),
             sex: user.sex,
-            date: match.date.toISOString(),
             media: user.media,
             seen: false,
+            streetpassDate: match.streetpassDate.toISOString(),
+            matchDate: date.toISOString(),
             unmatch: false,
           }, })
           this.matchSubscriptionsService.publish({ userId: input.userId, match: {
@@ -70,9 +74,10 @@ export class MatchesService {
             school: authUser.school,
             age: getAge(authUser.dob),
             sex: authUser.sex,
-            date: match.date.toISOString(),
             media: authUser.media,
             seen: false,
+            streetpassDate: match.streetpassDate.toISOString(),
+            matchDate: date.toISOString(),
             unmatch: false,
           }, })
           // TODO - push notification new match
@@ -97,7 +102,7 @@ export class MatchesService {
       { $project: { matches: { $slice: ['$matches', input.index || 0, 20], }, totalMatches: { $size: '$matches', }, }, },
     ])
     if (result.length) {
-      const matches: Match[] = result[0].matches
+      const matches: MatchDocument[] = result[0].matches
       const users = await this.userModel.find({ _id: { $in: matches.map(match => new mongoose.mongo.ObjectId(match.userId)), } }).lean()
       const usersMap = users.reduce((acc, user) => {
         acc[user._id.toString()] = user
@@ -114,10 +119,11 @@ export class MatchesService {
           school: user.school,
           age: getAge(user.dob),
           sex: user.sex,
-          date: match.date,
           media: user.media,
           seen: match.seen,
           unmatch: false,
+          streetpassDate: match.streetpassDate.toISOString(),
+          matchDate: match.matchDate.toISOString(),
         }
       }).filter(item => item !== null)
       return { matches: returnList, continue: input.index + 20 < result[0].totalMatches, }
@@ -129,6 +135,8 @@ export class MatchesService {
     const { userId, } = this.jwtService.decode(context.req.headers['access-token']) as AuthDecodedToken
     await this.matchesModel.updateOne({ userId: userId, }, { $pull: { matches: { userId: input.userId, }, }, })
     await this.matchesModel.updateOne({ userId: input.userId, }, { $pull: { matches: { userId: userId, }, }, })
+    await this.userChatsModel.updateOne({ userId: userId, }, { $pull: { chats: { userId: input.userId, }, }, })
+    await this.userChatsModel.updateOne({ userId: input.userId, }, { $pull: { chats: { userId: userId, }, }, })
     this.matchSubscriptionsService.publish({ userId: input.userId, match: {
       userId: userId,
       name: '',
@@ -137,9 +145,10 @@ export class MatchesService {
       school: '',
       age: 0,
       sex: null,
-      date: null,
       media: [],
       seen: false,
+      streetpassDate: null,
+      matchDate: null,
       unmatch: true,
     }, })
     return true

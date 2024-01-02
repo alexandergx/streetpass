@@ -26,6 +26,14 @@ export function setChat(input: ISetChat) {
   }
 }
 
+export type IUnsetChat = string
+export function unsetChat(input: IUnsetChat) {
+  return {
+    type: ChatsActions.UnsetChat,
+    payload: input,
+  }
+}
+
 export type ISetChatsSearch = ISearchChatsReq
 export function setChatsSearch(input: ISetChatsSearch) {
   return async (dispatch: any) => {

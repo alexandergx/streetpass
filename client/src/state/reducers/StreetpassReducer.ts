@@ -9,8 +9,8 @@ export interface IStreetpass {
   school: string
   age: number
   sex?: boolean
-  date: Date
   media: Array<IMedia>
+  streetpassDate: Date
 }
 
 export interface IStreetpassStore {

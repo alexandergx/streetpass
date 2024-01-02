@@ -44,30 +44,36 @@ export class ChatsService {
     ])
     if (result && result.length) {
       const chats: UserChatDocument[] = result[0].chats
-      const users = await this.userModel.find({ _id: { $in: chats.map(chat => new mongoose.mongo.ObjectId(chat.userId)), }, }).lean()
-      const returnList = users.map(user => {
-        const userId = user._id.toString()
-        const chat = chats.find(match => match.userId === userId)
+      const users = await this.userModel.find({ _id: { $in: chats.map(chat => new mongoose.mongo.ObjectId(chat.userId)) } }).lean()
+      const usersMap = users.reduce((acc, user) => {
+        acc[user._id.toString()] = user
+        return acc
+      }, {})
+      const returnList = chats.map(chat => {
+        const user = usersMap[chat.userId]
+        if (!user) return null
         return {
           chatId: chat.chatId,
-          userId: userId,
+          userId: chat.userId,
           name: user.name,
           bio: user.bio,
           work: user.work,
           school: user.school,
           age: getAge(user.dob),
           sex: user.sex,
-          date: chat.date.toISOString(),
           media: user.media,
           lastMessage: chat.lastMessage,
           unread: chat.unread,
           notifications: chat.notifications,
+          streetpassDate: chat.streetpassDate.toISOString(),
+          matchDate: chat.matchDate.toISOString(),
+          chatDate: chat.chatDate.toISOString(),
         }
-      })
+      }).filter(item => item !== null)
       return { chats: returnList, continue: input.index + 20 < result[0].total, }
     }
     return { chats: [], continue: false, }
-  }
+  }  
 
   async searchChats(input: SearchChatsDto, @Context() context: any): Promise<UserChat[]> {
     const { userId, } = this.jwtService.decode(context.req.headers['access-token']) as AuthDecodedToken
@@ -90,11 +96,13 @@ export class ChatsService {
           school: user.school,
           age: getAge(user.dob),
           sex: user.sex,
-          date: chat.date.toISOString(),
           media: user.media,
           lastMessage: chat.lastMessage,
           unread: chat.unread,
           notifications: chat.notifications,
+          streetpassDate: chat.streetpassDate.toISOString(),
+          matchDate: chat.matchDate.toISOString(),
+          chatDate: chat.chatDate.toISOString(),
         }
       })
       return returnList
@@ -122,12 +130,19 @@ export class ChatsService {
 
   async getMessages(input: GetMessagesDto, @Context() context: any): Promise<MessagesPagination> {
     const { userId, } = this.jwtService.decode(context.req.headers['access-token']) as AuthDecodedToken
+    // const result = await this.chatModel.aggregate([
+    //   { $match: { _id: new mongoose.mongo.ObjectId(input.chatId) } },
+    //   { $project: { participants: true, messages: true, total: { $size: '$messages', }, }, },
+    //   { $addFields: { startIndex: { $max: [{ $subtract: ['$total', (input.index || 0) + 30] }, 0], }, endIndex: { $min: [{ $subtract: ['$total', input.index || 0] }, '$total'], }, }, },
+    //   { $addFields: { messageSliceLength: { $max: [{ $subtract: ['$endIndex', '$startIndex'], }, 0], }, }, },
+    //   { $project: { participants: true, messages: { $slice: ['$messages', '$startIndex', '$messageSliceLength'], }, total: true, }, },
+    // ])
     const result = await this.chatModel.aggregate([
-      { $match: { _id: new mongoose.mongo.ObjectId(input.chatId) } },
+      { $match: { _id: new mongoose.mongo.ObjectId(input.chatId), }, },
       { $project: { participants: true, messages: true, total: { $size: '$messages', }, }, },
-      { $addFields: { startIndex: { $max: [{ $subtract: ['$total', (input.index || 0) + 30] }, 0], }, endIndex: { $min: [{ $subtract: ['$total', input.index || 0] }, '$total'], }, }, },
+      { $addFields: { startIndex: { $max: [{ $subtract: ['$total', (input.index || 0) + 30] }, 0], }, endIndex: { $min: [{ $subtract: ['$total', input.index || 0], }, '$total'], }, }, },
       { $addFields: { messageSliceLength: { $max: [{ $subtract: ['$endIndex', '$startIndex'], }, 0], }, }, },
-      { $project: { participants: true, messages: { $slice: ['$messages', '$startIndex', '$messageSliceLength'], }, total: true, }, },
+      { $project: { participants: true, messages: { $cond: { if: { $gt: ['$messageSliceLength', 0], }, then: { $slice: ['$messages', '$startIndex', '$messageSliceLength'], }, else: [], }, }, total: true, }, },
     ])
     if (result && result.length && result[0].participants.includes(userId)) {
       const messages: MessageDocument[] = result[0].messages
@@ -159,16 +174,16 @@ export class ChatsService {
         { $pull: { chats: { chatId: authChat.chatId, }, }, },
       )
       await this.userChatsModel.updateOne(
-        { userId: userId, },
-        { $push: { chats: { $each:[{ ...authChat, lastMessage: input.message, unread: false, date: date, }], $position: 0, }, }, },
-      )
-      await this.userChatsModel.updateOne(
         { userId: input.userId, },
         { $pull: { chats: { chatId: chat.chatId, }, }, },
       )
       await this.userChatsModel.updateOne(
+        { userId: userId, },
+        { $push: { chats: { $each:[{ ...authChat, lastMessage: input.message, unread: false, chatDate: date, }], $position: 0, }, }, },
+      )
+      await this.userChatsModel.updateOne(
         { userId: input.userId, },
-        { $push: { chats: { $each:[{ ...chat, lastMessage: input.message, unread: true, date: date, }], $position: 0, }, }, },
+        { $push: { chats: { $each:[{ ...chat, lastMessage: input.message, unread: true, chatDate: date, }], $position: 0, }, }, },
       )
       await this.chatModel.updateOne(
         { _id: new mongoose.mongo.ObjectId(chat.chatId), },
@@ -180,6 +195,8 @@ export class ChatsService {
         metadata: { sender: userId, recipient: input.userId, },
       })
     } else {
+      const { matches, } = await this.matchesModel.findOne({ userId: userId, }, { matches: { $elemMatch: { userId: input.userId, }, }, }).lean()
+      const [match] = matches
       await this.matchesModel.updateOne({ userId: userId, }, { $pull: { matches: { userId: input.userId, }, }, })
       await this.matchesModel.updateOne({ userId: input.userId, }, { $pull: { matches: { userId: userId, }, }, })
       const authUser = await this.userModel.findOne({ _id: new mongoose.mongo.ObjectId(userId), }).lean()
@@ -191,11 +208,33 @@ export class ChatsService {
       const chatId = chat._id.toString()
       await this.userChatsModel.updateOne(
         { userId: userId, },
-        { $push: { chats: { $each:[{ chatId: chatId, userId: input.userId, name: authUser.name, lastMessage: input.message, unread: false, notifications: true, date: date, }], $position: 0, }, }, },
+        { $push: { chats: { $each:[{
+          chatId: chatId,
+          userId: input.userId,
+          coordinates: match.coordinates,
+          name: authUser.name,
+          lastMessage: input.message,
+          unread: false,
+          notifications: true,
+          streetpassDate: match.streetpassDate,
+          matchDate: match.matchDate,
+          chatDate: date,
+        }], $position: 0, }, }, },
       )
       await this.userChatsModel.updateOne(
         { userId: input.userId, },
-        { $push: { chats: { $each:[{ chatId: chatId, userId: userId, name: user.name, lastMessage: input.message, unread: true, notifications: true, date: date, }], $position: 0, }, }, },
+        { $push: { chats: { $each:[{
+          chatId: chatId,
+          userId: userId,
+          coordinates: match.coordinates,
+          name: user.name,
+          lastMessage: input.message,
+          unread: true,
+          notifications: true,
+          streetpassDate: match.streetpassDate,
+          matchDate: match.matchDate,
+          chatDate: date,
+        }], $position: 0, }, }, },
       )
       this.matchSubscriptionsService.publish({ userId: userId, match: {
         userId: input.userId,
@@ -205,9 +244,10 @@ export class ChatsService {
         school: '',
         age: 0,
         sex: null,
-        date: null,
         media: [],
         seen: false,
+        streetpassDate: null,
+        matchDate: null,
         unmatch: true,
       }, })
       this.matchSubscriptionsService.publish({ userId: input.userId, match: {
@@ -218,9 +258,10 @@ export class ChatsService {
         school: '',
         age: 0,
         sex: null,
-        date: null,
         media: [],
         seen: false,
+        streetpassDate: null,
+        matchDate: null,
         unmatch: true,
       }, })
       this.chatsSubscriptionsService.publish({
@@ -234,11 +275,13 @@ export class ChatsService {
           school: user.school,
           age: getAge(user.dob),
           sex: user.sex,
-          date: date.toISOString(),
           media: user.media,
           lastMessage: input.message,
           unread: false,
           notifications: true,
+          streetpassDate: match.streetpassDate.toISOString(),
+          matchDate: match.matchDate.toISOString(),
+          chatDate: date.toISOString(),
         },
         message: { chatId: chatId, messageId: messageId, userId: userId, message: input.message, date: date.toISOString(), },
         metadata: { sender: userId, recipient: input.userId, },
@@ -254,11 +297,13 @@ export class ChatsService {
           school: authUser.school,
           age: getAge(authUser.dob),
           sex: authUser.sex,
-          date: date.toISOString(),
           media: authUser.media,
           lastMessage: input.message,
           unread: true,
           notifications: true,
+          streetpassDate: match.streetpassDate.toISOString(),
+          matchDate: match.matchDate.toISOString(),
+          chatDate: date.toISOString(),
         },
         message: { chatId: chatId, messageId: messageId, userId: userId, message: input.message, date: date.toISOString(), },
         metadata: { sender: userId, recipient: input.userId, },

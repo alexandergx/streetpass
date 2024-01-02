@@ -17,8 +17,8 @@ import Redis from 'ioredis'
   imports: [
     MongooseModule.forFeature([
       { name: User.name, collection: User.name, schema: UserSchema, },
-      { name: Streetpasses.name, collection: Streetpasses.name, schema: StreetpassesSchema, },
       { name: Streetpassed.name, collection: Streetpassed.name, schema: StreetpassedSchema, },
+      { name: Streetpasses.name, collection: Streetpasses.name, schema: StreetpassesSchema, },
       { name: Matches.name, collection: Matches.name, schema: MatchesSchema, },
       { name: Blocked.name, collection: Blocked.name, schema: BlockedSchema, },
     ]),

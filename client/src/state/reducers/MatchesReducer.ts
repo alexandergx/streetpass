@@ -10,9 +10,10 @@ export interface IMatch {
   school: string
   age: number
   sex?: boolean
-  date: Date
   media: Array<IMedia>
   seen: boolean
+  streetpassDate: Date
+  matchDate: Date
   unmatch: boolean
 }
 

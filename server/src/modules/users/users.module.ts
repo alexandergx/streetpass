@@ -4,7 +4,6 @@ import { UsersResolver, } from './users.resolver'
 import { MongooseModule, } from '@nestjs/mongoose'
 import { User, UserSchema, } from 'src/schemas/user.schema'
 import { JwtModule, } from '@nestjs/jwt'
-import { UserRecords, UserRecordsSchema, } from 'src/schemas/userRecords.schema'
 import { AuthModule, } from '../auth/auth.module'
 import { Matches, MatchesSchema, } from 'src/schemas/matches.schema'
 import { Matched, MatchedSchema, } from 'src/schemas/matched.schema'
@@ -16,7 +15,6 @@ import { UserChats, UserChatsSchema, } from 'src/schemas/userChats.schema'
   imports: [
     MongooseModule.forFeature([
       { name: User.name, collection: User.name, schema: UserSchema, },
-      { name: UserRecords.name, collection: UserRecords.name, schema: UserRecordsSchema, },
       { name: Streetpasses.name, collection: Streetpasses.name, schema: StreetpassesSchema, },
       { name: Matches.name, collection: Matches.name, schema: MatchesSchema, },
       { name: Matched.name, collection: Matched.name, schema: MatchedSchema, },

@@ -20,7 +20,7 @@ export const formatMultiline = (text: string) => {
   return firstPart + restPart
 }
 
-export const formatDate = (dateString: string, time = false) => {
+export const formatDate = (dateString: Date | string, time = false) => {
   const date = new Date(dateString)
   const month = date.getMonth() + 1
   const day = date.getDate()
@@ -37,7 +37,7 @@ export const formatDate = (dateString: string, time = false) => {
   return `${month}/${day}/${year}`
 }
 
-export const timePassedSince = (dateString: string | Date | null, locale: Locales) => {
+export const timePassedSince = (dateString: Date | string | null, locale: Locales) => {
   if (!dateString) return null
   const date: any = new Date(dateString)
   const now: any = new Date()

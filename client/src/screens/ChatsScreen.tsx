@@ -14,7 +14,6 @@ import { IStores, } from '../state/store'
 import { IUserStore, } from '../state/reducers/UserReducer'
 import { ISystemStore, } from '../state/reducers/SystemReducer'
 import { FlashList, } from '@shopify/flash-list'
-import { mockChats, mockMatches, } from '../utils/MockData'
 import { ScrollView } from 'react-native-gesture-handler'
 import FastImage from 'react-native-fast-image'
 import { BlurView } from '@react-native-community/blur'
@@ -34,6 +33,7 @@ import { ThemeTypes } from '../utils/themes'
 import { IMatchesStore } from '../state/reducers/MatchesReducer'
 import { IUnsetMatch, unsetMatch } from '../state/actions/MatchesActions'
 import { IChatsStore } from '../state/reducers/ChatsReducer'
+import { IUnsetChat, unsetChat } from '../state/actions/ChatsActions'
 
 const mapStateToProps = (state: IStores) => {
   const { systemStore, userStore, matchesStore, chatsStore, } = state
@@ -43,6 +43,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => ({
   actions: bindActionCreators(Object.assign(
     {
       unsetMatch,
+      unsetChat,
     }
   ), dispatch),
 })
@@ -55,6 +56,7 @@ interface IChatsScreenProps {
   chatsStore: IChatsStore,
   actions: {
     unsetMatch: (params: IUnsetMatch) => void,
+    unsetChat: (params: IUnsetChat) => void,
   },
 }
 interface IChatsScreenState {
@@ -132,6 +134,7 @@ class ChatsScreen extends React.Component<IChatsScreenProps> {
                                   list: [
                                     { Icon: DeleteIcon, image: item.item.media[0].thumbnail, title: Lit[systemStore.Locale].Button.Unmatch, noRight: true, onPress: () => {
                                       actions.unsetMatch({ userId: item.item.userId, })
+                                      actions.unsetChat(item.item.userId)
                                       this.setState({ matchId: null, selectionModalConfig: null, })
                                     }, },
                                     { Icon: DeleteIcon, title: Lit[systemStore.Locale].Button.Block, noRight: true, onPress: () => null, },
@@ -220,6 +223,7 @@ class ChatsScreen extends React.Component<IChatsScreenProps> {
                                 list: [
                                   { Icon: DeleteIcon, image: item.item.media[0].thumbnail, title: Lit[systemStore.Locale].Button.Unmatch, noRight: true, onPress: () => {
                                     actions.unsetMatch({ userId: item.item.userId, })
+                                    actions.unsetChat(item.item.userId)
                                     this.setState({ matchId: null, selectionModalConfig: null, })
                                   }, },
                                   { Icon: DeleteIcon, title: Lit[systemStore.Locale].Button.Block, noRight: true, onPress: () => null, },
@@ -261,7 +265,7 @@ class ChatsScreen extends React.Component<IChatsScreenProps> {
                                 <View style={{flexDirection: 'row',}}>
                                   <Text numberOfLines={1} style={{color: Colors.lightest, fontWeight: Fonts.cruiserWeight as any, marginRight: 8, flex: 1,}}>{item.item.name}</Text>
                                   <View style={{flexDirection: 'row', alignItems: 'center',}}>
-                                    <Text style={{color: Colors.lighter, fontWeight: Fonts.lightWeight as any,}}>{timePassedSince(item.item.date, systemStore.Locale)}</Text>
+                                    <Text style={{color: Colors.lighter, fontWeight: Fonts.lightWeight as any,}}>{timePassedSince(item.item.chatDate, systemStore.Locale)}</Text>
                                     {item.item.unread && <View style={{width: 8, aspectRatio: 1/1, borderRadius: 32, marginLeft: 8, backgroundColor: Colors.red,}} />}
                                   </View>
                                 </View>

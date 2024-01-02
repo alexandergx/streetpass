@@ -11,7 +11,7 @@ export class Streetpass {
   coordinates: { lat: number, lon: number, }
 
   @Prop({ required: true, })
-  date: Date
+  streetpassDate: Date
 }
 
 export type StreetpassesDocument = HydratedDocument<Streetpasses>

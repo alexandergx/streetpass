@@ -27,9 +27,6 @@ export class UserChat {
   @Field(() => Boolean, { nullable: true, })
   sex: boolean
 
-  @Field(() => String)
-  date: string
-
   @Field(() => [UserMedia])
   media: UserMedia[]
 
@@ -41,6 +38,15 @@ export class UserChat {
 
   @Field(() => Boolean)
   notifications: boolean
+
+  @Field(() => String)
+  streetpassDate: string
+
+  @Field(() => String)
+  matchDate: string
+
+  @Field(() => String)
+  chatDate: string
 }
 
 @ObjectType()

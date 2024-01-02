@@ -19,4 +19,8 @@ export function setStreetpasses() {
   }
 }
 
-export function setStreetpass() { return { type: StreetpassActions.SetStreetpass, } }
+export function setStreetpass() {
+  return {
+    type: StreetpassActions.SetStreetpass,
+  }
+}

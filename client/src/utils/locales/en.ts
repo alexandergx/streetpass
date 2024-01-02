@@ -113,6 +113,8 @@ const Locale: ILocale = {
     No: 'Not now',
     Enable: 'Enable',
     Unmatch: 'Unmatch',
+    Copy: 'Copy',
+    Message: 'Message',
   },
   Time: {
     Year: 'year',

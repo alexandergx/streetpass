@@ -11,9 +11,9 @@ import GradientBackground from '../../components/gradientBackground'
 import AnimatedBackground from '../../components/animated/AnimatedBackground'
 import { IMatch } from '../../state/reducers/MatchesReducer'
 import { IStreetpass } from '../../state/reducers/StreetpassReducer'
-import { ISetSeenMatch, setSeenMatch } from '../../state/actions/MatchesActions'
+import { ISetSeenMatch, IUnsetMatch, setSeenMatch, unsetMatch } from '../../state/actions/MatchesActions'
 import { IChat, IChatsStore, IMessages } from '../../state/reducers/ChatsReducer'
-import { ISetChatMessage, ISetMessages, setChatMessage, setMessages } from '../../state/actions/ChatsActions'
+import { ISetChatMessage, ISetChatNotifications, ISetMessages, ISetReadChat, IUnsetChat, setChatMessage, setChatNotifications, setMessages, setReadChat, unsetChat } from '../../state/actions/ChatsActions'
 
 const mapStateToProps = (state: IStores) => {
   const { systemStore, userStore, chatsStore, } = state
@@ -25,6 +25,10 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => ({
       setSeenMatch,
       setMessages,
       setChatMessage,
+      unsetMatch,
+      unsetChat,
+      setReadChat,
+      setChatNotifications,
     }
   ), dispatch),
 })
@@ -39,6 +43,10 @@ interface IChatScreenProps {
     setSeenMatch: (params: ISetSeenMatch) => void,
     setMessages: (params: ISetMessages) => void,
     setChatMessage: (params: ISetChatMessage) => void,
+    unsetMatch: (params: IUnsetMatch) => void,
+    unsetChat: (params: IUnsetChat) => void,
+    setReadChat: (params: ISetReadChat) => void,
+    setChatNotifications: (params: ISetChatNotifications) => void,
   },
 }
 export interface IChatScreenState {
@@ -50,6 +58,8 @@ export interface IChatScreenState {
   userId: string,
   selectionModalConfig: IListGroupConfig | null,
   streetpass: IStreetpass | null,
+  messageId: string | null,
+  messageIdTime: string | null,
   sending: boolean,
   paginating: boolean,
 }
@@ -65,10 +75,12 @@ class ChatScreen extends React.Component<IChatScreenProps> {
     appState: null,
     appStateListener: null,
     match: this.props.route.params.match || null,
-    chat: this.props.chatsStore.chats?.find(chat => chat.userId === this.props.route.params.match?.userId || chat.userId === this.props.route.params.chat.userId) || null,
+    chat: this.props.chatsStore.chats?.find(chat => chat.userId === this.props.route.params.match?.userId || chat.userId === this.props.route.params.chat?.userId) || null,
     userId: this.props.route.params.match?.userId || this.props.route.params.chat.userId,
     selectionModalConfig: null,
     streetpass: null,
+    messageId: null,
+    messageIdTime: null,
     sending: false,
     paginating: false,
   }
@@ -95,7 +107,7 @@ class ChatScreen extends React.Component<IChatScreenProps> {
     this.keyboardWillShowListener = Keyboard.addListener('keyboardWillShow', this.keyboardWillShow)
     this.keyboardWillHideListener = Keyboard.addListener('keyboardWillHide', this.keyboardWillHide)
     if (this.state.match && this.state.match.seen === false) this.props.actions.setSeenMatch({ userId: this.state.match.userId, })
-    // TODO - set read chat
+    if (this.state.chat && this.state.chat.unread) this.props.actions.setReadChat({ chatId: this.state.chat.chatId, })
   }
 
   componentDidUpdate(): void {
@@ -108,16 +120,14 @@ class ChatScreen extends React.Component<IChatScreenProps> {
   componentWillUnmount(): void {
     this.keyboardWillShowListener.remove()
     this.keyboardWillHideListener.remove()
-    // TODO - set read chat
+    if (this.state.appStateListener) this.state.appStateListener.remove()
+    if (this.state.chat && this.state.chat.unread) this.props.actions.setReadChat({ chatId: this.state.chat.chatId, })
   }
 
   appStateChange = (nextAppState: any) => {
-    // TODO - background -> active
-    // TODO - active -> background ?
-    // TODO - inactive -> background ?
-    if (this.state.appState !== nextAppState) {
+    if ((this.state.appState === 'inactive' && nextAppState === 'background') || (this.state.appState === 'background' && nextAppState === 'active')) {
       console.log('[APP STATE CHANGE]', this.state.appState, nextAppState)
-      // TODO - set read chat
+      if (this.state.chat && this.state.chat.unread) this.props.actions.setReadChat({ chatId: this.state.chat.chatId, })
     }
     this.setState({ appState: nextAppState, })
   }
@@ -141,6 +151,9 @@ class ChatScreen extends React.Component<IChatScreenProps> {
           actions={{
             setMessages: actions.setMessages,
             setChatMessage: actions.setChatMessage,
+            unsetMatch: actions.unsetMatch,
+            unsetChat: actions.unsetChat,
+            setChatNotifications: actions.setChatNotifications,
           }}
         />
       </>

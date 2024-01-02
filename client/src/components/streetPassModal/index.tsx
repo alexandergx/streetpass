@@ -26,19 +26,25 @@ import { IListGroupConfig } from '../listGroup'
 import SelectionModal from '../selectionModal'
 import Video from 'react-native-video'
 import convertToProxyURL from 'react-native-video-cache'
+import { blockUser } from '../../api/user'
+import { IStreetpass } from '../../state/reducers/StreetpassReducer'
+import { IUnsetChat } from '../../state/actions/ChatsActions'
+import { IUnsetMatch } from '../../state/actions/MatchesActions'
 
 interface IStreetpassModalProps {
   navigation: any,
   systemStore: ISystemStore,
-  streetpass: any,
+  streetpass: IStreetpass,
   streetpassCardRef?: RefObject<CardItemHandle> | null,
   streetpassImageIndex: number | null,
   hideActions?: boolean,
   unsetStreetpass: () => void,
+  actions: {
+    unsetMatch: (params: IUnsetMatch) => void,
+    unsetChat: (params: IUnsetChat) => void,
+  }
 }
-const StreetpassModal: React.FC<IStreetpassModalProps> = ({
-  navigation, systemStore, streetpass, streetpassCardRef, streetpassImageIndex, hideActions, unsetStreetpass,
-}) => {
+const StreetpassModal: React.FC<IStreetpassModalProps> = ({ navigation, systemStore, streetpass, streetpassCardRef, streetpassImageIndex, hideActions, unsetStreetpass, actions, }) => {
   const { Colors, Fonts, } = systemStore
   const streetpassCarouselRef: RefObject<ICarouselInstance> = React.createRef()
   const [imageIndex, setImageIndex] = useState<number>(streetpassImageIndex || 0)
@@ -93,15 +99,10 @@ const StreetpassModal: React.FC<IStreetpassModalProps> = ({
                   }
 
                   <View style={{position: 'absolute', zIndex: 1, width: '100%', height: '100%', flexDirection: 'row',}}>
-                    <TouchableWithoutFeedback onPress={() => {
-                      streetpassCarouselRef?.current?.prev()
-                    }}>
+                    <TouchableWithoutFeedback onPress={() => streetpassCarouselRef?.current?.prev()}>
                       <View style={{flex: 1,}} />
                     </TouchableWithoutFeedback>
-
-                    <TouchableWithoutFeedback onPress={() => {
-                      streetpassCarouselRef?.current?.next()
-                    }}>
+                    <TouchableWithoutFeedback onPress={() => streetpassCarouselRef?.current?.next()}>
                       <View style={{flex: 1,}} />
                     </TouchableWithoutFeedback>
                   </View>
@@ -115,7 +116,7 @@ const StreetpassModal: React.FC<IStreetpassModalProps> = ({
                 colors={['rgba(0,0,0,0.0)', 'rgba(0,0,0,0.05)', 'rgba(0,0,0,0.1)', 'rgba(0,0,0,0.2)']} start={{ x: 1, y: 1 }} end={{ x: 1, y: 0 }}
               />
 
-              <View style={{flexDirection: 'row', width: '100%', justifyContent: 'center',}}>
+              <View style={{flexDirection: 'row', width: '100%', justifyContent: 'center', marginTop: 8,}}>
                 {streetpass.media.length > 1 && Array.from({ length: streetpass.media.length, }, (v, i) => {
                   return imageIndex === i
                     ? <DotFillIcon key={i} fill={Colors.safeLightest} width={24} height={24} />
@@ -124,14 +125,24 @@ const StreetpassModal: React.FC<IStreetpassModalProps> = ({
               </View>
             </View>
 
-            <View style={{position: 'absolute', top: 0, right: 0, padding: 24,}}>
+            <View style={{position: 'absolute', top: 0, right: 0, paddingVertical: 8, paddingHorizontal: 24,}}>
               <View style={{flex: 0, justifyContent: 'center',}}>
                 <TouchableOpacity
                   activeOpacity={Colors.activeOpacity}
                   onPress={() => setSelectionModalConfig({
                     title: streetpass.name,
                     list: [
-                      { Icon: DeleteIcon, title: 'Block', noRight: true, onPress: () => null, },
+                      { Icon: DeleteIcon, title: 'Block', noRight: true, onPress: async () => {
+                        blockUser({ userId: streetpass.userId, })
+                        if (hideActions) {
+                          actions.unsetMatch({ userId: streetpass.userId, pass: true, })
+                          actions.unsetChat(streetpass.userId)
+                          navigation.goBack()
+                        } else {
+                          await unsetStreetpass()
+                          swipeLeft && swipeLeft()
+                        }
+                      }, },
                       { Icon: ExclamationIcon, title: 'Report', noRight: true, onPress: () => null, },
                     ],
                   })}
@@ -156,10 +167,10 @@ const StreetpassModal: React.FC<IStreetpassModalProps> = ({
           <View style={{flex: 1, flexDirection: 'row', paddingHorizontal: 16, paddingTop: 24,}}>
             <View style={{flex: 1, marginBottom: 16,}}>
               <Text style={{color: Colors.lightest, fontSize: Fonts.xl, fontWeight: Fonts.heavyWeight, textShadowColor: Colors.darkest, textShadowRadius: 2,}}>{streetpass.name} <Text style={{fontWeight: Fonts.lightWeight,}}>{streetpass.age}</Text></Text>
-              <Text numberOfLines={1} style={{color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.lightWeight, textShadowColor: Colors.darkest, textShadowRadius: 2}}>Streetpassed {timePassedSince(streetpass.date, systemStore.Locale)}</Text>
+              <Text numberOfLines={1} style={{color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.lightWeight, textShadowColor: Colors.darkest, textShadowRadius: 2}}>Streetpassed {timePassedSince(streetpass.streetpassDate, systemStore.Locale)}</Text>
             </View>
 
-            {/* {!hideActions &&
+            {!hideActions &&
               <View style={{flex: 0, flexDirection: 'row',}}>
                 <TouchableOpacity
                   onPress={async () => {
@@ -183,7 +194,7 @@ const StreetpassModal: React.FC<IStreetpassModalProps> = ({
                   <HeartIcon fill={Colors.red} width={24} height={24} />
                 </TouchableOpacity>
               </View>
-            } */}
+            }
           </View>
 
           {streetpass.work &&

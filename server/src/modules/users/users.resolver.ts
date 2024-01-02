@@ -2,7 +2,7 @@ import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql'
 import { UsersService, PrivacyGuard, } from './users.service'
 import { UseGuards } from '@nestjs/common'
 import { AuthGuard } from '../auth/auth.service'
-import { GetUserDto, RemoveMediaDto, SortMediaDto, UpdateUserDto, UploadMediaDto } from './users.dto'
+import { BlockUserDto, GetUserDto, RemoveMediaDto, SortMediaDto, UpdateUserDto, UploadMediaDto } from './users.dto'
 import { UserProfile } from './users.entities'
 
 @Resolver()
@@ -33,5 +33,10 @@ export class UsersResolver {
   @Mutation(() => Boolean)
   async removeMedia(@Args('input') input: RemoveMediaDto, @Context() context: any) {
     return this.usersService.removeMedia(input, context)
+  }
+
+  @Mutation(() => Boolean)
+  async blockUser(@Args('input') input: BlockUserDto, @Context() context: any) {
+    return this.usersService.blockUser(input, context)
   }
 }

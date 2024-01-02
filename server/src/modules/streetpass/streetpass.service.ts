@@ -25,8 +25,8 @@ export class StreetpassSubscriptionsService {
 export class StreetpassService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
-    @InjectModel(Streetpasses.name) private streetpassesModel: Model<StreetpassesDocument>,
     @InjectModel(Streetpassed.name) private streetpassedModel: Model<StreetpassedDocument>,
+    @InjectModel(Streetpasses.name) private streetpassesModel: Model<StreetpassesDocument>,
     @InjectModel(Blocked.name) private blockedModel: Model<BlockedDocument>,
     private readonly jwtService: JwtService,
     private readonly streetpassSubscriptionsService: StreetpassSubscriptionsService,
@@ -73,14 +73,13 @@ export class StreetpassService {
       let streetpasses = []
       for (const user of users) {
         const streetpassed = await this.streetpassedModel.updateOne({ userId: userId, }, { $addToSet: { streetpassed: user._id.toString(), }, })
-        if (streetpassed.modifiedCount) streetpasses.push({ userId: user._id.toString(), coordinates: { lat: input.lat, lon: input.lon, }, date: date, })
+        if (streetpassed.modifiedCount) streetpasses.push({ userId: user._id.toString(), coordinates: { lat: input.lat, lon: input.lon, }, streetpassDate: date, })
       }
       if (streetpasses.length) {
         await this.streetpassesModel.updateOne({ userId: userId, }, { $push: { streetpasses: { $each: streetpasses, }, }, })
         this.streetpassSubscriptionsService.publish({ userId: userId, })
         // TODO - push notification new streetpasses
       }
-      console.log
       return true
     }
     throw new GraphQLError(Errors.NotFound)
@@ -107,8 +106,8 @@ export class StreetpassService {
           school: user.school,
           age: getAge(user.dob),
           sex: user.sex,
-          date: streetpass.date,
           media: user.media,
+          streetpassDate: streetpass.streetpassDate,
         }
       }).filter(item => item !== null)
     }

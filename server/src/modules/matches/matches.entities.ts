@@ -23,15 +23,18 @@ export class Match {
 
   @Field(() => Boolean, { nullable: true, })
   sex?: boolean
-  
-  @Field(() => String, { nullable: true, })
-  date?: string
 
   @Field(() => [UserMedia])
   media: UserMedia[]
 
   @Field(() => Boolean)
   seen: boolean
+  
+  @Field(() => String, { nullable: true, })
+  streetpassDate?: string
+  
+  @Field(() => String, { nullable: true, })
+  matchDate?: string
 
   @Field(() => Boolean, { nullable: true, })
   unmatch?: boolean

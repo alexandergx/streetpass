@@ -132,6 +132,8 @@ export type ILocale = {
     No: string,
     Enable: string,
     Unmatch: string,
+    Copy: string,
+    Message: string,
   },
   Time: {
     Year: string,

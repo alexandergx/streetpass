@@ -10,6 +10,9 @@ export class UserChat {
   @Prop({ required: true, })
   userId: string
 
+  @Prop({ required: true, type: Object, })
+  coordinates: { lat: number, lon: number, }
+
   @Prop({ required: true, })
   name: string
 
@@ -23,7 +26,13 @@ export class UserChat {
   notifications: boolean
 
   @Prop({ required: true, })
-  date: Date
+  streetpassDate: Date
+  
+  @Prop({ required: true, })
+  matchDate: Date
+
+  @Prop({ required: true, })
+  chatDate: Date
 }
 
 export type UserChatsDocument = HydratedDocument<UserChats>

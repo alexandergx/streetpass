@@ -34,14 +34,12 @@ const Pretext: React.FC<IPretextProps> = ({ systemStore, text, linkColor, textPr
                 key={index}
                 onPress={() => onPress(token.replace('@', '').trim())}
                 onLongPress={onLongPress}
-                style={{color: linkColor ? linkColor : Colors.lightBlue, fontWeight: Fonts.middleWeight,}}
+                style={{color: linkColor ? linkColor : Colors.lightBlue, fontWeight: Fonts.cruiserWeight,}}
               >
                 {token}
               </Text>
             )
-          } else {
-            return <Text key={index}>{token}</Text>
-          }
+          } else return <Text key={index} style={{fontWeight: Fonts.middleWeight,}}>{token}</Text>
         })}
       </Text>
     </Hyperlink>

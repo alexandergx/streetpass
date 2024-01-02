@@ -16,17 +16,15 @@ import { Streetpasses, StreetpassesDocument, } from 'src/schemas/streetpasses.sc
 import { Matches, MatchesDocument, } from 'src/schemas/matches.schema'
 import { Matched, MatchedDocument, } from 'src/schemas/matched.schema'
 import { Blocked, BlockedDocument, } from 'src/schemas/blocked.schema'
-import { UserRecords, UserRecordsDocument, } from 'src/schemas/userRecords.schema'
 import { UserChats, UserChatsDocument, } from 'src/schemas/userChats.schema'
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
-    @InjectModel(UserRecords.name) private userRecordsModel: Model<UserRecordsDocument>,
     @InjectModel(Streetpasses.name) private streetpassesModel: Model<StreetpassesDocument>,
-    @InjectModel(Matches.name) private matchesModel: Model<MatchesDocument>,
     @InjectModel(Matched.name) private matchedModel: Model<MatchedDocument>,
+    @InjectModel(Matches.name) private matchesModel: Model<MatchesDocument>,
     @InjectModel(UserChats.name) private userChatsModel: Model<UserChatsDocument>,
     @InjectModel(Blocked.name) private blockedModel: Model<BlockedDocument>,
     private readonly jwtService: JwtService,
@@ -65,21 +63,6 @@ export class UsersService {
     const updatedUser = await this.userModel.updateOne({ _id: new mongoose.mongo.ObjectId(userId), }, { $set: { ...update, }, })
     if (updatedUser.modifiedCount) return true
     return false
-  }
-
-  async blockUser(input: BlockUserDto, @Context() context: any): Promise<boolean> {
-    const { userId, } = this.jwtService.verify(context.req.headers['access-token']) as AuthDecodedToken
-    await this.streetpassesModel.updateOne({ userId: userId, }, { $pull: { streetpasses: { userId: input.userId, }, }, })
-    await this.streetpassesModel.updateOne({ userId: input.userId, }, { $pull: { streetpasses: { userId: userId, }, }, })
-    await this.matchesModel.updateOne({ userId: userId, }, { $pull: { matches: { userId: input.userId, }, }, })
-    await this.matchesModel.updateOne({ userId: input.userId, }, { $pull: { matches: { userId: userId, }, }, })
-    await this.matchedModel.updateOne({ userId: userId, }, { $pull: { matched: { userId: input.userId, }, }, })
-    await this.matchedModel.updateOne({ userId: input.userId, }, { $pull: { matched: { userId: userId, }, }, })
-    await this.userChatsModel.updateOne({ userId: userId, }, { $pull: { chats: { userId: input.userId, }, }, })
-    await this.userChatsModel.updateOne({ userId: input.userId, }, { $pull: { chats: { userId: userId, }, }, })
-    await this.blockedModel.updateOne({ userId: userId, }, { $addToSet: { blocking: input.userId, }, })
-    await this.blockedModel.updateOne({ userId: input.userId, }, { $addToSet: { blockers: userId, }, })
-    return true
   }
 
   async uploadMedia(input: UploadMediaDto, @Context() context: any): Promise<string> {
@@ -145,12 +128,26 @@ export class UsersService {
     }
     throw new GraphQLError(Errors.InputError)
   }
+
+  async blockUser(input: BlockUserDto, @Context() context: any): Promise<boolean> {
+    const { userId, } = this.jwtService.verify(context.req.headers['access-token']) as AuthDecodedToken
+    await this.streetpassesModel.updateOne({ userId: userId, }, { $pull: { streetpasses: { userId: input.userId, }, }, })
+    await this.streetpassesModel.updateOne({ userId: input.userId, }, { $pull: { streetpasses: { userId: userId, }, }, })
+    await this.matchedModel.updateOne({ userId: userId, }, { $pull: { matched: { userId: input.userId, }, }, })
+    await this.matchedModel.updateOne({ userId: input.userId, }, { $pull: { matched: { userId: userId, }, }, })
+    await this.matchesModel.updateOne({ userId: userId, }, { $pull: { matches: { userId: input.userId, }, }, })
+    await this.matchesModel.updateOne({ userId: input.userId, }, { $pull: { matches: { userId: userId, }, }, })
+    await this.userChatsModel.updateOne({ userId: userId, }, { $pull: { chats: { userId: input.userId, }, }, })
+    await this.userChatsModel.updateOne({ userId: input.userId, }, { $pull: { chats: { userId: userId, }, }, })
+    await this.blockedModel.updateOne({ userId: userId, }, { $addToSet: { blocking: input.userId, }, })
+    await this.blockedModel.updateOne({ userId: input.userId, }, { $addToSet: { blockers: userId, }, })
+    return true
+  }
 }
 
 @Injectable()
 export class PrivacyGuard implements CanActivate {
   constructor(
-    @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(Blocked.name) private blockedModel: Model<BlockedDocument>,
     private readonly jwtService: JwtService,
   ) {}

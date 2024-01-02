@@ -7,6 +7,7 @@ import {
   Linking,
   Dimensions,
   Keyboard,
+  Text,
 } from 'react-native'
 import Message from './Message'
 import TextInput from '../textInput'
@@ -39,7 +40,9 @@ import StreetpassModal from '../streetpassModal'
 import { IMatch } from '../../state/reducers/MatchesReducer'
 import { IChat, IChatsStore, IMessage, IMessageMetadata, IMessages } from '../../state/reducers/ChatsReducer'
 import { sendMessage } from '../../api/chats'
-import { ISetChatMessage, ISetMessages } from '../../state/actions/ChatsActions'
+import { ISetChatMessage, ISetChatNotifications, ISetMessages, ISetReadChat, IUnsetChat } from '../../state/actions/ChatsActions'
+import { IUnsetMatch } from '../../state/actions/MatchesActions'
+import { timePassedSince } from '../../utils/functions'
 
 const MMKV = new MMKVLoader().withEncryption().withInstanceID(LocalStorage.AuthStore).initialize()
 
@@ -54,6 +57,9 @@ interface IChatBlockProps {
   actions: {
     setMessages: (params: ISetMessages) => void,
     setChatMessage: (params: ISetChatMessage) => void,
+    unsetMatch: (params: IUnsetMatch) => void,
+    unsetChat: (params: IUnsetChat) => void,
+    setChatNotifications: (params: ISetChatNotifications) => void,
   }
 }
 const ChatBlock: React.FC<IChatBlockProps> = ({
@@ -91,6 +97,10 @@ const ChatBlock: React.FC<IChatBlockProps> = ({
           streetpassImageIndex={0}
           hideActions={true}
           unsetStreetpass={() => setState({ streetpass: state.streetpass ? null : state.match, })}
+          actions={{
+            unsetMatch: actions.unsetMatch,
+            unsetChat: actions.unsetChat,
+          }}
         />
       }
 
@@ -100,26 +110,30 @@ const ChatBlock: React.FC<IChatBlockProps> = ({
         title={state.match ? state.match.name : state.chat ? state.chat.name : undefined}
         thumbnail={state.match ? state.match.media[0]?.thumbnail : state.chat ? state.chat.media[0]?.thumbnail : undefined}
         EndIcon={EllipsisIcon}
-        onPress={() => {
-          // actions.setChatId(null)
-          // state.chat?.chatId && actions.setReadChat(state.chat.chatId)
-          navigation.goBack()
-        }}
         onPressEnd={() => {
           Keyboard.dismiss()
           setState({
             selectionModalConfig: {
               titleColor: Colors.safeLightest,
               list: [
-                // {
-                //   Icon: state.chat?.notifications || state.chat?.notifications === null ? BellIcon : BellSolidIcon,
-                //   title: state.chat?.notifications || state.chat?.notifications === null ? Lit[systemStore.Locale].Button.Mute : Lit[systemStore.Locale].Button.Unmute,
-                //   disabled: !state.messages?.length, noRight: true, onPress: setNotifications,
-                // },
-                { Icon: ExclamationCircledIcon, image: state.match ? state.match.media[0]?.thumbnail : state.chat ? state.chat.media[0]?.thumbnail : undefined, title: Lit[systemStore.Locale].Button.Unmatch, noRight: true,
-                  onPress: () => null,
+                { Icon: ExclamationCircledIcon, image: state.match ? state.match.media[0]?.thumbnail : state.chat ? state.chat.media[0]?.thumbnail : undefined, title: Lit[systemStore.Locale].Button.Unmatch, noRight: true, onPress: () => {
+                  actions.unsetMatch({ userId: state.userId, })
+                  actions.unsetChat(state.userId)
+                  navigation.goBack()
+                }, },
+                state.chat && {
+                  Icon: state.chat?.notifications ? BellIcon : BellSolidIcon,
+                  title: state.chat?.notifications ? Lit[systemStore.Locale].Button.Mute : Lit[systemStore.Locale].Button.Unmute,
+                  disabled: !state.chat, noRight: true, onPress: () => {
+                    if (state.chat) {
+                      actions.setChatNotifications({ chatId: state.chat.chatId, notifications: !state.chat.notifications, })
+                      setState({ selectionModalConfig: null, chat: { ...state.chat, notifications: !state.chat.notifications, }, })
+                    }
+                  },
                 },
-                { Icon: ExclamationCircledIcon, title: Lit[systemStore.Locale].Button.Block, noRight: true, onPress: () => null, },
+                { Icon: ExclamationCircledIcon, title: Lit[systemStore.Locale].Button.Block, noRight: true, onPress: () => {
+
+                }, },
                 { Icon: ExclamationCircledIcon, title: Lit[systemStore.Locale].Button.Report, noRight: true, onPress: () => Linking.openURL(`${protocol[0]}${baseUrl}/help`), },
               ],
             }
@@ -144,14 +158,12 @@ const ChatBlock: React.FC<IChatBlockProps> = ({
                 <Message
                   item={item}
                   index={index}
-                  messages={messages.messages || []}
-                  // messageId={state.messageId}
-                  // messageIdTime={state.messageIdTime}
-                  // setMessageId={setMessageId}
-                  // setMessageIdTime={setMessageIdTime}
-                  // setMessageReaction={setMessageReaction}
                   systemStore={systemStore}
                   userId={userStore.user.userId}
+                  messages={messages.messages || []}
+                  messageId={state.messageId}
+                  messageIdTime={state.messageIdTime}
+                  setState={(params) => setState({ ...params, })}
                 />
               )
             }}
@@ -160,10 +172,10 @@ const ChatBlock: React.FC<IChatBlockProps> = ({
                 <View style={{height: state.keyboard ? 88 : 112,}} />
                 {/* {state.messageId &&
                   <TouchableOpacity
-                    onPress={() => setMessageId(null)}
+                    // onPress={() => setMessageId(null)}
                     style={{
                       position: 'absolute', zIndex: -1, width: '100%', display: 'flex',
-                      height: Dimensions.get('window').height * (state.messages?.length || 1) * 2, bottom: -Dimensions.get('window').height,
+                      height: Dimensions.get('window').height * (messages.messages?.length || 1) * 2, bottom: -Dimensions.get('window').height,
                     }}
                   >
                     <BlurView blurAmount={2} style={{position: 'absolute', zIndex: 0, width: '100%', height: '100%',}} />
@@ -173,25 +185,27 @@ const ChatBlock: React.FC<IChatBlockProps> = ({
             }
             ListFooterComponent={
               <>
-                {/* {state.messagesPage !== -1 && state.loading &&
+                {messages?.continue !== false && state.paginating &&
                   <ActivityIndicator color={Colors.lighter} style={{position: 'absolute', width: '100%', marginTop: 16, alignSelf: 'center',}} />
-                } */}
+                }
                 <View pointerEvents={'none'} style={{height: 160,}} />
+                <View style={{width: '100%', justifyContent: 'center', alignItems: 'center', paddingVertical: 16,}}>
+                  <Text style={{color: Colors.lighter, fontSize: Fonts.sm, fontWeight: Fonts.heavyWeight as any, textTransform: 'uppercase',}}>Matched with {state.chat?.name} {timePassedSince(state.chat?.chatDate || null, systemStore.Locale)}</Text>
+                </View>
               </>
             }
             inverted={true}
             onScrollBeginDrag={() => {
-              // if (state.messageId || state.messageIdTime) {
-              //   setMessageId(null)
-              //   setMessageIdTime(null)
-              // }
+              if (state.messageId || state.messageIdTime) setState({ messageId: null, messageIdTime: null, })
             }}
             showsVerticalScrollIndicator={false}
             keyboardDismissMode={'interactive'}
             keyboardShouldPersistTaps={'handled'}
-            onEndReached={() => {
-              if (state.chat && messages && messages.continue !== false) {
-                actions.setMessages({ chatId: state.chat.chatId, userId: state.userId, index: messages.messages.length || 0, })
+            onEndReached={async () => {
+              if (state.chat && messages && messages.continue !== false && !state.paginating) {
+                setState({ paginating: true, })
+                await actions.setMessages({ chatId: state.chat.chatId, userId: state.userId, index: messages.messages.length || 0, })
+                setState({ paginating: false, })
               }
             }}
             onEndReachedThreshold={0.2}
@@ -216,12 +230,7 @@ const ChatBlock: React.FC<IChatBlockProps> = ({
                   loading={state.sending}
                   disabled={state.sending}
                   onChangeText={(text: string) => actions.setChatMessage({ userId: state.userId, message: text, })}
-                  // placeholder={(state.chat?.private && !state.messages?.length)
-                  //   ? Lit[systemStore.Locale].Input.MessagesLimited
-                  //   : state.chat?.isBlocking || state.chat?.isBlocker
-                  //     ? Lit[systemStore.Locale].Input.MessagesBlocked
-                  //     : Lit[systemStore.Locale].Input.Message
-                  // }
+                  placeholder={`${Lit[systemStore.Locale].Button.Message}...`}
                   multiline={true}
                   EndIcon={SendIcon}
                   exceedChars={InputLimits.DescriptionMin}
