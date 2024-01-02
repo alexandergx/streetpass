@@ -4,6 +4,8 @@ import {
   ScrollView,
   Text,
   Linking,
+  Animated,
+  Dimensions,
 } from 'react-native'
 import NavHeader from '../navigation/NavHeader'
 import { BlurView } from '@react-native-community/blur'
@@ -40,13 +42,35 @@ interface IProfileSettingsModalState {
   signingOut: boolean,
 }
 class UserSettingsModal extends React.Component<IProfileSettingsModalProps> {
+  constructor(props: IProfileSettingsModalProps) {
+    super(props)
+    this.fadeAnim = new Animated.Value(0)
+    this.heightAnim = new Animated.Value(Dimensions.get('window').height)
+  }
+  fadeAnim: Animated.Value
+  heightAnim: Animated.Value
+
   state: IProfileSettingsModalState = {
     settings: true,
     signingOut: false,
   }
 
+  componentDidMount() {
+    Animated.parallel([
+      Animated.timing(this.fadeAnim, { toValue: 1, duration: 200, useNativeDriver: true, }),
+      Animated.timing(this.heightAnim, { toValue: 0, duration: 200, useNativeDriver: true, }),
+    ]).start()
+  }
+
+  close = () => {
+    Animated.parallel([
+      Animated.timing(this.fadeAnim, { toValue: 0, duration: 100, useNativeDriver: true, }),
+      Animated.timing(this.heightAnim, { toValue: Dimensions.get('window').height, duration: 200, useNativeDriver: true, }),
+    ]).start(() => this.props.toggleModal())
+  }
+
   render() {
-    const { navigation, systemStore, userStore, toggleModal, handleSignOut, }: IProfileSettingsModalProps = this.props
+    const { navigation, systemStore, userStore, handleSignOut, }: IProfileSettingsModalProps = this.props
     const { Colors, Fonts, } = systemStore
 
     const profileConfig: IListGroupConfig = {
@@ -88,33 +112,35 @@ class UserSettingsModal extends React.Component<IProfileSettingsModalProps> {
     }
 
     return (
-      <BlurView blurType={Colors.darkBlur as any} style={{position: 'absolute', zIndex: 2, width: '100%', height: '100%',}}>
-        <NavHeader
-          systemStore={systemStore}
-          title={Lit[systemStore.Locale].Title.Settings}
-          color={Colors.lightest}
-          StartIcon={CrossIcon}
-          onPress={() => this.state.signingOut ? null : toggleModal()}
-        />
+      <Animated.View style={{position: 'absolute', zIndex: 2, width: '100%', height: '100%', opacity: this.fadeAnim, transform: [{ translateY: this.heightAnim }],}}>
+        <BlurView blurType={Colors.darkBlur as any} style={{width: '100%', height: '100%',}}>
+          <NavHeader
+            systemStore={systemStore}
+            title={Lit[systemStore.Locale].Title.Settings}
+            color={Colors.lightest}
+            StartIcon={CrossIcon}
+            onPress={() => this.state.signingOut ? null : this.close()}
+          />
 
-        <View style={{flex: 1, width: '100%', height: '100%',}}>
+          <View style={{flex: 1, width: '100%', height: '100%',}}>
 
-          <ScrollView showsVerticalScrollIndicator={false} style={{width: '100%', height: '100%', paddingHorizontal: 16,}} >
-            <ListGroup systemStore={systemStore} config={profileConfig} />
-            <ListGroup systemStore={systemStore} config={accountConfig} />
-            <ListGroup systemStore={systemStore} config={supportConfig} />
+            <ScrollView showsVerticalScrollIndicator={false} style={{width: '100%', height: '100%', paddingHorizontal: 16,}} >
+              <ListGroup systemStore={systemStore} config={profileConfig} />
+              <ListGroup systemStore={systemStore} config={accountConfig} />
+              <ListGroup systemStore={systemStore} config={supportConfig} />
 
-            <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginVertical: 32,}}>
-              <AppTitle systemStore={systemStore} fontSize={Fonts.sm} fontWeight={Fonts.lightWeight} />
-              <Text
-                style={{color: Colors.light, fontWeight: Fonts.lightWeight as any, fontSize: Fonts.sm,}}
-              > v{AppVersion}</Text>
-            </View>
+              <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginVertical: 32,}}>
+                <AppTitle systemStore={systemStore} fontSize={Fonts.sm} fontWeight={Fonts.lightWeight} />
+                <Text
+                  style={{color: Colors.light, fontWeight: Fonts.lightWeight as any, fontSize: Fonts.sm,}}
+                > v{AppVersion}</Text>
+              </View>
 
-            <View style={{height: 32,}} />
-          </ScrollView>
-        </View>
-      </BlurView>
+              <View style={{height: 32,}} />
+            </ScrollView>
+          </View>
+        </BlurView>
+      </Animated.View>
     )
   }
 }

@@ -1,5 +1,6 @@
-import React, { RefObject, useState } from 'react'
+import React, { RefObject, useEffect, useRef, useState } from 'react'
 import {
+  Animated,
   Dimensions,
   StyleSheet,
   Text, TouchableWithoutFeedback, View,
@@ -38,13 +39,28 @@ interface IStreetpassModalProps {
   streetpassCardRef?: RefObject<CardItemHandle> | null,
   streetpassImageIndex: number | null,
   hideActions?: boolean,
-  unsetStreetpass: () => void,
+  toggleModal: () => void,
   actions: {
     unsetMatch: (params: IUnsetMatch) => void,
     unsetChat: (params: IUnsetChat) => void,
   }
 }
-const StreetpassModal: React.FC<IStreetpassModalProps> = ({ navigation, systemStore, streetpass, streetpassCardRef, streetpassImageIndex, hideActions, unsetStreetpass, actions, }) => {
+const StreetpassModal: React.FC<IStreetpassModalProps> = ({ navigation, systemStore, streetpass, streetpassCardRef, streetpassImageIndex, hideActions, toggleModal, actions, }) => {
+  const fadeAnim = useRef(new Animated.Value(0)).current
+  const heightAnim = useRef(new Animated.Value(Dimensions.get('window').height)).current
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true, }),
+      Animated.timing(heightAnim, { toValue: 0, duration: 150, useNativeDriver: true, }),
+    ]).start()
+  }, [fadeAnim, heightAnim])
+  const close = () => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, { toValue: 0, duration: 200, useNativeDriver: true, }),
+      Animated.timing(heightAnim, { toValue: Dimensions.get('window').height * 0.8, duration: 200, useNativeDriver: true, }),
+    ]).start(() => toggleModal())
+  }
+
   const { Colors, Fonts, } = systemStore
   const streetpassCarouselRef: RefObject<ICarouselInstance> = React.createRef()
   const [imageIndex, setImageIndex] = useState<number>(streetpassImageIndex || 0)
@@ -53,8 +69,8 @@ const StreetpassModal: React.FC<IStreetpassModalProps> = ({ navigation, systemSt
   const swipeRight = streetpassCardRef?.current?.swipeRight
 
   return (
-    <>
-      <BlurView blurType={Colors.darkBlur as any} style={{position: 'absolute', zIndex: 3, width: '100%', height: '100%',}}>
+    <Animated.View style={{position: 'absolute', zIndex: 3, width: '100%', height: '100%', opacity: fadeAnim, transform: [{ translateY: heightAnim }],}}>
+      <BlurView blurType={Colors.darkBlur} style={{width: '100%', height: '100%',}}>
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={{marginTop: 64,}}>
             <Carousel
@@ -139,7 +155,7 @@ const StreetpassModal: React.FC<IStreetpassModalProps> = ({ navigation, systemSt
                           actions.unsetChat(streetpass.userId)
                           navigation.goBack()
                         } else {
-                          await unsetStreetpass()
+                          await toggleModal()
                           swipeLeft && swipeLeft()
                         }
                       }, },
@@ -156,7 +172,7 @@ const StreetpassModal: React.FC<IStreetpassModalProps> = ({ navigation, systemSt
               <View style={{flex: 0, justifyContent: 'center',}}>
                 <TouchableOpacity
                   activeOpacity={Colors.activeOpacity}
-                  onPress={unsetStreetpass}
+                  onPress={close}
                 >
                   <ChevronDownIcon fill={Colors.safeLightest} width={32} height={32} />
                 </TouchableOpacity>
@@ -174,7 +190,7 @@ const StreetpassModal: React.FC<IStreetpassModalProps> = ({ navigation, systemSt
               <View style={{flex: 0, flexDirection: 'row',}}>
                 <TouchableOpacity
                   onPress={async () => {
-                    await unsetStreetpass()
+                    await toggleModal()
                     swipeLeft && swipeLeft()
                   }}
                   activeOpacity={Colors.activeOpacity}
@@ -185,7 +201,7 @@ const StreetpassModal: React.FC<IStreetpassModalProps> = ({ navigation, systemSt
 
                 <TouchableOpacity
                   onPress={async () => {
-                    await unsetStreetpass()
+                    await toggleModal()
                     swipeRight && swipeRight()
                   }}
                   activeOpacity={Colors.activeOpacity}
@@ -222,7 +238,7 @@ const StreetpassModal: React.FC<IStreetpassModalProps> = ({ navigation, systemSt
           <SelectionModal systemStore={systemStore} config={selectionModalConfig} toggleModal={() => setSelectionModalConfig(null)} />
         }
       </BlurView>
-    </>
+    </Animated.View>
   )
 }
 

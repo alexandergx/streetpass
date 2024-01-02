@@ -197,7 +197,7 @@ class StreetpassScreen extends React.Component<IStreetpassScreenProps> {
             streetpass={this.state.streetpass}
             streetpassCardRef={this.streetpassCardRefs[this.state.streetpass.userId]}
             streetpassImageIndex={this.state.streetpassImageIndex}
-            unsetStreetpass={() => this.setState({ streetpass: null, streetpassImageIndex: null, })}
+            toggleModal={() => this.setState({ streetpass: null, streetpassImageIndex: null, })}
             actions={{
               unsetMatch: actions.unsetMatch,
               unsetChat: actions.unsetChat,

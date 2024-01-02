@@ -1,5 +1,5 @@
 import React from 'react'
-import { Alert, KeyboardAvoidingView, ScrollView, View, } from 'react-native'
+import { KeyboardAvoidingView, ScrollView, View, Animated, Dimensions, } from 'react-native'
 import { IUserStore } from '../../state/reducers/UserReducer'
 import { ISystemStore } from '../../state/reducers/SystemReducer'
 import ListGroup, { IListGroupConfig, } from '../listGroup'
@@ -34,6 +34,28 @@ export interface IStreetpassSettingsModalState {
   scroll: boolean,
 }
 class StreetpassSettingsModal extends React.Component<IStreetpassSettingsModalProps> {
+  constructor(props: IStreetpassSettingsModalProps) {
+    super(props)
+    this.fadeAnim = new Animated.Value(0)
+    this.heightAnim = new Animated.Value(Dimensions.get('window').height)
+  }
+  fadeAnim: Animated.Value
+  heightAnim: Animated.Value
+
+  componentDidMount() {
+    Animated.parallel([
+      Animated.timing(this.fadeAnim, { toValue: 1, duration: 200, useNativeDriver: true, }),
+      Animated.timing(this.heightAnim, { toValue: 0, duration: 200, useNativeDriver: true, }),
+    ]).start()
+  }
+
+  close = () => {
+    Animated.parallel([
+      Animated.timing(this.fadeAnim, { toValue: 0, duration: 100, useNativeDriver: true, }),
+      Animated.timing(this.heightAnim, { toValue: Dimensions.get('window').height, duration: 200, useNativeDriver: true, }),
+    ]).start(() => this.props.toggleModal())
+  }
+
   state: IStreetpassSettingsModalState = {
     streetpass: this.props.userStore.user.streetpass,
     discoverable: this.props.userStore.user.streetpassPreferences.discoverable,
@@ -63,12 +85,12 @@ class StreetpassSettingsModal extends React.Component<IStreetpassSettingsModalPr
         },
       })
       this.setState({ loading: false, })
-      this.props.toggleModal()
-    } else this.props.toggleModal()
+      this.close()
+    } else this.close()
   }
 
   render() {
-    const { systemStore, toggleModal, }: IStreetpassSettingsModalProps = this.props
+    const { systemStore, }: IStreetpassSettingsModalProps = this.props
     const { Colors, } = systemStore
 
     const streetpassConfig: IListGroupConfig = {
@@ -107,20 +129,10 @@ class StreetpassSettingsModal extends React.Component<IStreetpassSettingsModalPr
       ],
     }
 
-    // const locationConfig: IListGroupConfig = {
-    //   title: Lit[systemStore.Locale].Title.VisibleOnMap,
-    //   list: [
-    //     {
-    //       title: Lit[systemStore.Locale].Title.StreetpassLocation, toggleValue: this.state.location, onToggle: () => this.setState({ location: !this.state.location, }),
-    //       description: Lit[systemStore.Locale].Copywrite.StreetpassLocationDescription,
-    //     },
-    //   ],
-    // }
-
     return (
-      <>
-        <BlurView blurType={Colors.darkBlur as any} style={{position: 'absolute', zIndex: 3, width: '100%', height: '100%',}}>
-          <NavHeader systemStore={systemStore} color={Colors.lightest} StartIcon={CrossIcon} onPress={toggleModal} />
+      <Animated.View style={{position: 'absolute', zIndex: 3, width: '100%', height: '100%', opacity: this.fadeAnim, transform: [{ translateY: this.heightAnim }],}}>
+        <BlurView blurType={Colors.darkBlur as any} style={{width: '100%', height: '100%',}}>
+          <NavHeader systemStore={systemStore} color={Colors.lightest} StartIcon={CrossIcon} onPress={this.close} />
 
           <KeyboardAvoidingView
             behavior={'padding'}
@@ -147,8 +159,6 @@ class StreetpassSettingsModal extends React.Component<IStreetpassSettingsModalPr
                       onSlidingEnd={() => this.setState({ scroll: true, })}
                     />
                     <ListGroup systemStore={systemStore} config={discoverableConfig} />
-                    {/* <ListGroup systemStore={systemStore} config={locationConfig} /> */}
-
                     <View style={{height: 32,}} />
                   </>
                 }
@@ -165,7 +175,7 @@ class StreetpassSettingsModal extends React.Component<IStreetpassSettingsModalPr
             </View>
           </KeyboardAvoidingView>
         </BlurView>
-      </>
+      </Animated.View>
     )
   }
 }

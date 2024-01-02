@@ -96,7 +96,7 @@ const ChatBlock: React.FC<IChatBlockProps> = ({
           streetpass={state.streetpass}
           streetpassImageIndex={0}
           hideActions={true}
-          unsetStreetpass={() => setState({ streetpass: state.streetpass ? null : state.match, })}
+          toggleModal={() => setState({ streetpass: state.streetpass ? null : state.match, })}
           actions={{
             unsetMatch: actions.unsetMatch,
             unsetChat: actions.unsetChat,

@@ -2,6 +2,8 @@ import React from 'react'
 import {
   View,
   TouchableOpacity,
+  Animated,
+  Dimensions,
 } from 'react-native'
 import Button from '../button'
 import ListGroup, { IListGroupConfig } from '../listGroup'
@@ -20,8 +22,30 @@ interface ISelectionModalState {
   settings: boolean,
 }
 class SelectionModal extends React.Component<ISelectionModalProps> {
+  constructor(props: ISelectionModalProps) {
+    super(props)
+    this.fadeAnim = new Animated.Value(0)
+    this.heightAnim = new Animated.Value(Dimensions.get('window').height)
+  }
+  fadeAnim: Animated.Value
+  heightAnim: Animated.Value
+
   state: ISelectionModalState = {
     settings: true,
+  }
+
+  componentDidMount() {
+    Animated.parallel([
+      Animated.timing(this.fadeAnim, { toValue: 1, duration: 200, useNativeDriver: true, }),
+      Animated.timing(this.heightAnim, { toValue: 0, duration: 200, useNativeDriver: true, }),
+    ]).start()
+  }
+
+  close = () => {
+    Animated.parallel([
+      Animated.timing(this.fadeAnim, { toValue: 0, duration: 100, useNativeDriver: true, }),
+      Animated.timing(this.heightAnim, { toValue: Dimensions.get('window').height, duration: 200, useNativeDriver: true, }),
+    ]).start(() => this.props.toggleModal())
   }
 
   render() {
@@ -30,13 +54,17 @@ class SelectionModal extends React.Component<ISelectionModalProps> {
 
     return (
       <TouchableOpacity
-        onPress={this.props.toggleModal}
+        onPress={this.close}
         activeOpacity={1}
         style={{position: 'absolute', zIndex: 3, width: '100%', height: '100%',}}
       >
-        {!clear && <BlurView blurAmount={2} style={{position: 'absolute', zIndex: -1, width: '100%', height: '100%', display: 'flex',}} />}
+        {!clear &&
+          <Animated.View style={{position: 'absolute', zIndex: -1, width: '100%', height: '100%', opacity: this.fadeAnim,}}>
+            <BlurView blurAmount={2} style={{width: '100%', height: '100%',}} />
+          </Animated.View>
+        }
 
-        <View style={{flex: 1, width: '100%', height: '100%', justifyContent: 'flex-end', marginBottom: 16, paddingBottom: 16,}}>
+        <Animated.View style={{flex: 1, width: '100%', height: '100%', justifyContent: 'flex-end', marginBottom: 16, paddingBottom: 16, transform: [{ translateY: this.heightAnim }],}}>            
           <View>
             <LinearGradient
               style={{position: 'absolute', zIndex: 0, width: '100%', height: '150%', bottom: -64,}}
@@ -51,12 +79,12 @@ class SelectionModal extends React.Component<ISelectionModalProps> {
                   systemStore={systemStore}
                   title={Lit[systemStore.Locale].Button.Done}
                   color={Colors.darkerBackground}
-                  onPress={this.props.toggleModal}
+                  onPress={this.close}
                 />
               </View>
             </View>
           </View>
-        </View>
+        </Animated.View>
       </TouchableOpacity>
     )
   }

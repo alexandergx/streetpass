@@ -70,6 +70,7 @@ export class StreetpassService {
           },
         },
       ])
+      // console.log(input, users)
       let streetpasses = []
       for (const user of users) {
         const streetpassed = await this.streetpassedModel.updateOne({ userId: userId, }, { $addToSet: { streetpassed: user._id.toString(), }, })

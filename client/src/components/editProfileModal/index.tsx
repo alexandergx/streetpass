@@ -1,5 +1,5 @@
 import React, { RefObject } from 'react'
-import { Dimensions, Keyboard, KeyboardAvoidingView, ScrollView, Text, TouchableOpacity, View, } from 'react-native'
+import { Animated, Dimensions, Keyboard, KeyboardAvoidingView, ScrollView, Text, TouchableOpacity, View, } from 'react-native'
 import { IMedia, IUserStore } from '../../state/reducers/UserReducer'
 import { ISystemStore } from '../../state/reducers/SystemReducer'
 import { BlurView } from '@react-native-community/blur'
@@ -58,9 +58,13 @@ export interface IEditProfileModalState {
 class EditProfileModal extends React.Component<IEditProfileModalProps> {
   constructor(props: IEditProfileModalProps) {
     super(props)
+    this.fadeAnim = new Animated.Value(0)
+    this.heightAnim = new Animated.Value(Dimensions.get('window').height)
     this.scrollRef = React.createRef()
     this.profileMediaRef = React.createRef()
   }
+  fadeAnim: Animated.Value
+  heightAnim: Animated.Value
   scrollRef: RefObject<ScrollView>
   profileMediaRef: RefObject<ProfileMediaMethods>
 
@@ -85,11 +89,22 @@ class EditProfileModal extends React.Component<IEditProfileModalProps> {
   componentDidMount () {
     this.keyboardWillShowListener = Keyboard.addListener('keyboardWillShow', this.keyboardWillShow)
     this.keyboardWillHideListener = Keyboard.addListener('keyboardWillHide', this.keyboardWillHide)
+    Animated.parallel([
+      Animated.timing(this.fadeAnim, { toValue: 1, duration: 200, useNativeDriver: true, }),
+      Animated.timing(this.heightAnim, { toValue: 0, duration: 200, useNativeDriver: true, }),
+    ]).start()
   }
 
   componentWillUnmount () {
     this.keyboardWillShowListener.remove()
     this.keyboardWillHideListener.remove()
+  }
+
+  close = () => {
+    Animated.parallel([
+      Animated.timing(this.fadeAnim, { toValue: 0, duration: 100, useNativeDriver: true, }),
+      Animated.timing(this.heightAnim, { toValue: Dimensions.get('window').height, duration: 200, useNativeDriver: true, }),
+    ]).start(() => this.props.toggleModal())
   }
 
   handleUpdateProfile = async () => {
@@ -103,24 +118,24 @@ class EditProfileModal extends React.Component<IEditProfileModalProps> {
       )) await this.props.actions.setUpdateUser({ bio: this.state.bio, work: this.state.work, school: this.state.school, })
       await this.props.actions.setUser()
       // this.props.navigation.navigate(Screens.Streetpass)
-      this.props.onPress ? this.props.onPress() : this.props.toggleModal()
+      this.props.onPress ? this.props.onPress() : this.close()
     }
     this.setState({ loading: false, editProfile: true, })
   }
 
   render() {
-    const { systemStore, userStore, toggleModal, onPress, }: IEditProfileModalProps = this.props
+    const { systemStore, userStore, onPress, }: IEditProfileModalProps = this.props
     const { Colors, Fonts, } = systemStore
 
     return (
-      <>
+      <Animated.View style={{position: 'absolute', zIndex: 3, width: '100%', height: '100%', opacity: this.fadeAnim, transform: [{ translateY: this.heightAnim }],}}>
         <BlurView blurType={Colors.darkBlur as any} style={{position: 'absolute', zIndex: 3, width: '100%', height: '100%',}}>
           <NavHeader
             systemStore={systemStore}
             title={`${userStore.user.name}`}
             color={Colors.lightest}
             StartIcon={onPress ? undefined : CrossIcon}
-            onPress={toggleModal}
+            onPress={this.close}
           />
 
           <KeyboardAvoidingView
@@ -224,7 +239,7 @@ class EditProfileModal extends React.Component<IEditProfileModalProps> {
         {this.state.selectionModalConfig &&
           <SelectionModal systemStore={systemStore} config={this.state.selectionModalConfig} toggleModal={() => this.setState({ selectionModalConfig: null, })} />
         }
-      </>
+      </Animated.View>
     )
   }
 }
