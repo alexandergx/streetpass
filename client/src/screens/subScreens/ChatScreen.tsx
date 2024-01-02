@@ -126,14 +126,13 @@ class ChatScreen extends React.Component<IChatScreenProps> {
 
   appStateChange = (nextAppState: any) => {
     if ((this.state.appState === 'inactive' && nextAppState === 'background') || (this.state.appState === 'background' && nextAppState === 'active')) {
-      console.log('[APP STATE CHANGE]', this.state.appState, nextAppState)
       if (this.state.chat && this.state.chat.unread) this.props.actions.setReadChat({ chatId: this.state.chat.chatId, })
     }
     this.setState({ appState: nextAppState, })
   }
 
   render() {
-    const { navigation, route, systemStore, userStore, chatsStore, actions, }: IChatScreenProps = this.props
+    const { navigation, systemStore, userStore, chatsStore, actions, }: IChatScreenProps = this.props
 
     return (
       <>

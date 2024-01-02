@@ -43,6 +43,7 @@ import { sendMessage } from '../../api/chats'
 import { ISetChatMessage, ISetChatNotifications, ISetMessages, ISetReadChat, IUnsetChat } from '../../state/actions/ChatsActions'
 import { IUnsetMatch } from '../../state/actions/MatchesActions'
 import { timePassedSince } from '../../utils/functions'
+import { blockUser } from '../../api/user'
 
 const MMKV = new MMKVLoader().withEncryption().withInstanceID(LocalStorage.AuthStore).initialize()
 
@@ -132,7 +133,10 @@ const ChatBlock: React.FC<IChatBlockProps> = ({
                   },
                 },
                 { Icon: ExclamationCircledIcon, title: Lit[systemStore.Locale].Button.Block, noRight: true, onPress: () => {
-
+                  blockUser({ userId: state.userId, })
+                  actions.unsetMatch({ userId: state.userId, pass: true, })
+                  actions.unsetChat(state.userId)
+                  navigation.goBack()
                 }, },
                 { Icon: ExclamationCircledIcon, title: Lit[systemStore.Locale].Button.Report, noRight: true, onPress: () => Linking.openURL(`${protocol[0]}${baseUrl}/help`), },
               ],

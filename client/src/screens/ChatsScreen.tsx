@@ -34,6 +34,7 @@ import { IMatchesStore } from '../state/reducers/MatchesReducer'
 import { IUnsetMatch, unsetMatch } from '../state/actions/MatchesActions'
 import { IChatsStore } from '../state/reducers/ChatsReducer'
 import { IUnsetChat, unsetChat } from '../state/actions/ChatsActions'
+import { blockUser } from '../api/user'
 
 const mapStateToProps = (state: IStores) => {
   const { systemStore, userStore, matchesStore, chatsStore, } = state
@@ -226,7 +227,11 @@ class ChatsScreen extends React.Component<IChatsScreenProps> {
                                     actions.unsetChat(item.item.userId)
                                     this.setState({ matchId: null, selectionModalConfig: null, })
                                   }, },
-                                  { Icon: DeleteIcon, title: Lit[systemStore.Locale].Button.Block, noRight: true, onPress: () => null, },
+                                  { Icon: DeleteIcon, title: Lit[systemStore.Locale].Button.Block, noRight: true, onPress: () => {
+                                    blockUser({ userId: item.item.userId, })
+                                    actions.unsetMatch({ userId: item.item.userId, pass: true, })
+                                    actions.unsetChat(item.item.userId)
+                                  }, },
                                   { Icon: ExclamationIcon, title: Lit[systemStore.Locale].Button.Report, noRight: true, onPress: () => null, },
                                 ],
                               }
