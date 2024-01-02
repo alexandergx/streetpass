@@ -31,9 +31,9 @@ import { Lit, } from '../utils/locale'
 import AnimatedBackground from '../components/animated/AnimatedBackground'
 import { ThemeTypes } from '../utils/themes'
 import { IMatchesStore } from '../state/reducers/MatchesReducer'
-import { IUnsetMatch, unsetMatch } from '../state/actions/MatchesActions'
+import { ISetMatches, IUnsetMatch, setMatches, unsetMatch } from '../state/actions/MatchesActions'
 import { IChatsStore } from '../state/reducers/ChatsReducer'
-import { IUnsetChat, unsetChat } from '../state/actions/ChatsActions'
+import { ISetChats, ISetChatsSearch, IUnsetChat, setChats, setChatsSearch, unsetChat, unsetChatsSearch } from '../state/actions/ChatsActions'
 import { blockUser } from '../api/user'
 
 const mapStateToProps = (state: IStores) => {
@@ -43,8 +43,12 @@ const mapStateToProps = (state: IStores) => {
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => ({
   actions: bindActionCreators(Object.assign(
     {
-      unsetMatch,
+      setChats,
       unsetChat,
+      setChatsSearch,
+      unsetChatsSearch,
+      setMatches,
+      unsetMatch,
     }
   ), dispatch),
 })
@@ -56,8 +60,12 @@ interface IChatsScreenProps {
   matchesStore: IMatchesStore,
   chatsStore: IChatsStore,
   actions: {
-    unsetMatch: (params: IUnsetMatch) => void,
+    setChats: (params: ISetChats) => void,
     unsetChat: (params: IUnsetChat) => void,
+    setChatsSearch: (params: ISetChatsSearch) => void,
+    unsetChatsSearch: () => void,
+    setMatches: (params: ISetMatches) => void,
+    unsetMatch: (params: IUnsetMatch) => void,
   },
 }
 interface IChatsScreenState {
@@ -66,11 +74,16 @@ interface IChatsScreenState {
   matchId: string | null,
   chatId: string | null,
   keyboard: boolean,
+  paginatingMatches: boolean,
+  paginatingChats: boolean,
 }
 class ChatsScreen extends React.Component<IChatsScreenProps> {
   constructor(props: IChatsScreenProps) {
     super(props)
+    this.inputRef = this.inputRef.bind(this)
   }
+  childInputRef: any
+  inputRef(input: any) { this.childInputRef = input }
 
   state: IChatsScreenState = {
     search: '',
@@ -78,6 +91,8 @@ class ChatsScreen extends React.Component<IChatsScreenProps> {
     matchId: null,
     chatId: null,
     keyboard: false,
+    paginatingMatches: false,
+    paginatingChats: true,
   }
 
   private keyboardWillShowListener: any
@@ -144,7 +159,7 @@ class ChatsScreen extends React.Component<IChatsScreenProps> {
                                 }
                               })}
                               activeOpacity={Colors.activeOpacity}
-                              style={{marginLeft: item.index === 0 ? 16 : 0, marginRight: matchesStore.matches && item.index === matchesStore.matches.length - 1 ? 16 : 8, width: 112, aspectRatio: 1/1.2, borderRadius: 16, overflow: 'hidden',}}
+                              style={{marginLeft: item.index === 0 ? 16 : 0, marginRight: matchesStore.matches && item.index === matchesStore.matches.length - 1 ? 16 : 8, width: 96, aspectRatio: 1/1.2, borderRadius: 16, overflow: 'hidden',}}
                               >
                               {(this.state.matchId || this.state.chatId) && this.state.matchId !== item.item.userId &&
                                 <BlurView
@@ -173,41 +188,47 @@ class ChatsScreen extends React.Component<IChatsScreenProps> {
                       }}
                       keyboardDismissMode={'interactive'}
                       keyboardShouldPersistTaps={'handled'}
-                      onEndReached={() => null}
+                      onEndReached={async () => {
+                        if (matchesStore.matches && matchesStore.continue && !this.state.paginatingMatches) {
+                          this.setState({ paginatingMatches: true, })
+                          await actions.setMatches({ index: matchesStore.matches.length, })
+                          this.setState({ paginatingMatches: false, })
+                        }
+                      }}
                       // onEndReachedThreshold={0.2}
                       />
                   </View>
                 }
 
-                {/* <Text style={{paddingHorizontal: 16, marginTop: 16, marginBottom: 8, color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.cruiserWeight,}}>Chats</Text> */}
+                <Text style={{paddingHorizontal: 16, marginTop: 24, color: Colors.lightest, fontSize: Fonts.md, fontWeight: Fonts.cruiserWeight,}}>
+                  {chatsStore.chatsSearch ? Lit[systemStore.Locale].Title.SearchResults : Lit[systemStore.Locale].Title.Chats}
+                </Text>
 
-                <View style={{flex: 0, width: '100%', marginTop: 16, marginBottom: 8, justifyContent: 'flex-end', alignItems: 'center', paddingHorizontal: 16,}}>
+                <View style={{flex: 0, width: '100%', marginBottom: 8, justifyContent: 'flex-end', alignItems: 'center', paddingHorizontal: 16,}}>
                   <ButtonInput
                     systemStore={systemStore}
-                    // inputRef={this.inputRef}
-                    // childInputRef={this.childInputRef}
-                    value={''}
-                    onChangeText={() => null}
-                    placeholder={'Search chats'}
+                    inputRef={this.inputRef}
+                    childInputRef={this.childInputRef}
+                    value={this.state.search}
+                    onChangeText={(text) => {
+                      this.setState({ search: text, })
+                      if (text.length > 0) actions.setChatsSearch({ name: text, })
+                      else actions.unsetChatsSearch()
+                    }}
+                    placeholder={Lit[systemStore.Locale].Title.SearchChats}
                     StartIcon={SearchIcon}
-                    // onPressStart={() => this.childInputRef.focus()}
-                    // EndIcon={this.state.search.length > 0 || this.props.chatsStore.chatsSearch ? CrossIcon : undefined}
-                    onPressEnd={() => null}
+                    onPressStart={() => this.childInputRef.focus()}
+                    EndIcon={this.state.search.length > 0 || this.props.chatsStore.chatsSearch ? CrossIcon : undefined}
+                    onPressEnd={() => {
+                      this.setState({ search: '', })
+                      actions.unsetChatsSearch()
+                    }}
                   />
-                  {/* {this.state.search.length > 0 &&
-                    <>
-                      <View style={{marginBottom: 8, alignSelf: 'flex-start',}}>
-                        <Text style={{color: Colors.lightest, fontWeight: Fonts.middleWeight as any,}}>
-                          {!this.props.chatsStore.chatsSearch && !this.state.searchLoading && this.state.search.length > 2 ? Lit[systemStore.Locale].Copywrite.NoResults : Lit[systemStore.Locale].Copywrite.SearchResults}
-                        </Text>
-                      </View>
-                    </>
-                  } */}
                 </View>
 
                 <View style={{minHeight: 72,}}>
                   <FlashList
-                    data={chatsStore.chatsSearch.length ? chatsStore.chatsSearch : chatsStore.chats ? chatsStore.chats : []}
+                    data={chatsStore.chatsSearch ? chatsStore.chatsSearch : chatsStore.chats ? chatsStore.chats : []}
                     extraData={{ matchId: this.state.chatId, chatId: this.state.chatId, }}
                     estimatedItemSize={72}
                     showsVerticalScrollIndicator={false}
@@ -284,19 +305,19 @@ class ChatsScreen extends React.Component<IChatsScreenProps> {
                                 </View>
                               </View>
                             </View>
-
-                            {/* {item.item.chatId && this.state.chatLoading.includes(item.chatId) &&
-                              <View style={{position: 'absolute', right: 0, marginRight: 22,}}>
-                                <ActivityIndicator color={Colors.lighter} />
-                              </View>
-                            } */}
                           </TouchableOpacity>
                         </>
                       )
                     }}
                     keyboardDismissMode={'interactive'}
                     keyboardShouldPersistTaps={'handled'}
-                    onEndReached={() => null}
+                    onEndReached={async () => {
+                      if (chatsStore.chats && chatsStore.continue && !this.state.paginatingChats) {
+                        this.setState({ paginatingChats: true, })
+                        await actions.setChats({ index: chatsStore.chats.length, })
+                        this.setState({ paginatingChats: false, })
+                      }
+                    }}
                     // onEndReachedThreshold={0.2}
                   />
                 </View>

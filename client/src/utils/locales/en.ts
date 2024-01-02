@@ -25,6 +25,8 @@ const Locale: ILocale = {
     Alerts: 'Alerts',
     Messages: 'Messages',
     Matches: 'Matches',
+    Chats: 'Chats',
+    SearchResults: 'Search results',
     NoMatches: 'No matches',
     Streetpasses: 'Streetpasses',
     Email: 'Email',
@@ -56,6 +58,7 @@ const Locale: ILocale = {
     Work: 'Work',
     School: 'School',
     Settings: 'Settings',
+    SearchChats: 'Search chats',
 
     DefaultCamera: 'Default front camera',
     SaveCapturedMedia: 'Save to camera roll',
@@ -80,6 +83,7 @@ const Locale: ILocale = {
     Bio: 'Say something about yourself',
     Work: 'What you do for work',
     School: 'Where did you graduate',
+    MatchedWith: 'Matched with',
 
     DiscardMedia: ['Discard media?', 'You will lose any changes made.'],
     CameraRequired: ['Camera required', 'Please allow access to your Camera in app settings.'],

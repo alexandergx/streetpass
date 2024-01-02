@@ -21,10 +21,7 @@ const App: React.FC<null> = () => {
     <GestureHandlerRootView style={{flex: 1,}}>
       <ApolloProvider client={customClient}>
         <Provider store={store}>
-          <StatusBar
-            barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-            backgroundColor={backgroundStyle.backgroundColor}
-          />
+          <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} backgroundColor={backgroundStyle.backgroundColor} />
           <AppNavigation />
         </Provider>
       </ApolloProvider>

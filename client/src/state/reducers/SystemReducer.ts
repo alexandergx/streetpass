@@ -1,3 +1,4 @@
+import { Appearance, } from 'react-native'
 import { Themes } from '../../utils/themes'
 import { MMKVLoader, } from 'react-native-mmkv-storage'
 import { LocalStorage, SystemStore } from '../../utils/constants'
@@ -14,7 +15,10 @@ export interface ISystemStore {
 
 const MMKVSystem = new MMKVLoader().withInstanceID(LocalStorage.SystemStore).initialize()
 const savedTheme = MMKVSystem.getString(SystemStore.Theme) as keyof typeof Themes
-const theme = savedTheme && Object.keys(Themes).includes(savedTheme) ? savedTheme : Object.keys(Themes)[0] as keyof typeof Themes
+const theme = savedTheme && Object.keys(Themes).includes(savedTheme)
+  ? savedTheme : Appearance.getColorScheme() === 'light'
+    ? Object.keys(Themes)[0] as keyof typeof Themes : Appearance.getColorScheme() === 'dark'
+      ? Object.keys(Themes)[1] as keyof typeof Themes : Object.keys(Themes)[0] as keyof typeof Themes
 const locale = (Platform.OS === 'ios'
   ? NativeModules.SettingsManager.settings.AppleLocale || NativeModules.SettingsManager.settings.AppleLanguages[0]
   : NativeModules.I18nManager.localeIdentifier).split('_')[0]

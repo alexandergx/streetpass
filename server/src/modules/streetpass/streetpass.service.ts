@@ -55,7 +55,7 @@ export class StreetpassService {
           $geoNear: {
             near: { type: 'Point', coordinates: [input.lon, input.lat], },
             distanceField: 'dist.calculated',
-            maxDistance: 30,
+            maxDistance: 30000,
             spherical: true,
           },
         },

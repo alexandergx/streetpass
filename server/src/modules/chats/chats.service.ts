@@ -79,7 +79,7 @@ export class ChatsService {
     const { userId, } = this.jwtService.decode(context.req.headers['access-token']) as AuthDecodedToken
     const result = await this.userChatsModel.aggregate([
       { $match: { userId: userId, }, }, { $limit: 20, },
-      { $project: { chats: { $slice: [{ $filter: { input: '$chats', as: 'chat', cond: { $regexMatch: { input: '$$chat.name', regex: input.name, options: 'i', }, }, }, }, 20], }, }, },
+      { $project: { chats: { $slice: [{ $filter: { input: '$chats', as: 'chat', cond: { $regexMatch: { input: '$$chat.name', regex: `^${input.name}`, options: 'i', }, }, }, }, 20], }, }, },
     ])
     if (result && result.length) {
       const chats: UserChatDocument[] = result[0].chats
@@ -212,7 +212,7 @@ export class ChatsService {
           chatId: chatId,
           userId: input.userId,
           coordinates: match.coordinates,
-          name: authUser.name,
+          name: user.name,
           lastMessage: input.message,
           unread: false,
           notifications: true,
@@ -227,7 +227,7 @@ export class ChatsService {
           chatId: chatId,
           userId: userId,
           coordinates: match.coordinates,
-          name: user.name,
+          name: authUser.name,
           lastMessage: input.message,
           unread: true,
           notifications: true,

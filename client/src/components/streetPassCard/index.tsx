@@ -60,12 +60,12 @@ const StreetpassCard = React.forwardRef<CardItemHandle, IStreetpassCardProps>(({
         onSwipedRight={async () => {
           setStreetpassLoading(streetpass.userId)
           actions.setStreetpass()
-          await match({ userId: streetpass.userId, match: true, }).then(() => setStreetpassLoading(null))
+          match({ userId: streetpass.userId, match: true, }).then(() => setStreetpassLoading(null))
         }}
         onSwipedLeft={async () => {
           setStreetpassLoading(streetpass.userId)
           actions.setStreetpass()
-          await match({ userId: streetpass.userId, match: false, }).then(() => setStreetpassLoading(null))
+          match({ userId: streetpass.userId, match: false, }).then(() => setStreetpassLoading(null))
         }}
         cardStyle={{borderRadius: 32, overflow: 'hidden',}}
       >

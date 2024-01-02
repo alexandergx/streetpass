@@ -152,6 +152,7 @@ class ChatScreen extends React.Component<IChatScreenProps> {
             setChatMessage: actions.setChatMessage,
             unsetMatch: actions.unsetMatch,
             unsetChat: actions.unsetChat,
+            setReadChat: actions.setReadChat,
             setChatNotifications: actions.setChatNotifications,
           }}
         />

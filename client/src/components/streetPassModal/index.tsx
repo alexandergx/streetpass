@@ -47,7 +47,7 @@ interface IStreetpassModalProps {
 }
 const StreetpassModal: React.FC<IStreetpassModalProps> = ({ navigation, systemStore, streetpass, streetpassCardRef, streetpassImageIndex, hideActions, toggleModal, actions, }) => {
   const fadeAnim = useRef(new Animated.Value(0)).current
-  const heightAnim = useRef(new Animated.Value(Dimensions.get('window').height)).current
+  const heightAnim = useRef(new Animated.Value(Dimensions.get('window').height * 0.1)).current
   useEffect(() => {
     Animated.parallel([
       Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true, }),
@@ -57,7 +57,7 @@ const StreetpassModal: React.FC<IStreetpassModalProps> = ({ navigation, systemSt
   const close = () => {
     Animated.parallel([
       Animated.timing(fadeAnim, { toValue: 0, duration: 200, useNativeDriver: true, }),
-      Animated.timing(heightAnim, { toValue: Dimensions.get('window').height * 0.8, duration: 200, useNativeDriver: true, }),
+      Animated.timing(heightAnim, { toValue: Dimensions.get('window').height * 0.1, duration: 200, useNativeDriver: true, }),
     ]).start(() => toggleModal())
   }
 
@@ -148,14 +148,14 @@ const StreetpassModal: React.FC<IStreetpassModalProps> = ({ navigation, systemSt
                   onPress={() => setSelectionModalConfig({
                     title: streetpass.name,
                     list: [
-                      { Icon: DeleteIcon, title: 'Block', noRight: true, onPress: async () => {
+                      { Icon: DeleteIcon, title: 'Block', noRight: true, onPress: () => {
                         blockUser({ userId: streetpass.userId, })
                         if (hideActions) {
                           actions.unsetMatch({ userId: streetpass.userId, pass: true, })
                           actions.unsetChat(streetpass.userId)
                           navigation.goBack()
                         } else {
-                          await toggleModal()
+                          toggleModal()
                           swipeLeft && swipeLeft()
                         }
                       }, },
@@ -189,9 +189,9 @@ const StreetpassModal: React.FC<IStreetpassModalProps> = ({ navigation, systemSt
             {!hideActions &&
               <View style={{flex: 0, flexDirection: 'row',}}>
                 <TouchableOpacity
-                  onPress={async () => {
-                    await toggleModal()
-                    swipeLeft && swipeLeft()
+                  onPress={() => {
+                    close()
+                    setTimeout(() => swipeLeft && swipeLeft(), 200)
                   }}
                   activeOpacity={Colors.activeOpacity}
                   style={{padding: 12, borderWidth: 1, borderRadius: 64, marginHorizontal: 8, borderColor: Colors.lightBlue,}}
@@ -200,9 +200,9 @@ const StreetpassModal: React.FC<IStreetpassModalProps> = ({ navigation, systemSt
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  onPress={async () => {
-                    await toggleModal()
-                    swipeRight && swipeRight()
+                  onPress={() => {
+                    close()
+                    setTimeout(() => swipeRight && swipeRight(), 200)
                   }}
                   activeOpacity={Colors.activeOpacity}
                   style={{padding: 12, borderWidth: 1, borderRadius: 64, marginHorizontal: 8, borderColor: Colors.red,}}

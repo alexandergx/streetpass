@@ -41,7 +41,7 @@ export interface IChat {
 
 export interface IChatsStore {
   chats: Array<IChat> | null,
-  chatsSearch: Array<IChat>,
+  chatsSearch: Array<IChat> | null,
   messages: Record<string, IMessages>,
   chatId: string | null,
   unread: number | null,
@@ -55,6 +55,7 @@ export enum ChatsActions {
   SetChat = 'SET_CHAT',
   UnsetChat = 'UNSET_CHAT',
   SetChatsSearch = 'SET_CHATS_SEARCH',
+  UnsetChatsSearch = 'UNSET_CHATS_SEARCH',
   SetReadChat = 'SET_READ_CHAT',
   SetChatNotifications = 'SET_CHAT_NOTIFICATIONS',
   SetMessages = 'SET_MESSAGES',
@@ -69,6 +70,7 @@ type ChatsAction =
   | { type: ChatsActions.SetChat, payload: ISetChat, }
   | { type: ChatsActions.UnsetChat, payload: IUnsetChat, }
   | { type: ChatsActions.SetChatsSearch, payload: ISearchChatsRes, }
+  | { type: ChatsActions.UnsetChatsSearch, }
   | { type: ChatsActions.SetReadChat, payload: string, }
   | { type: ChatsActions.SetChatNotifications, payload: ISetChatNotifications, }
   | { type: ChatsActions.SetMessages, payload: IGetMessagesRes & ISetMessages, }
@@ -78,7 +80,7 @@ type ChatsAction =
 
 const INITIAL_STATE: IChatsStore = {
   chats: null,
-  chatsSearch: [],
+  chatsSearch: null,
   messages: {},
   chatId: null,
   unread: null,
@@ -114,6 +116,11 @@ const chatsStore = (state = INITIAL_STATE, action: ChatsAction) => {
       return {
         ...state,
         chatsSearch: action.payload,
+      }
+    case ChatsActions.UnsetChatsSearch:
+      return {
+        ...state,
+        chatsSearch: null,
       }
     case ChatsActions.SetReadChat:
       return {

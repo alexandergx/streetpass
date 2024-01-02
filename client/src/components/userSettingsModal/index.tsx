@@ -78,7 +78,7 @@ class UserSettingsModal extends React.Component<IProfileSettingsModalProps> {
       list: [
         { Icon: SwatchIcon, title: Lit[systemStore.Locale].ScreenTitle.AppStyleScreen, content: null, onPress: () => navigation.navigate(Screens.AppStyle), },
         { Icon: BellIcon, title: Lit[systemStore.Locale].ScreenTitle.NotificationsScreen, onPress: () => navigation.navigate(Screens.Notifications), },
-        { Icon: RestrictedIcon, title: Lit[systemStore.Locale].ScreenTitle.BlockingScreen, onPress: () => navigation.navigate(Screens.Blocking), },
+        // { Icon: RestrictedIcon, title: Lit[systemStore.Locale].ScreenTitle.BlockingScreen, onPress: () => navigation.navigate(Screens.Blocking), },
       ],
     }
 

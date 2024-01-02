@@ -1,11 +1,9 @@
-import React, { memo, useRef, useState, } from 'react'
+import React from 'react'
 import {
   View,
   KeyboardAvoidingView,
-  TouchableOpacity,
   ActivityIndicator,
   Linking,
-  Dimensions,
   Keyboard,
   Text,
 } from 'react-native'
@@ -23,22 +21,14 @@ import BellSolidIcon from '../../assets/icons/bell-solid.svg'
 import ExclamationCircledIcon from '../../assets/icons/exclamation-circled.svg'
 import { ISystemStore } from '../../state/reducers/SystemReducer'
 import { MMKVLoader } from 'react-native-mmkv-storage'
-import { AuthStore, InputLimits, LocalStorage, Time } from '../../utils/constants'
-import GradientBackground from '../gradientBackground'
-import { IListGroupConfig } from '../listGroup'
-import { useSubscription } from '@apollo/client'
-// import { SUBSCRIBE_MESSAGES, apiRequest, baseUrl, protocol } from '../../api'
-// import { IMessage } from '../../state/reducers/ChatsReducer'
-import { Screens } from '../../navigation'
-// import { ISetChatId, ISetReadChat } from '../../state/actions/ChatsActions'
-import { useIsFocused } from '@react-navigation/native'
-import { Lit, Locales, } from '../../utils/locale'
+import { InputLimits, LocalStorage, } from '../../utils/constants'
+import { Lit, } from '../../utils/locale'
 import { FlashList, } from '@shopify/flash-list'
 import { IChatScreenState } from '../../screens/subScreens/ChatScreen'
-import { SUBSCRIBE_MESSAGES, apiRequest, baseUrl, protocol } from '../../api'
+import { baseUrl, protocol } from '../../api'
 import StreetpassModal from '../streetpassModal'
 import { IMatch } from '../../state/reducers/MatchesReducer'
-import { IChat, IChatsStore, IMessage, IMessageMetadata, IMessages } from '../../state/reducers/ChatsReducer'
+import { IChat, IMessages } from '../../state/reducers/ChatsReducer'
 import { sendMessage } from '../../api/chats'
 import { ISetChatMessage, ISetChatNotifications, ISetMessages, ISetReadChat, IUnsetChat } from '../../state/actions/ChatsActions'
 import { IUnsetMatch } from '../../state/actions/MatchesActions'
@@ -49,7 +39,7 @@ const MMKV = new MMKVLoader().withEncryption().withInstanceID(LocalStorage.AuthS
 
 interface IChatBlockProps {
   navigation: any,
-  route: { params: { chatId?: string, match: IMatch, }, } | any,
+  route: { params: { chat?: IChat, match?: IMatch, }, } | any,
   systemStore: ISystemStore,
   userStore: IUserStore,
   state: IChatScreenState,
@@ -60,6 +50,7 @@ interface IChatBlockProps {
     setChatMessage: (params: ISetChatMessage) => void,
     unsetMatch: (params: IUnsetMatch) => void,
     unsetChat: (params: IUnsetChat) => void,
+    setReadChat: (params: ISetReadChat) => void,
     setChatNotifications: (params: ISetChatNotifications) => void,
   }
 }
@@ -67,26 +58,6 @@ const ChatBlock: React.FC<IChatBlockProps> = ({
   navigation, route, systemStore, userStore, state, messages, setState, actions,
 }) => {
   const { Colors, Fonts, } = systemStore
-  const flatListRef = useRef(null)
-  const isFocused = useIsFocused()
-
-  // useSubscription(SUBSCRIBE_MESSAGES({
-  //   chatId: state.chat?.chatId || undefined,
-  //   userId: userStore.user.userId,
-  // }), {
-  //   skip: !state.chat || !MMKV.getString(AuthStore.AccessToken),
-  //   shouldResubscribe: true,
-  //   onData: (data) => {
-  //     const { message, metadata, } = data?.data?.data?.messages as { chat?: IChat, message: IMessage, metadata: IMessageMetadata, }
-  //     // if (isFocused) actions.setChatId(data.data.data.messageSent.chatId)
-  //     // else actions.setChatId(null)
-  //     // setNewMessage(data.data.data.messageSent)
-  //   },
-  //   onError: async (error) => {
-  //     console.log('[SUBSCRIBE MESSAGES ERROR]', error)
-  //     await apiRequest(null)
-  //   }
-  // })
 
   return (
     <>
@@ -111,6 +82,10 @@ const ChatBlock: React.FC<IChatBlockProps> = ({
         title={state.match ? state.match.name : state.chat ? state.chat.name : undefined}
         thumbnail={state.match ? state.match.media[0]?.thumbnail : state.chat ? state.chat.media[0]?.thumbnail : undefined}
         EndIcon={EllipsisIcon}
+        onPress={() => {
+          if (state.chat && state.chat.unread) actions.setReadChat({ chatId: state.chat.chatId, })
+          navigation.goBack()
+        }}
         onPressEnd={() => {
           Keyboard.dismiss()
           setState({
@@ -152,7 +127,6 @@ const ChatBlock: React.FC<IChatBlockProps> = ({
       >
         <View style={{flex: 1,}}>
           <FlashList
-            ref={flatListRef}
             data={messages?.messages || []}
             extraData={state}
             estimatedItemSize={51}
@@ -194,7 +168,9 @@ const ChatBlock: React.FC<IChatBlockProps> = ({
                 }
                 <View pointerEvents={'none'} style={{height: 160,}} />
                 <View style={{width: '100%', justifyContent: 'center', alignItems: 'center', paddingVertical: 16,}}>
-                  <Text style={{color: Colors.lighter, fontSize: Fonts.sm, fontWeight: Fonts.heavyWeight as any, textTransform: 'uppercase',}}>Matched with {state.chat?.name} {timePassedSince(state.chat?.chatDate || null, systemStore.Locale)}</Text>
+                  <Text style={{color: Colors.lighter, fontSize: Fonts.sm, fontWeight: Fonts.heavyWeight as any, textTransform: 'uppercase',}}>
+                    {Lit[systemStore.Locale].Copywrite.MatchedWith} {route.params.chat?.name || route.params.match?.name} {timePassedSince(route.params.chat?.matchDate || route.params.match?.matchDate, systemStore.Locale)}
+                  </Text>
                 </View>
               </>
             }

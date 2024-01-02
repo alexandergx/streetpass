@@ -51,6 +51,12 @@ export function setChatsSearch(input: ISetChatsSearch) {
   }
 }
 
+export function unsetChatsSearch() {
+  return {
+    type: ChatsActions.UnsetChatsSearch,
+  }
+}
+
 export type ISetReadChat = IReadChatReq
 export function setReadChat(input: ISetReadChat) {
   return async (dispatch: any) => {

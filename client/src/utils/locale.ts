@@ -45,6 +45,8 @@ export type ILocale = {
     Messages: string,
     Matches: string,
     NoMatches: string,
+    Chats: string,
+    SearchResults: string,
     Streetpasses: string,
     Email: string,
     EmailNotifications: string,
@@ -75,6 +77,7 @@ export type ILocale = {
     Work: string,
     School: string,
     Settings: string,
+    SearchChats: string,
 
     DefaultCamera: string,
     SaveCapturedMedia: string,
@@ -99,6 +102,7 @@ export type ILocale = {
     Bio: string,
     Work: string,
     School: string,
+    MatchedWith: string,
 
     DiscardMedia: [string, string],
     CameraRequired: [string, string],
