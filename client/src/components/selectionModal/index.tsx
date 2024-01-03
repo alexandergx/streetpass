@@ -64,7 +64,7 @@ class SelectionModal extends React.Component<ISelectionModalProps> {
           </Animated.View>
         }
 
-        <Animated.View style={{flex: 1, width: '100%', height: '100%', justifyContent: 'flex-end', marginBottom: 16, paddingBottom: 16, transform: [{ translateY: this.heightAnim }],}}>            
+        <Animated.View style={{flex: 1, width: '100%', height: '100%', justifyContent: 'flex-end', marginBottom: 16, paddingBottom: 16, transform: [{ translateY: this.heightAnim, }],}}>            
           <View style={{zIndex: 1,}}>
             <LinearGradient
               style={{position: 'absolute', zIndex: 0, width: '100%', height: '130%', bottom: -64,}}

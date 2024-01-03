@@ -1,4 +1,6 @@
+import { PixelRatio } from 'react-native'
 import { Lit, Locales } from './locale'
+
 
 export const validateUsername = (text: string) => !/[^A-Za-z0-9_]/g.test(text)
 export const validatePassword = (text: string) => !/^(?=.*[0-9])(?=.*[a-zA-Z])(?=\S+$).{8,64}$/i.test(text)
@@ -19,17 +21,56 @@ export const truncateString = (str: string, length: number, subLength: number) =
 //   restPart = restPart.replace(/\r?\n|\r/g, ' ')
 //   return firstPart + restPart
 // }
+// export const formatMultiline = (text: string) => {
+//   let lines = text.replace(/\r\n?/g, '\n').split('\n')
+//   lines = lines.map(line => line.trim().replace(/\\/g, '\\\\').replace(/"/g, '\\"'))
+//   let result
+//   if (lines.length > 6) {
+//     const firstSixLines = lines.slice(0, 6).join('\\n')
+//     const remainingLines = lines.slice(6).join(' ').replace(/\s+/g, ' ').trim()
+//     result = firstSixLines + (remainingLines ? ' ' + remainingLines : '')
+//   } else result = lines.join('\\n')
+//   return result
+// }
+
 export const formatMultiline = (text: string) => {
-  let lines = text.replace(/\r\n?/g, '\n').split('\n')
-  lines = lines.map(line => line.trim().replace(/\\/g, '\\\\').replace(/"/g, '\\"'))
-  let result
-  if (lines.length > 6) {
-    const firstSixLines = lines.slice(0, 6).join('\\n')
-    const remainingLines = lines.slice(6).join(' ').trim()
-    result = firstSixLines + (remainingLines ? ' ' + remainingLines : '')
+  let lines = text.replace(/\r\n?/g, '\n').split('\n').map(line => line.trim())
+  let result = ''
+  if (lines.length > 7) {
+    let firstSeven = lines.slice(0, 7)
+    if (firstSeven[0] === '') firstSeven.shift()
+    // if (firstSeven[firstSeven.length - 1] === '') firstSeven.pop()
+    const firstSevenLines = firstSeven.join('\\n')
+    let remaining = lines.slice(7)
+    console.log(remaining)
+    if (remaining[0] === '') remaining.shift()
+    if (remaining[remaining.length - 1] === '') remaining.pop()
+    console.log(remaining)
+    const remainingLines = remaining.filter(line => line.length > 0).join(' ')
+    console.log(remainingLines)
+    result = firstSevenLines + '\\n' + remainingLines
   } else result = lines.join('\\n')
+
+  // // Trim each line and escape for GraphQL
+  // lines = lines.map(line => line.trim().replace(/\\/g, '\\\\').replace(/"/g, '\\"'));
+
+  // let result;
+  // if (lines.length > 11) {
+  //   // Join the first 6 lines with \n
+  //   const firstSixLines = lines.slice(0, 11).join('\\n');
+
+  //   // Concatenate the remaining lines with a space, and trim leading spaces
+  //   const remainingLines = lines.slice(11).join(' ').replace(/^\s+/, '');
+
+  //   result = firstSixLines + (remainingLines ? ' ' + remainingLines : '');
+  // } else {
+  //   result = lines.join('\\n');
+  // }
+
   return result
 }
+
+
 
 export const formatDate = (dateString: Date | string, time = false) => {
   const date = new Date(dateString)
@@ -103,6 +144,53 @@ export const getModulus = (contentLength: number, mod: number) => {
   for (let i = 0; i <= contentLength - 1; i++) if (i % mod === 0) modulus = i
   return modulus
 }
+
+// export const getLineCount = (string: string = '', fontScale: number = 1) => {
+//   // TODO - adjust maxCharsPerLine by fontScale // 0.823 - 1.353
+//   const maxCharsPerLine: number = 35
+//   if (!string.length) return 1
+//   const lines = string.split(/\r\n|\r|\n/)
+//   let lineCount = 0
+//   lines.forEach(line => {
+//     const lineLength = line.length
+//     const linesForThisLine = Math.ceil(lineLength / maxCharsPerLine) || 1
+//     lineCount += linesForThisLine
+//   })
+//   return lineCount
+// }
+// export const getLineCount = (string: string = '', fontScale: number = 1) => {
+//   // Define the relationship between fontScale and maxCharsPerLine
+//   const maxCharsAtMinScale = 55; // maxCharsPerLine at fontScale 0.823
+//   const maxCharsAtMaxScale = 20; // maxCharsPerLine at fontScale 1.353
+//   const minScale = 0.823;
+//   const maxScale = 1.353;
+
+//   // Linear interpolation function
+//   const interpolate = (minVal, maxVal, minScale, maxScale, currentScale) => {
+//     return minVal + (maxVal - minVal) * ((currentScale - minScale) / (maxScale - minScale));
+//   };
+
+//   // Calculate maxCharsPerLine based on fontScale
+//   let maxCharsPerLine: number;
+//   if (fontScale <= 1) {
+//     maxCharsPerLine = interpolate(35, maxCharsAtMinScale, 1, minScale, fontScale);
+//   } else {
+//     maxCharsPerLine = interpolate(35, maxCharsAtMaxScale, 1, maxScale, fontScale);
+//   }
+//   maxCharsPerLine = Math.round(maxCharsPerLine);
+
+//   // Counting lines
+//   if (!string.length) return 1;
+//   const lines = string.split(/\r\n|\r|\n/);
+//   let lineCount = 0;
+//   lines.forEach(line => {
+//     const lineLength = line.length;
+//     const linesForThisLine = Math.ceil(lineLength / maxCharsPerLine) || 1;
+//     lineCount += linesForThisLine;
+//   });
+
+//   return lineCount;
+// }
 
 export const formatNumber = (num: number) => {
   if (num < 1000) {

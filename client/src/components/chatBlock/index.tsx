@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import {
   View,
   KeyboardAvoidingView,
@@ -35,8 +35,6 @@ import { IUnsetMatch } from '../../state/actions/MatchesActions'
 import { timePassedSince } from '../../utils/functions'
 import { blockUser } from '../../api/user'
 
-const MMKV = new MMKVLoader().withEncryption().withInstanceID(LocalStorage.AuthStore).initialize()
-
 interface IChatBlockProps {
   navigation: any,
   route: { params: { chat?: IChat, match?: IMatch, }, } | any,
@@ -58,10 +56,10 @@ interface IChatBlockProps {
 const ChatBlock: React.FC<IChatBlockProps> = ({ navigation, route, systemStore, userStore, state, messages, setState, actions, }) => {
   const { Colors, Fonts, } = systemStore
   const listRef = useRef<FlashList<IMessage>>(null)
-  const [viewableMessageIndices, setViewableMessageIndices] = useState<Array<number>>([0, 0])
-  const [scrollPosition, setScrollPosition] = useState<number>(0)
-  // if (state.messageIndex !== null && state.messageIndex <= viewableMessageIndices[0]) listRef.current?.scrollToOffset({ offset: -150, animated: true, })
-  if (state.messageIndex && state.messageIndex > viewableMessageIndices[1]) listRef.current?.scrollToOffset({ offset: scrollPosition + 250, animated: true, })
+
+  const scrollTo = useCallback(async (index: number) => {
+    if (listRef.current) listRef.current.scrollToIndex({ index: index, animated: true, viewPosition: 0.5, })
+  }, [])
 
   return (
     <>
@@ -140,8 +138,6 @@ const ChatBlock: React.FC<IChatBlockProps> = ({ navigation, route, systemStore, 
             onScrollBeginDrag={() => {
               if (state.messageId || state.messageIndex !== null || state.messageTime) setState({ messageId: null, messageIndex: null, messageTime: null, })
             }}
-            onViewableItemsChanged={({ viewableItems, }) => setViewableMessageIndices([viewableItems[0]?.index || 0, viewableItems[viewableItems.length - 1]?.index || 0])}
-            onScrollEndDrag={(event) => setScrollPosition(event.nativeEvent.contentOffset.y)}
             renderItem={({ item, index, }) => {
               if (!item) return null
               return (
@@ -154,6 +150,7 @@ const ChatBlock: React.FC<IChatBlockProps> = ({ navigation, route, systemStore, 
                   messageId={state.messageId}
                   messageIndex={state.messageIndex}
                   messageTime={state.messageTime}
+                  scrollTo={scrollTo}
                   setState={(params) => setState({ ...params, })}
                 />
               )
@@ -176,15 +173,17 @@ const ChatBlock: React.FC<IChatBlockProps> = ({ navigation, route, systemStore, 
             }
             ListFooterComponent={
               <>
-                {messages?.continue !== false && state.paginating &&
+                {/* {messages?.continue !== false && state.paginating &&
                   <ActivityIndicator color={Colors.lighter} style={{position: 'absolute', width: '100%', marginTop: 16, alignSelf: 'center',}} />
-                }
+                } */}
                 <View onTouchStart={() => setState({ messageId: null, messageIndex: null, messageTime: null, })} style={{height: 160,}} />
-                <View onTouchStart={() => setState({ messageId: null, messageIndex: null, messageTime: null, })} style={{width: '100%', justifyContent: 'center', alignItems: 'center', paddingVertical: 32,}}>
-                  <Text style={{color: Colors.lighter, fontSize: Fonts.sm, fontWeight: Fonts.heavyWeight , textTransform: 'uppercase',}}>
-                    {Lit[systemStore.Locale].Copywrite.MatchedWith} {route.params.chat?.name || route.params.match?.name} {timePassedSince(route.params.chat?.matchDate || route.params.match?.matchDate, systemStore.Locale)}
-                  </Text>
-                </View>
+                {!messages?.continue && !state.paginating &&
+                  <View onTouchStart={() => setState({ messageId: null, messageIndex: null, messageTime: null, })} style={{width: '100%', justifyContent: 'center', alignItems: 'center', paddingVertical: 32,}}>
+                    <Text style={{color: Colors.lighter, fontSize: Fonts.sm, fontWeight: Fonts.heavyWeight , textTransform: 'uppercase',}}>
+                      {Lit[systemStore.Locale].Copywrite.MatchedWith} {route.params.chat?.name || route.params.match?.name} {timePassedSince(route.params.chat?.matchDate || route.params.match?.matchDate, systemStore.Locale)}
+                    </Text>
+                  </View>
+                }
               </>
             }
             inverted={true}

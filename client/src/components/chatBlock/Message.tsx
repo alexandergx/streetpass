@@ -3,97 +3,44 @@ import {
   View,
   Text,
   TouchableOpacity,
-  Linking,
-  Clipboard,
-  ScrollView,
+  Keyboard,
 } from 'react-native'
 import { BlurView } from '@react-native-community/blur'
-import CopyIcon from '../../assets/icons/copy.svg'
-import { Emojis, Time } from '../../utils/constants'
-import ListGroup from '../listGroup'
+import { Time } from '../../utils/constants'
 import { formatDate, withinTime } from '../../utils/functions'
-import ReactionButton from './EmojiButton'
 import { softVibrate } from '../../utils/services'
 import { ISystemStore } from '../../state/reducers/SystemReducer'
-import { Lit } from '../../utils/locale'
 import Pretext from '../pretext'
 import { IMessage } from '../../state/reducers/ChatsReducer'
-import { reactMessage } from '../../api/chats'
+import MessageControls from './MessageControls'
 
 interface IMessageProps {
   item: IMessage,
   index: number,
   systemStore: ISystemStore,
   userId: string,
-  messages: Array<IMessage> | null,
+  messages: Array<IMessage>,
   messageId: string | null,
   messageIndex: number | null,
   messageTime: string | null,
+  scrollTo: (params: number) => void,
   setState: (params: any) => void,
 }
-const Message: React.FC<IMessageProps>  = React.memo(({ systemStore, userId, item, index, messages, messageId, messageIndex, messageTime, setState, }) => {
+const Message: React.FC<IMessageProps>  = React.memo(({ systemStore, userId, item, index, messages, messageId, messageIndex, messageTime, scrollTo, setState, }) => {
   const { Colors, Fonts, } = systemStore
   const me = item.userId === userId
-  const prev = messages && messages[index + 1]?.userId === item.userId && withinTime(item.date, messages[index + 1].date, Time.Minute * 10 * 1000) ? true : false
-  const next = messages && messages[index - 1]?.userId === item.userId && withinTime(item.date, messages[index - 1].date, Time.Minute * 10 * 1000) ? true : false
+  const prev = messages[index + 1]?.userId === item.userId && withinTime(item.date, messages[index + 1].date, Time.Minute * 10 * 1000) ? true : false
+  const next = messages[index - 1]?.userId === item.userId && withinTime(item.date, messages[index - 1].date, Time.Minute * 10 * 1000) ? true : false
 
   return (
     <>
       {messageId === item.messageId &&
-        <>
-          <TouchableOpacity
-            onPress={() => setState({ messageId: null, messageIndex: null, })}
-            activeOpacity={1}
-            style={{zIndex: 1, width: '100%', paddingHorizontal: 16, bottom: 2,}}
-          >
-            <View style={{alignSelf: me ? 'flex-end' : 'flex-start', marginBottom: 4,}}>
-              <ListGroup
-                systemStore={systemStore}
-                config={{
-                  list: me ? [
-                    { Icon: CopyIcon, title: Lit[systemStore.Locale].Button.Copy, noRight: true, onPress: () => {
-                      Clipboard.setString(item.message)
-                      setState({ messageId: null, messageIndex: null, })
-                    }, },
-                  ] : [
-                    { Icon: CopyIcon, title: Lit[systemStore.Locale].Button.Copy, noRight: true, onPress: () => {
-                      Clipboard.setString(item.message)
-                      setState({ messageId: null, messageIndex: null, })
-                    }, },
-                  ],
-                }}
-              />
-            </View>
-
-            {!me &&
-              <View style={{alignSelf: me ? 'flex-end' : 'flex-start', maxWidth: '85%', height: 52, borderRadius: 16, overflow: 'hidden',}}>
-                <BlurView blurType={Colors.darkestBlur } style={{position: 'absolute', zIndex: -1, height: '100%', width: '100%', display: 'flex', backgroundColor: Colors.darkerBackground,}} />
-
-                <ScrollView
-                  horizontal={true}
-                  showsHorizontalScrollIndicator={false}
-                  keyboardDismissMode={'none'}
-                  keyboardShouldPersistTaps={'always'}
-                >
-                  <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center',}}>
-                    {Emojis.map((emoji, index) =>
-                      <ReactionButton
-                        key={index}
-                        systemStore={systemStore}
-                        title={emoji}
-                        active={item.reaction === emoji}
-                        onPress={async () => {
-                          await reactMessage({ chatId: item.chatId, messageId: item.messageId, reaction: item.reaction === emoji ? null : emoji })
-                          setState({ messageId: null, messageIndex: null, })
-                        }}
-                      />
-                    )}
-                  </View>
-                </ScrollView>
-              </View>
-            }
-          </TouchableOpacity>
-        </>
+        <MessageControls
+          systemStore={systemStore}
+          item={item}
+          me={me}
+          setState={setState}
+        />
       }
 
       <TouchableOpacity
@@ -106,8 +53,10 @@ const Message: React.FC<IMessageProps>  = React.memo(({ systemStore, userId, ite
         <TouchableOpacity
           onPress={() => messageId ? setState({ messageId: null, messageIndex: null, }) : setState({ messageTime: messageTime === item.messageId ? null : item.messageId, })}
           onLongPress={() => {
+            Keyboard.dismiss()
             softVibrate()
             setState({ messageId: messageId === item.messageId ? null : item.messageId, messageIndex: messageIndex === index ? null : index, })
+            scrollTo(index)
           }}
           activeOpacity={Colors.activeOpacity}
         >
@@ -136,8 +85,10 @@ const Message: React.FC<IMessageProps>  = React.memo(({ systemStore, userId, ite
               textStyle={{color: Colors.safeLightest, paddingVertical: 12, paddingHorizontal: 16,}}
               onPress={(word) => null}
               onLongPress={() => {
+                Keyboard.dismiss()
                 softVibrate()
                 setState({ messageId: messageId === item.messageId ? null : item.messageId, messageIndex: messageIndex === index ? null : index, })
+                scrollTo(index)
               }}
             />
           </View>

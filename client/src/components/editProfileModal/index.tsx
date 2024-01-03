@@ -121,7 +121,7 @@ class EditProfileModal extends React.Component<IEditProfileModalProps> {
     const { Colors, Fonts, } = systemStore
 
     return (
-      <Animated.View style={{position: 'absolute', zIndex: 3, width: '100%', height: '100%', opacity: this.fadeAnim, transform: [{ translateY: this.heightAnim }],}}>
+      <Animated.View style={{position: 'absolute', zIndex: 3, width: '100%', height: '100%', opacity: this.fadeAnim, transform: [{ translateY: this.heightAnim, }],}}>
         <BlurView blurType={Colors.darkBlur } style={{position: 'absolute', zIndex: 3, width: '100%', height: '100%',}}>
           <NavHeader
             systemStore={systemStore}

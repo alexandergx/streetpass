@@ -65,7 +65,7 @@ class PickerModal extends React.Component<IPickerModalProps> {
 
         <Animated.View
           style={{
-            width: '100%', justifyContent: 'flex-end', transform: [{ translateY: this.heightAnim }],
+            width: '100%', justifyContent: 'flex-end', transform: [{ translateY: this.heightAnim, }],
             flex: 0, paddingBottom: 16, marginTop: 96, padding: 16, marginBottom: this.props.onPress ? 16 : 80,
           }}
         >

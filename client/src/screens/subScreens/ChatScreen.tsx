@@ -91,7 +91,7 @@ class ChatScreen extends React.Component<IChatScreenProps> {
 
   private keyboardWillShowListener: any
   private keyboardWillHideListener: any
-  keyboardWillShow = () => this.setState({ keyboard: true, })
+  keyboardWillShow = () => this.setState({ keyboard: true, messageId: null, messageIndex: null, })
   keyboardWillHide = () => this.setState({ keyboard: false, })
   focusListener!: () => void
   blurListener!: () => void
