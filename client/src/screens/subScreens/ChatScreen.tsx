@@ -1,5 +1,5 @@
 import React from 'react'
-import { AppState, Keyboard, AppStateStatus, } from 'react-native'
+import { AppState, Keyboard, } from 'react-native'
 import { connect } from 'react-redux'
 import { bindActionCreators, Dispatch, AnyAction, } from 'redux'
 import { IStores } from '../../state/store'
@@ -12,8 +12,8 @@ import AnimatedBackground from '../../components/animated/AnimatedBackground'
 import { IMatch } from '../../state/reducers/MatchesReducer'
 import { IStreetpass } from '../../state/reducers/StreetpassReducer'
 import { ISetSeenMatch, IUnsetMatch, setSeenMatch, unsetMatch } from '../../state/actions/MatchesActions'
-import { IChat, IChatsStore, IMessages } from '../../state/reducers/ChatsReducer'
-import { ISetChatMessage, ISetChatNotifications, ISetMessages, ISetReadChat, IUnsetChat, setChatMessage, setChatNotifications, setMessages, setReadChat, unsetChat } from '../../state/actions/ChatsActions'
+import { IChat, IChatsStore, } from '../../state/reducers/ChatsReducer'
+import { ISetChatKey, ISetChatMessage, ISetChatNotifications, ISetMessages, ISetReadChat, IUnsetChat, setChatKey, setChatMessage, setChatNotifications, setMessages, setReadChat, unsetChat } from '../../state/actions/ChatsActions'
 
 const mapStateToProps = (state: IStores) => {
   const { systemStore, userStore, chatsStore, } = state
@@ -27,6 +27,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => ({
       setChatMessage,
       unsetMatch,
       unsetChat,
+      setChatKey,
       setReadChat,
       setChatNotifications,
     }
@@ -45,6 +46,7 @@ interface IChatScreenProps {
     setChatMessage: (params: ISetChatMessage) => void,
     unsetMatch: (params: IUnsetMatch) => void,
     unsetChat: (params: IUnsetChat) => void,
+    setChatKey: (params: ISetChatKey) => void,
     setReadChat: (params: ISetReadChat) => void,
     setChatNotifications: (params: ISetChatNotifications) => void,
   },
@@ -59,12 +61,13 @@ export interface IChatScreenState {
   selectionModalConfig: IListGroupConfig | null,
   streetpass: IStreetpass | null,
   messageId: string | null,
-  messageIdTime: string | null,
+  messageIndex: number | null
+  messageTime: string | null,
   sending: boolean,
   paginating: boolean,
 }
 class ChatScreen extends React.Component<IChatScreenProps> {
-  constructor(props: any) {
+  constructor(props: IChatScreenProps) {
     super(props)
     this.flatListRef = React.createRef()
   }
@@ -80,7 +83,8 @@ class ChatScreen extends React.Component<IChatScreenProps> {
     selectionModalConfig: null,
     streetpass: null,
     messageId: null,
-    messageIdTime: null,
+    messageIndex: null,
+    messageTime: null,
     sending: false,
     paginating: false,
   }
@@ -97,6 +101,7 @@ class ChatScreen extends React.Component<IChatScreenProps> {
     this.blurListener = this.props.navigation.addListener('blur', () => this.setState({ active: false, }))
     const appStateListener = AppState.addEventListener('change', this.appStateChange)
     this.setState({ appStateListener, })
+    this.props.actions.setChatKey(this.state.userId)
     if (!this.props.chatsStore.messages[this.state.userId]) this.props.actions.setChatMessage({ userId: this.state.userId, message: '', })
     if (this.state.chat && this.props.chatsStore.messages[this.state.userId]?.continue !== false) {
       this.props.actions.setMessages({ chatId: this.state.chat.chatId, userId: this.state.userId, index: undefined, })
@@ -120,6 +125,7 @@ class ChatScreen extends React.Component<IChatScreenProps> {
   componentWillUnmount(): void {
     this.keyboardWillShowListener.remove()
     this.keyboardWillHideListener.remove()
+    this.props.actions.setChatKey(null)
     if (this.state.appStateListener) this.state.appStateListener.remove()
     if (this.state.chat && this.state.chat.unread) this.props.actions.setReadChat({ chatId: this.state.chat.chatId, })
   }
@@ -152,6 +158,7 @@ class ChatScreen extends React.Component<IChatScreenProps> {
             setChatMessage: actions.setChatMessage,
             unsetMatch: actions.unsetMatch,
             unsetChat: actions.unsetChat,
+            setChatKey: actions.setChatKey,
             setReadChat: actions.setReadChat,
             setChatNotifications: actions.setChatNotifications,
           }}

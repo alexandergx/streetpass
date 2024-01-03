@@ -57,6 +57,14 @@ export function unsetChatsSearch() {
   }
 }
 
+export type ISetChatKey = string | null
+export function setChatKey(input: ISetChatKey) {
+  return {
+    type: ChatsActions.SetChatKey,
+    payload: input,
+  }
+}
+
 export type ISetReadChat = IReadChatReq
 export function setReadChat(input: ISetReadChat) {
   return async (dispatch: any) => {

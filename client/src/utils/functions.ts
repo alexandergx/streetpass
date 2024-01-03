@@ -11,13 +11,24 @@ export const truncateString = (str: string, length: number, subLength: number) =
 }
 
 // export const formatMultiline = (text: string) => (text.replace(/(\r?\n|\r){2,}/g, '\n').replace(/^\n+|\n+$/g, '').match(/(?:[^\n]*\n?){0,5}[^\n]*/) ?? [''])[0].replace(/\r?\n|\r/g, '\\n')
+// export const formatMultiline = (text: string) => {
+//   let result = text.replace(/(\r?\n|\r){3,}/g, '\n').replace(/^\n+|\n+$/g, '')
+//   let firstPart = (result.match(/(?:[^\n]*\n?){0,5}[^\n]*/) ?? [''])[0]
+//   let restPart = result.substring(firstPart.length)
+//   firstPart = firstPart.replace(/\r?\n|\r/g, '\\n')
+//   restPart = restPart.replace(/\r?\n|\r/g, ' ')
+//   return firstPart + restPart
+// }
 export const formatMultiline = (text: string) => {
-  let result = text.replace(/(\r?\n|\r){2,}/g, '\n').replace(/^\n+|\n+$/g, '')
-  let firstPart = (result.match(/(?:[^\n]*\n?){0,5}[^\n]*/) ?? [''])[0]
-  let restPart = result.substring(firstPart.length)
-  firstPart = firstPart.replace(/\r?\n|\r/g, '\\n')
-  restPart = restPart.replace(/\r?\n|\r/g, ' ')
-  return firstPart + restPart
+  let lines = text.replace(/\r\n?/g, '\n').split('\n')
+  lines = lines.map(line => line.trim().replace(/\\/g, '\\\\').replace(/"/g, '\\"'))
+  let result
+  if (lines.length > 6) {
+    const firstSixLines = lines.slice(0, 6).join('\\n')
+    const remainingLines = lines.slice(6).join(' ').trim()
+    result = firstSixLines + (remainingLines ? ' ' + remainingLines : '')
+  } else result = lines.join('\\n')
+  return result
 }
 
 export const formatDate = (dateString: Date | string, time = false) => {

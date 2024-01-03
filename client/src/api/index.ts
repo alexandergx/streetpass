@@ -661,7 +661,7 @@ export const SEND_MESSAGE = (input: ISendMessageMutation) => {
   mutation {
       sendMessage(input: {
   `
-  mutation = mutation + inputConstructor(input)
+  mutation = mutation + inputConstructor(input, true)
   mutation = mutation + `
       })
     }

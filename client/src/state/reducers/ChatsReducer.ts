@@ -1,5 +1,5 @@
 import { IGetChatsRes, IGetMessagesRes, ISearchChatsRes } from '../../api/chats'
-import { ISetChat, ISetChatMessage, ISetChatNotifications, ISetMessage, ISetMessageReaction, ISetMessages, IUnsetChat } from '../actions/ChatsActions'
+import { ISetChat, ISetChatKey, ISetChatMessage, ISetChatNotifications, ISetMessage, ISetMessageReaction, ISetMessages, IUnsetChat } from '../actions/ChatsActions'
 import { IMedia } from './UserReducer'
 
 export interface IMessageMetadata {
@@ -45,8 +45,8 @@ export interface IChat {
 export interface IChatsStore {
   chats: Array<IChat> | null,
   chatsSearch: Array<IChat> | null,
+  chatKey: string | null,
   messages: Record<string, IMessages>,
-  chatId: string | null,
   unread: number | null,
   continue: boolean,
   chatsError: boolean,
@@ -59,6 +59,7 @@ export enum ChatsActions {
   UnsetChat = 'UNSET_CHAT',
   SetChatsSearch = 'SET_CHATS_SEARCH',
   UnsetChatsSearch = 'UNSET_CHATS_SEARCH',
+  SetChatKey = 'SET_CHAT_KEY',
   SetReadChat = 'SET_READ_CHAT',
   SetChatNotifications = 'SET_CHAT_NOTIFICATIONS',
   SetMessages = 'SET_MESSAGES',
@@ -75,6 +76,7 @@ type ChatsAction =
   | { type: ChatsActions.UnsetChat, payload: IUnsetChat, }
   | { type: ChatsActions.SetChatsSearch, payload: ISearchChatsRes, }
   | { type: ChatsActions.UnsetChatsSearch, }
+  | { type: ChatsActions.SetChatKey, payload: ISetChatKey, }
   | { type: ChatsActions.SetReadChat, payload: string, }
   | { type: ChatsActions.SetChatNotifications, payload: ISetChatNotifications, }
   | { type: ChatsActions.SetMessages, payload: IGetMessagesRes & ISetMessages, }
@@ -86,8 +88,8 @@ type ChatsAction =
 const INITIAL_STATE: IChatsStore = {
   chats: null,
   chatsSearch: null,
+  chatKey: null,
   messages: {},
-  chatId: null,
   unread: null,
   continue: true,
   chatsError: false,
@@ -126,6 +128,11 @@ const chatsStore = (state = INITIAL_STATE, action: ChatsAction) => {
       return {
         ...state,
         chatsSearch: null,
+      }
+    case ChatsActions.SetChatKey:
+      return {
+        ...state,
+        chatKey: action.payload,
       }
     case ChatsActions.SetReadChat:
       return {

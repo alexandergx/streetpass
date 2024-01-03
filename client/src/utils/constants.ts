@@ -38,7 +38,7 @@ export const CameraPan = {
   Slow: 300,
 }
 
-export const Emojis: any = {
+export const EmojisConfig: Object = {
   Heart: '❤',
   Like: '👍',
   Laugh: '😂',
@@ -51,10 +51,11 @@ export const Emojis: any = {
   Teary: '🥹',
   Wink: '😜',
   Cry: '🥲',
-  Sparkle: '✨',
   Praise: '🙏',
   Celebrate: '🎉',
 }
+
+export const Emojis = Object.values(EmojisConfig)
 
 let ages: Array<number> = []
 for (let i = InputLimits.StreetpassAgeMin; i <= 40; i++) ages.push(i)

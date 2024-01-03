@@ -20,8 +20,6 @@ import Pretext from '../pretext'
 import { IMessage } from '../../state/reducers/ChatsReducer'
 import { reactMessage } from '../../api/chats'
 
-const emojis = Object.keys(Emojis)
-
 interface IMessageProps {
   item: IMessage,
   index: number,
@@ -29,10 +27,11 @@ interface IMessageProps {
   userId: string,
   messages: Array<IMessage> | null,
   messageId: string | null,
-  messageIdTime: string | null,
+  messageIndex: number | null,
+  messageTime: string | null,
   setState: (params: any) => void,
 }
-const Message: React.FC<IMessageProps>  = React.memo(({ systemStore, userId, item, index, messages, messageId, messageIdTime, setState, }) => {
+const Message: React.FC<IMessageProps>  = React.memo(({ systemStore, userId, item, index, messages, messageId, messageIndex, messageTime, setState, }) => {
   const { Colors, Fonts, } = systemStore
   const me = item.userId === userId
   const prev = messages && messages[index + 1]?.userId === item.userId && withinTime(item.date, messages[index + 1].date, Time.Minute * 10 * 1000) ? true : false
@@ -43,7 +42,7 @@ const Message: React.FC<IMessageProps>  = React.memo(({ systemStore, userId, ite
       {messageId === item.messageId &&
         <>
           <TouchableOpacity
-            onPress={() => setState({ messageId: null, })}
+            onPress={() => setState({ messageId: null, messageIndex: null, })}
             activeOpacity={1}
             style={{zIndex: 1, width: '100%', paddingHorizontal: 16, bottom: 2,}}
           >
@@ -54,12 +53,12 @@ const Message: React.FC<IMessageProps>  = React.memo(({ systemStore, userId, ite
                   list: me ? [
                     { Icon: CopyIcon, title: Lit[systemStore.Locale].Button.Copy, noRight: true, onPress: () => {
                       Clipboard.setString(item.message)
-                      setState({ messageId: null, })
+                      setState({ messageId: null, messageIndex: null, })
                     }, },
                   ] : [
                     { Icon: CopyIcon, title: Lit[systemStore.Locale].Button.Copy, noRight: true, onPress: () => {
                       Clipboard.setString(item.message)
-                      setState({ messageId: null, })
+                      setState({ messageId: null, messageIndex: null, })
                     }, },
                   ],
                 }}
@@ -77,15 +76,15 @@ const Message: React.FC<IMessageProps>  = React.memo(({ systemStore, userId, ite
                   keyboardShouldPersistTaps={'always'}
                 >
                   <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center',}}>
-                    {emojis.map((emoji, index) =>
+                    {Emojis.map((emoji, index) =>
                       <ReactionButton
                         key={index}
                         systemStore={systemStore}
-                        title={Emojis[emoji]}
-                        active={item.reaction === Emojis[emoji]}
+                        title={emoji}
+                        active={item.reaction === emoji}
                         onPress={async () => {
-                          await reactMessage({ chatId: item.chatId, messageId: item.messageId, reaction: item.reaction === Emojis[emoji] ? null : Emojis[emoji], })
-                          setState({ messageId: null, })
+                          await reactMessage({ chatId: item.chatId, messageId: item.messageId, reaction: item.reaction === emoji ? null : emoji })
+                          setState({ messageId: null, messageIndex: null, })
                         }}
                       />
                     )}
@@ -105,10 +104,10 @@ const Message: React.FC<IMessageProps>  = React.memo(({ systemStore, userId, ite
         {!prev && messageId !== item.messageId && <View style={{height: 12,}} />}
 
         <TouchableOpacity
-          onPress={() => messageId ? setState({ messageId: null, }) : setState({ messageIdTime: messageIdTime === item.messageId ? null : item.messageId, })}
+          onPress={() => messageId ? setState({ messageId: null, messageIndex: null, }) : setState({ messageTime: messageTime === item.messageId ? null : item.messageId, })}
           onLongPress={() => {
             softVibrate()
-            setState({ messageId: messageId === item.messageId ? null : item.messageId, })
+            setState({ messageId: messageId === item.messageId ? null : item.messageId, messageIndex: messageIndex === index ? null : index, })
           }}
           activeOpacity={Colors.activeOpacity}
         >
@@ -138,7 +137,7 @@ const Message: React.FC<IMessageProps>  = React.memo(({ systemStore, userId, ite
               onPress={(word) => null}
               onLongPress={() => {
                 softVibrate()
-                setState({ messageId: messageId === item.messageId ? null : item.messageId, })
+                setState({ messageId: messageId === item.messageId ? null : item.messageId, messageIndex: messageIndex === index ? null : index, })
               }}
             />
           </View>
@@ -166,7 +165,7 @@ const Message: React.FC<IMessageProps>  = React.memo(({ systemStore, userId, ite
           </View>
         </TouchableOpacity>
 
-        {messageIdTime === item.messageId &&
+        {messageTime === item.messageId &&
           <View style={{marginVertical: 4, opacity: 0.5,}}><Text style={{color: Colors.lightest,}}>{formatDate(item.date, true)}</Text></View>
         }
       </TouchableOpacity>
