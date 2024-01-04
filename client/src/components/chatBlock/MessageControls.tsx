@@ -57,6 +57,8 @@ const MessageControls: React.FC<IMessageProps>  = React.memo(({ systemStore, ite
                   Clipboard.setString(item.message)
                   setState({ messageId: null, messageIndex: null, })
                 }, },
+                // { Icon: Icon, title: 'Unsend', noRight: true, onPress: () => {
+                // }, },
               ] : [
                 { Icon: CopyIcon, title: Lit[systemStore.Locale].Button.Copy, noRight: true, onPress: () => {
                   Clipboard.setString(item.message)

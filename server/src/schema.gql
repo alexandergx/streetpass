@@ -44,6 +44,7 @@ input ChatNotificationsDto {
 type ChatsPagination {
   chats: [UserChat!]!
   continue: Boolean!
+  lastUpdated: String
 }
 
 """

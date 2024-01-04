@@ -1,15 +1,30 @@
-import { CHAT_NOTIFICATIONS, GET_CHATS, GET_MESSAGES, IChatNotificationsMutation, IGetChatsQuery, IGetMessagesQuery, IReactMessageMutation, IReadChatMutation, ISearchChatsQuery, ISendMessageMutation, REACT_MESSAGE, READ_CHAT, SEARCH_CHATS, SEND_MESSAGE, apiRequest } from '.'
+import { CHAT_NOTIFICATIONS, GET_CHATS, GET_MESSAGES, IChatNotificationsMutation, IGetChatsQuery, IGetMessagesQuery, IReactMessageMutation, IReadChatMutation, ISearchChatsQuery, ISendMessageMutation, IUpdateChatsQuery, IUpdateMessagesQuery, REACT_MESSAGE, READ_CHAT, SEARCH_CHATS, SEND_MESSAGE, UPDATE_CHATS, UPDATE_MESSAGES, apiRequest } from '.'
 import { IChat, IMessage } from '../state/reducers/ChatsReducer'
 
 export type IGetChatsReq = IGetChatsQuery
 export interface IGetChatsRes {
   chats: Array<IChat>,
   continue: boolean,
+  lastUpdated: Date | null,
 }
 export const getChats = async (input: IGetChatsReq): Promise<IGetChatsRes> => {
   try {
     const { data, } = await apiRequest(GET_CHATS(input))
     return data.getChats
+  } catch(e) {
+    throw new Error
+  }
+}
+
+export type IUpdateChatsReq = IUpdateChatsQuery
+export interface IUpdateChatsRes {
+  chats: Array<IChat>,
+  lastUpdated: Date | null,
+}
+export const updateChats = async (input: IUpdateChatsReq): Promise<IUpdateChatsRes> => {
+  try {
+    const { data, } = await apiRequest(UPDATE_CHATS(input))
+    return data.updateChats
   } catch(e) {
     throw new Error
   }
@@ -57,6 +72,19 @@ export const getMessages = async (input: IGetMessagesReq): Promise<IGetMessagesR
   try {
     const { data, } = await apiRequest(GET_MESSAGES(input))
     return data.getMessages
+  } catch(e) {
+    throw new Error
+  }
+}
+
+export type IUpdateMessagesReq = IUpdateMessagesQuery
+export interface IUpdateMessagesRes {
+  messages: Array<IMessage>,
+}
+export const updateMessages = async (input: IUpdateMessagesReq): Promise<IUpdateMessagesRes> => {
+  try {
+    const { data, } = await apiRequest(UPDATE_MESSAGES(input))
+    return data.updateMessages
   } catch(e) {
     throw new Error
   }

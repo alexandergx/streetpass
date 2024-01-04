@@ -1,7 +1,7 @@
 import { Resolver, Query, Mutation, Args, Context, Subscription } from '@nestjs/graphql'
 import { ChatsService, ChatsSubscriptionsService, } from './chats.service'
-import { ChatsPagination, MessagesPagination, MessagesSubscription, UserChat, UserMessage, } from './chats.entities'
-import { GetChatsDto, GetMessagesDto, ReadChatDto, SearchChatsDto, ChatNotificationsDto, SubscribeChatsDto, SendMessageDto, ReactMessageDto, } from './chats.dto'
+import { ChatsPagination, MessagesPagination, MessagesSubscription, UpdateChats, UpdateMessages, UserChat, UserMessage, } from './chats.entities'
+import { GetChatsDto, GetMessagesDto, ReadChatDto, SearchChatsDto, ChatNotificationsDto, SubscribeChatsDto, SendMessageDto, ReactMessageDto, UpdateMessagesDto, UpdateChatsDto, } from './chats.dto'
 import { UseGuards } from '@nestjs/common'
 import { AuthGuard } from '../auth/auth.service'
 import { Errors, InputLimits, Subscriptions, Time } from 'src/utils/constants'
@@ -22,6 +22,12 @@ export class ChatsResolver {
   @UseGuards(AuthGuard)
   async getChats(@Args('input') input: GetChatsDto, @Context() context: any) {
     return this.chatsService.getChats(input, context)
+  }
+
+  @Query(() => UpdateChats)
+  @UseGuards(AuthGuard)
+  async updateChats(@Args('input') input: UpdateChatsDto, @Context() context: any) {
+    return this.chatsService.updateChats(input, context)
   }
 
   @Query(() => [UserChat])
@@ -46,6 +52,12 @@ export class ChatsResolver {
   @UseGuards(AuthGuard)
   async getMessages(@Args('input') input: GetMessagesDto, @Context() context: any) {
     return this.chatsService.getMessages(input, context)
+  }
+
+  @Query(() => UpdateMessages)
+  @UseGuards(AuthGuard)
+  async updateMessages(@Args('input') input: UpdateMessagesDto, @Context() context: any) {
+    return this.chatsService.updateMessages(input, context)
   }
 
   @Mutation(() => Boolean)

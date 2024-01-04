@@ -158,39 +158,42 @@ export const getModulus = (contentLength: number, mod: number) => {
 //   })
 //   return lineCount
 // }
-// export const getLineCount = (string: string = '', fontScale: number = 1) => {
-//   // Define the relationship between fontScale and maxCharsPerLine
-//   const maxCharsAtMinScale = 55; // maxCharsPerLine at fontScale 0.823
-//   const maxCharsAtMaxScale = 20; // maxCharsPerLine at fontScale 1.353
-//   const minScale = 0.823;
-//   const maxScale = 1.353;
 
-//   // Linear interpolation function
-//   const interpolate = (minVal, maxVal, minScale, maxScale, currentScale) => {
-//     return minVal + (maxVal - minVal) * ((currentScale - minScale) / (maxScale - minScale));
-//   };
-
-//   // Calculate maxCharsPerLine based on fontScale
-//   let maxCharsPerLine: number;
-//   if (fontScale <= 1) {
-//     maxCharsPerLine = interpolate(35, maxCharsAtMinScale, 1, minScale, fontScale);
-//   } else {
-//     maxCharsPerLine = interpolate(35, maxCharsAtMaxScale, 1, maxScale, fontScale);
-//   }
-//   maxCharsPerLine = Math.round(maxCharsPerLine);
-
-//   // Counting lines
-//   if (!string.length) return 1;
-//   const lines = string.split(/\r\n|\r|\n/);
-//   let lineCount = 0;
-//   lines.forEach(line => {
-//     const lineLength = line.length;
-//     const linesForThisLine = Math.ceil(lineLength / maxCharsPerLine) || 1;
-//     lineCount += linesForThisLine;
-//   });
-
-//   return lineCount;
+// let min = 20, max = 24, msg = 4
+// const fontScale = PixelRatio.getFontScale()
+// if (fontScale > 1) min = 12, max = 28, msg = 3
+// if (fontScale < 1) min = 24, max = 28, msg = 5
+// let lineCount = getLineCount(messages[index]?.message, fontScale)
+// let messageCount = 0
+// while (lineCount < min && (lineCount + getLineCount(messages[index - messageCount]?.message, fontScale) < max) && (index - messageCount >= 0) && messageCount < msg) {
+//   messageCount += 1
+//   lineCount += getLineCount(messages[index - messageCount]?.message)
 // }
+// console.log('[LINE COUNT]', lineCount, '[MSG COUNT]', messageCount, '[MIN]', min, '[MAX]', max)
+
+export const getLineCount = (string: string = '') => {
+  const fontScale = PixelRatio.getFontScale()
+  const maxCharsAtMinScale = 55
+  const maxCharsAtMaxScale = 20
+  const minScale = 0.823
+  const maxScale = 1.353
+  const interpolate = (minVal: number, maxVal: number, minScale: number, maxScale: number, currentScale: number) => {
+    return minVal + (maxVal - minVal) * ((currentScale - minScale) / (maxScale - minScale))
+  }
+  let maxCharsPerLine: number
+  if (fontScale <= 1) maxCharsPerLine = interpolate(35, maxCharsAtMinScale, 1, minScale, fontScale)
+  else maxCharsPerLine = interpolate(35, maxCharsAtMaxScale, 1, maxScale, fontScale)
+  maxCharsPerLine = Math.round(maxCharsPerLine)
+  if (!string.length) return 1
+  const lines = string.split(/\r\n|\r|\n/)
+  let lineCount = 0
+  lines.forEach(line => {
+    const lineLength = line.length
+    const linesForThisLine = Math.ceil(lineLength / maxCharsPerLine) || 1
+    lineCount += linesForThisLine
+  })
+  return lineCount
+}
 
 export const formatNumber = (num: number) => {
   if (num < 1000) {

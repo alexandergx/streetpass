@@ -550,6 +550,50 @@ export const GET_CHATS = (input: IGetChatsQuery) => {
           chatDate
         }
         continue
+        lastUpdated
+      }
+    }
+  `
+  return gql(query)
+}
+
+export interface IUpdateChatsQuery {
+  index?: number,
+  lastUpdated: Date | null,
+}
+export const UPDATE_CHATS = (input: IUpdateChatsQuery) => {
+  let query = `
+    query {
+      updateChats(input: {
+  `
+  query = query + inputConstructor(input)
+  query = query + `
+      }) {
+        chats {
+          chatId
+          userId
+          name
+          bio
+          work
+          school
+          age
+          sex
+          media {
+            mediaId
+            image
+            video
+            thumbnail
+          }
+          lastMessage
+          lastMessageId
+          lastMessageUserId
+          unread
+          notifications
+          streetpassDate
+          matchDate
+          chatDate
+        }
+        lastUpdated
       }
     }
   `
@@ -645,6 +689,33 @@ export const GET_MESSAGES = (input: IGetMessagesQuery) => {
           date
         }
         continue
+      }
+    }
+  `
+  return gql(query)
+}
+
+export interface IUpdateMessagesQuery {
+  chatId: string,
+  userId: string,
+  messageId: string,
+}
+export const UPDATE_MESSAGES = (input: IUpdateMessagesQuery) => {
+  let query = `
+    query {
+      updateMessages(input: {
+  `
+  query = query + inputConstructor(input)
+  query = query + `
+      }) {
+        messages {
+          chatId
+          messageId
+          userId
+          message
+          reaction
+          date
+        }
       }
     }
   `

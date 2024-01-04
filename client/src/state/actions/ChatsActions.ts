@@ -1,4 +1,4 @@
-import { IChatNotificationsReq, IGetChatsReq, IGetChatsRes, IGetMessagesReq, IGetMessagesRes, IReadChatReq, IReadChatRes, ISearchChatsReq, ISearchChatsRes, chatNotifications, getChats, getMessages, readChat, searchChats } from '../../api/chats'
+import { IChatNotificationsReq, IGetChatsReq, IGetChatsRes, IGetMessagesReq, IGetMessagesRes, IReadChatReq, IReadChatRes, ISearchChatsReq, ISearchChatsRes, IUpdateChatsReq, IUpdateChatsRes, IUpdateMessagesReq, IUpdateMessagesRes, chatNotifications, getChats, getMessages, readChat, searchChats, updateChats, updateMessages } from '../../api/chats'
 import { ChatsActions, IChat, IMessage } from '../reducers/ChatsReducer'
 
 export type ISetChats = IGetChatsReq
@@ -9,6 +9,23 @@ export function setChats(input: ISetChats) {
       return dispatch({
         type: ChatsActions.SetChats,
         payload: result as IGetChatsRes,
+      })
+    } catch (e) {
+      return dispatch({
+        type: ChatsActions.ChatsError,
+      })
+    }
+  }
+}
+
+export type ISetUpdateChats = IUpdateChatsReq
+export function setUpdateChats(input: ISetUpdateChats) {
+  return async (dispatch: any) => {
+    try {
+      const result = await updateChats(input)
+      return dispatch({
+        type: ChatsActions.SetUpdateChats,
+        payload: result as IUpdateChatsRes,
       })
     } catch (e) {
       return dispatch({
@@ -107,6 +124,23 @@ export function setMessages(input: ISetMessages) {
       return dispatch({
         type: ChatsActions.SetMessages,
         payload: { ...result, ...input, } as IGetMessagesRes & ISetMessages,
+      })
+    } catch (e) {
+      return dispatch({
+        type: ChatsActions.ChatsError,
+      })
+    }
+  }
+}
+
+export type ISetUpdateMessages = IUpdateMessagesReq
+export function setUpdateMessages(input: ISetUpdateMessages) {
+  return async (dispatch: any) => {
+    try {
+      const result = await updateMessages(input)
+      return dispatch({
+        type: ChatsActions.SetUpdateMessages,
+        payload: { ...result, ...input, } as IUpdateMessagesRes & ISetUpdateMessages,
       })
     } catch (e) {
       return dispatch({

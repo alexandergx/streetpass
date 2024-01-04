@@ -7,7 +7,7 @@ import {
 } from 'react-native'
 import { BlurView } from '@react-native-community/blur'
 import { Time } from '../../utils/constants'
-import { formatDate, withinTime } from '../../utils/functions'
+import { formatDate, getLineCount, withinTime } from '../../utils/functions'
 import { softVibrate } from '../../utils/services'
 import { ISystemStore } from '../../state/reducers/SystemReducer'
 import Pretext from '../pretext'
@@ -31,6 +31,18 @@ const Message: React.FC<IMessageProps>  = React.memo(({ systemStore, userId, ite
   const me = item.userId === userId
   const prev = messages[index + 1]?.userId === item.userId && withinTime(item.date, messages[index + 1].date, Time.Minute * 10 * 1000) ? true : false
   const next = messages[index - 1]?.userId === item.userId && withinTime(item.date, messages[index - 1].date, Time.Minute * 10 * 1000) ? true : false
+  const longPress = () => {
+    Keyboard.dismiss()
+    softVibrate()
+    setState({ messageId: messageId === item.messageId ? null : item.messageId, messageIndex: messageIndex === index ? null : index, })
+    let lineCount = index > 3 ? 0 : getLineCount(messages[index].message)
+    let messageCount = 0
+    while ((index <= 3) && (lineCount < 3 )&& (index - messageCount >= 0)) {
+      messageCount += 1
+      lineCount += getLineCount(messages[index - messageCount]?.message)
+    }
+    if (index > 3 || lineCount > 3) scrollTo(index)
+  }
 
   return (
     <>
@@ -52,12 +64,7 @@ const Message: React.FC<IMessageProps>  = React.memo(({ systemStore, userId, ite
 
         <TouchableOpacity
           onPress={() => messageId ? setState({ messageId: null, messageIndex: null, }) : setState({ messageTime: messageTime === item.messageId ? null : item.messageId, })}
-          onLongPress={() => {
-            Keyboard.dismiss()
-            softVibrate()
-            setState({ messageId: messageId === item.messageId ? null : item.messageId, messageIndex: messageIndex === index ? null : index, })
-            scrollTo(index)
-          }}
+          onLongPress={longPress}
           activeOpacity={Colors.activeOpacity}
         >
           <View
@@ -84,12 +91,7 @@ const Message: React.FC<IMessageProps>  = React.memo(({ systemStore, userId, ite
               linkColor={me ? Colors.darkBlue : Colors.lightBlue}
               textStyle={{color: Colors.safeLightest, paddingVertical: 12, paddingHorizontal: 16,}}
               onPress={(word) => null}
-              onLongPress={() => {
-                Keyboard.dismiss()
-                softVibrate()
-                setState({ messageId: messageId === item.messageId ? null : item.messageId, messageIndex: messageIndex === index ? null : index, })
-                scrollTo(index)
-              }}
+              onLongPress={longPress}
             />
           </View>
 

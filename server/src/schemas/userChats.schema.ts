@@ -49,6 +49,9 @@ export class UserChats {
 
   @Prop({ required: true, default: [], })
   chats: UserChatDocument[]
+
+  @Prop({ required: true, })
+  lastUpdated: Date
 }
 
 export const UserChatsSchema = SchemaFactory.createForClass(UserChats)

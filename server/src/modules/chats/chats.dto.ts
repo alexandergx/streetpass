@@ -7,6 +7,15 @@ export class GetChatsDto {
 }
 
 @InputType()
+export class UpdateChatsDto {
+  @Field(() => Number, { nullable: true, })
+  index?: number
+
+  @Field(() => Date, { nullable: true, })
+  lastUpdated?: Date
+}
+
+@InputType()
 export class SearchChatsDto {
   @Field(() => String)
   name: string
@@ -37,6 +46,18 @@ export class GetMessagesDto {
 
   @Field(() => Number, { nullable: true, })
   index?: number
+}
+
+@InputType()
+export class UpdateMessagesDto {
+  @Field(() => String)
+  chatId: string
+
+  @Field(() => String)
+  userId: string
+
+  @Field(() => String)
+  messageId: string
 }
 
 @InputType()

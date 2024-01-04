@@ -62,6 +62,18 @@ export class ChatsPagination {
 
   @Field(() => Boolean)
   continue: boolean
+
+  @Field(() => String, { nullable: true, })
+  lastUpdated?: string
+}
+
+@ObjectType()
+export class UpdateChats {
+  @Field(() => [UserChat])
+  chats: UserChat[]
+
+  @Field(() => String, { nullable: true, })
+  lastUpdated?: string
 }
 
 @ObjectType()
@@ -92,6 +104,12 @@ export class MessagesPagination {
 
   @Field(() => Boolean)
   continue: boolean
+}
+
+@ObjectType()
+export class UpdateMessages {
+  @Field(() => [UserMessage])
+  messages: UserMessage[]
 }
 
 @ObjectType()

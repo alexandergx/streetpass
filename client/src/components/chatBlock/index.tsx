@@ -56,10 +56,7 @@ interface IChatBlockProps {
 const ChatBlock: React.FC<IChatBlockProps> = ({ navigation, route, systemStore, userStore, state, messages, setState, actions, }) => {
   const { Colors, Fonts, } = systemStore
   const listRef = useRef<FlashList<IMessage>>(null)
-
-  const scrollTo = useCallback(async (index: number) => {
-    if (listRef.current) listRef.current.scrollToIndex({ index: index, animated: true, viewPosition: 0.5, })
-  }, [])
+  const scrollTo = useCallback(async (index: number) => listRef.current?.scrollToIndex({ index: index, animated: true, viewPosition: 0.5, }), [])
 
   return (
     <>
@@ -193,6 +190,7 @@ const ChatBlock: React.FC<IChatBlockProps> = ({ navigation, route, systemStore, 
             onEndReached={async () => {
               if (state.chat && messages && messages.continue !== false && !state.paginating) {
                 setState({ paginating: true, })
+                console.log('[PAGINATING]')
                 await actions.setMessages({ chatId: state.chat.chatId, userId: state.userId, index: messages.messages.length || 0, })
                 setState({ paginating: false, })
               }
@@ -229,6 +227,7 @@ const ChatBlock: React.FC<IChatBlockProps> = ({ navigation, route, systemStore, 
                   limitChars={InputLimits.DescriptionMax}
                   onPressEnd={async () => {
                     setState({ sending: true, })
+                    listRef.current?.scrollToOffset({ offset: 0, animated: true, })
                     await sendMessage({
                       chatId: undefined,
                       userId: state.userId,

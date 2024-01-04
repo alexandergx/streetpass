@@ -1,5 +1,5 @@
-import { useEffect, useState, } from 'react'
-import { Platform, View, } from 'react-native'
+import { useEffect, useRef, useState, } from 'react'
+import { AppState, AppStateStatus, Platform, View, } from 'react-native'
 import { NavigationContainer, createNavigationContainerRef, } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { connect } from 'react-redux'
@@ -9,7 +9,7 @@ import { MMKVLoader } from 'react-native-mmkv-storage'
 import { IUserStore } from '../state/reducers/UserReducer'
 import { ISystemStore } from '../state/reducers/SystemReducer'
 import { AppVersion, AuthStore, LocalStorage, OS, } from '../utils/constants'
-// import { getDeviceId, getCarrier, } from 'react-native-device-info'
+import { getDeviceId, getCarrier, } from 'react-native-device-info'
 // import { getIP, getLocation, requestPushNotifications } from '../utils/services'
 
 // MAIN ROUTES
@@ -38,16 +38,16 @@ import { useSubscription } from '@apollo/client'
 import { SUBSCRIBE_MATCHES, SUBSCRIBE_MESSAGES, SUBSCRIBE_STREETPASSES, apiRequest } from '../api'
 import { IMatch } from '../state/reducers/MatchesReducer'
 import { IStreetpassStore } from '../state/reducers/StreetpassReducer'
-import { ISetChat, ISetChats, ISetMessage, ISetMessageReaction, IUnsetChat, setChat, setChats, setMessage, setMessageReaction, unsetChat } from '../state/actions/ChatsActions'
-import { IChat, IMessage, IMessageMetadata } from '../state/reducers/ChatsReducer'
+import { ISetChat, ISetChats, ISetMessage, ISetMessageReaction, ISetUpdateChats, IUnsetChat, setChat, setChats, setMessage, setMessageReaction, setUpdateChats, unsetChat } from '../state/actions/ChatsActions'
+import { IChat, IChatsStore, IMessage, IMessageMetadata } from '../state/reducers/ChatsReducer'
 
 export const navigationRef = createNavigationContainerRef()
 
 const MMKV = new MMKVLoader().withEncryption().withInstanceID(LocalStorage.AuthStore).initialize()
 
 const mapStateToProps = (state: IStores) => {
-  const { systemStore, userStore, streetpassStore, } = state
-  return { systemStore, userStore, streetpassStore, }
+  const { userStore, streetpassStore, chatsStore, } = state
+  return { userStore, streetpassStore, chatsStore, }
 }
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => ({
   actions: bindActionCreators(Object.assign(
@@ -58,6 +58,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => ({
       setMatches,
       setMatch,
       setChats,
+      setUpdateChats,
       setChat,
       unsetChat,
       setMessage,
@@ -89,9 +90,9 @@ export enum Screens {
 }
 
 interface IMapScreenProps {
-  systemStore: ISystemStore,
   userStore: IUserStore,
   streetpassStore: IStreetpassStore,
+  chatsStore: IChatsStore,
   actions: {
     setSignIn: (params: ISetSignIn) => Promise<any>,
     setUpdateUser: (params: ISetUpdateUser) => void,
@@ -99,6 +100,7 @@ interface IMapScreenProps {
     setMatches: (params: ISetMatches) => void,
     setMatch: (params: ISetMatch) => void,
     setChats: (params: ISetChats) => void,
+    setUpdateChats: (params: ISetUpdateChats) => void,
     setChat: (params: ISetChat) => void,
     unsetChat: (params: IUnsetChat) => void,
     setMessage: (params: ISetMessage) => void,
@@ -106,9 +108,24 @@ interface IMapScreenProps {
   },
 }
 
-function AppNavigation({ systemStore, userStore, streetpassStore, actions, }: IMapScreenProps) {
+function AppNavigation({ userStore, streetpassStore, chatsStore, actions, }: IMapScreenProps) {
   const [initialized, setInitialized] = useState<boolean>(false)
+  const appState = useRef<AppStateStatus>(AppState.currentState)
   const accessToken = MMKV.getString(AuthStore.AccessToken)
+
+  useEffect(() => {
+    const handleAppStateChange = (nextAppState: AppStateStatus) => {
+      if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
+        if (userStore.signedIn) {
+          if (chatsStore.chats) actions.setUpdateChats({ index: chatsStore.chats.length, lastUpdated: chatsStore.lastUpdated, })
+        }
+      }
+      appState.current = nextAppState
+    }
+    const subscription = AppState.addEventListener('change', handleAppStateChange)
+    return () => subscription.remove()
+  }, [])
+
   useEffect(() => {
     const autoSignIn = async () => {
       await actions.setSignIn({
@@ -172,6 +189,7 @@ function AppNavigation({ systemStore, userStore, streetpassStore, actions, }: IM
     shouldResubscribe: true,
     onData: (data) => {
       const { chat, message, metadata, } = data?.data?.data?.messages as { chat?: IChat, message: IMessage, metadata: IMessageMetadata, }
+      if (getDeviceId() === 'iPhone15,4') console.log('[LOG]', message.message)
       if (message.reaction) {
         actions.setMessageReaction({ userId: metadata.recipient, messageId: message.messageId, reaction: message.reaction === 'null' ? null : message.reaction, })
         return

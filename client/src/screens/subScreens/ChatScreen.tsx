@@ -13,7 +13,7 @@ import { IMatch } from '../../state/reducers/MatchesReducer'
 import { IStreetpass } from '../../state/reducers/StreetpassReducer'
 import { ISetSeenMatch, IUnsetMatch, setSeenMatch, unsetMatch } from '../../state/actions/MatchesActions'
 import { IChat, IChatsStore, } from '../../state/reducers/ChatsReducer'
-import { ISetChatKey, ISetChatMessage, ISetChatNotifications, ISetMessages, ISetReadChat, IUnsetChat, setChatKey, setChatMessage, setChatNotifications, setMessages, setReadChat, unsetChat } from '../../state/actions/ChatsActions'
+import { ISetChatKey, ISetChatMessage, ISetChatNotifications, ISetMessages, ISetReadChat, ISetUpdateMessages, IUnsetChat, setChatKey, setChatMessage, setChatNotifications, setMessages, setReadChat, setUpdateMessages, unsetChat } from '../../state/actions/ChatsActions'
 
 const mapStateToProps = (state: IStores) => {
   const { systemStore, userStore, chatsStore, } = state
@@ -24,6 +24,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => ({
     {
       setSeenMatch,
       setMessages,
+      setUpdateMessages,
       setChatMessage,
       unsetMatch,
       unsetChat,
@@ -43,6 +44,7 @@ interface IChatScreenProps {
   actions: {
     setSeenMatch: (params: ISetSeenMatch) => void,
     setMessages: (params: ISetMessages) => void,
+    setUpdateMessages: (params: ISetUpdateMessages) => void,
     setChatMessage: (params: ISetChatMessage) => void,
     unsetMatch: (params: IUnsetMatch) => void,
     unsetChat: (params: IUnsetChat) => void,
@@ -105,6 +107,13 @@ class ChatScreen extends React.Component<IChatScreenProps> {
     if (!this.props.chatsStore.messages[this.state.userId]) this.props.actions.setChatMessage({ userId: this.state.userId, message: '', })
     if (this.state.chat && this.props.chatsStore.messages[this.state.userId]?.continue !== false) {
       this.props.actions.setMessages({ chatId: this.state.chat.chatId, userId: this.state.userId, index: undefined, })
+    }
+    if (this.state.chat && this.state.chat.lastMessageId !== this.props.chatsStore.messages[this.state.userId]?.messages[0]?.messageId) {
+      this.props.actions.setUpdateMessages({
+        chatId: this.state.chat.chatId,
+        userId: this.state.chat.userId,
+        messageId: this.props.chatsStore.messages[this.state.userId].messages[0].messageId,
+      })
     }
   }
 
