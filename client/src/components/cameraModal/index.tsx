@@ -34,7 +34,7 @@ import TimerIcon from '../../assets/icons/timer.svg'
 import { ISystemStore } from '../../state/reducers/SystemReducer'
 import { CameraStore, Errors, InputLimits, LocalStorage, } from '../../utils/constants'
 import CameraButton from './CameraButton'
-import { requestCamera, requestMicrophone, requestPhotoLibrary, softVibrate, } from '../../utils/services'
+import { requestCamera, requestMicrophone, requestPhotoLibrary, hardVibrate, } from '../../utils/services'
 import { Lit, } from '../../utils/locale'
 import { CameraRoll, } from '@react-native-camera-roll/camera-roll'
 
@@ -225,7 +225,7 @@ const CameraModal: React.FC<ICameraModalProps> = ({ systemStore, toggleModal, on
 
   const onHandlerStateChange = ({ nativeEvent }: any) => {
     if (nativeEvent.state === State.BEGAN) {
-      softVibrate()
+      hardVibrate()
       longPressTimeoutRef.current = setTimeout(() => {
         setLongPressActive(true)
         recordVideoStarted()

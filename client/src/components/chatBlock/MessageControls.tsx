@@ -12,7 +12,7 @@ import CopyIcon from '../../assets/icons/copy.svg'
 import { Emojis, } from '../../utils/constants'
 import ListGroup from '../listGroup'
 import ReactionButton from './EmojiButton'
-import { midVibrate, softVibrate } from '../../utils/services'
+import { softVibrate, hardVibrate } from '../../utils/services'
 import { ISystemStore } from '../../state/reducers/SystemReducer'
 import { Lit } from '../../utils/locale'
 import { IMessage } from '../../state/reducers/ChatsReducer'
@@ -69,7 +69,7 @@ const MessageControls: React.FC<IMessageProps>  = React.memo(({ systemStore, ite
           />
         </View>
 
-        {me &&
+        {!me &&
           <View style={{alignSelf: me ? 'flex-end' : 'flex-start', maxWidth: '85%', height: 52, borderRadius: 16, overflow: 'hidden',}}>
             <BlurView blurType={Colors.darkestBlur } style={{position: 'absolute', zIndex: -1, height: '100%', width: '100%', display: 'flex', backgroundColor: Colors.darkerBackground,}} />
 
@@ -87,7 +87,7 @@ const MessageControls: React.FC<IMessageProps>  = React.memo(({ systemStore, ite
                     title={emoji}
                     active={item.reaction === emoji}
                     onPress={async () => {
-                      item.reaction === null ? midVibrate() : softVibrate()
+                      item.reaction === null ? softVibrate() : hardVibrate()
                       await reactMessage({ chatId: item.chatId, messageId: item.messageId, reaction: item.reaction === emoji ? null : emoji })
                       setState({ messageId: null, messageIndex: null, })
                     }}

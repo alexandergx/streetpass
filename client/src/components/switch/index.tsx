@@ -2,7 +2,7 @@ import React, { useState, useEffect, } from 'react'
 import { View, Animated, TouchableOpacity, } from 'react-native'
 import { SvgProps } from 'react-native-svg'
 import { ISystemStore } from '../../state/reducers/SystemReducer'
-import { midVibrate, softVibrate } from '../../utils/services'
+import { softVibrate, hardVibrate } from '../../utils/services'
 
 interface ISwitchProps {
   systemStore: ISystemStore,
@@ -29,7 +29,7 @@ export const Switch: React.FC<ISwitchProps> = function ({ systemStore, value, di
   return (
     <TouchableOpacity
       onPress={() => {
-        !toggleValue ? softVibrate() : midVibrate()
+        !toggleValue ? hardVibrate() : softVibrate()
         setToggleValue(!toggleValue)
         onToggle()
       }}

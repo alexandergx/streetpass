@@ -8,7 +8,7 @@ import {
 import { BlurView } from '@react-native-community/blur'
 import { Time } from '../../utils/constants'
 import { formatDate, getLineCount, withinTime } from '../../utils/functions'
-import { softVibrate } from '../../utils/services'
+import { hardVibrate } from '../../utils/services'
 import { ISystemStore } from '../../state/reducers/SystemReducer'
 import Pretext from '../pretext'
 import { IMessage } from '../../state/reducers/ChatsReducer'
@@ -33,7 +33,7 @@ const Message: React.FC<IMessageProps>  = React.memo(({ systemStore, userId, ite
   const next = messages[index - 1]?.userId === item.userId && withinTime(item.date, messages[index - 1].date, Time.Minute * 10 * 1000) ? true : false
   const longPress = () => {
     Keyboard.dismiss()
-    softVibrate()
+    hardVibrate()
     setState({ messageId: messageId === item.messageId ? null : item.messageId, messageIndex: messageIndex === index ? null : index, })
     let lineCount = index > 3 ? 0 : getLineCount(messages[index].message)
     let messageCount = 0
@@ -69,7 +69,7 @@ const Message: React.FC<IMessageProps>  = React.memo(({ systemStore, userId, ite
         >
           <View
             style={{
-              alignItems: 'center', overflow: 'hidden', maxWidth: '80%', marginTop: 2,
+              alignItems: 'center', overflow: 'hidden', maxWidth: '80%', marginTop: 3,
               borderTopLeftRadius: prev && !me ? 4 : 20, borderTopRightRadius: prev && me ? 4 : 20,
               borderBottomLeftRadius: next && !me ? 4 : 20, borderBottomRightRadius: next && me ? 4 : 20,
             }}
@@ -89,7 +89,7 @@ const Message: React.FC<IMessageProps>  = React.memo(({ systemStore, userId, ite
               systemStore={systemStore}
               text={item.message}
               linkColor={me ? Colors.darkBlue : Colors.lightBlue}
-              textStyle={{color: Colors.safeLightest, paddingVertical: 12, paddingHorizontal: 16,}}
+              textStyle={{color: Colors.safeLightest, paddingVertical: 10, paddingHorizontal: 16,}}
               onPress={(word) => null}
               onLongPress={longPress}
             />

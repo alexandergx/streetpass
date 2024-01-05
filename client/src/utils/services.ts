@@ -292,14 +292,14 @@ export const openCoordinates = async (lon: number, lat: number, username: string
   Linking.openURL(appleMapsUrl)
 }
 
-export const softVibrate = () => {
+export const hardVibrate = () => {
   ReactNativeHapticFeedback.trigger('impactLight', {
     enableVibrateFallback: true,
     ignoreAndroidSystemSettings: false,
   })
 }
 
-export const midVibrate = () => {
+export const softVibrate = () => {
   ReactNativeHapticFeedback.trigger('soft', {
     enableVibrateFallback: true,
     ignoreAndroidSystemSettings: false,

@@ -25,7 +25,7 @@ import SelectionModal from '../../components/selectionModal'
 import { IListGroupConfig } from '../../components/listGroup'
 import { baseUrl, protocol } from '../../api'
 import { BlurView } from '@react-native-community/blur'
-import { softVibrate } from '../../utils/services'
+import { hardVibrate } from '../../utils/services'
 import { Lit } from '../../utils/locale'
 import { FlashList, } from '@shopify/flash-list'
 import NotFound from '../../components/notFound'
@@ -172,7 +172,7 @@ class BlockingScreen extends React.Component<IBlockingScreenProps> {
                       blur={this.state.userId && this.state.userId !== item.userId || false}
                       loading={this.state.profileLoading.includes(item.userId as never)}
                       onPress={() => {
-                        softVibrate()
+                        hardVibrate()
                         this.setState({
                           userId: item.userId,
                           selectionModalConfig: config,
