@@ -31,7 +31,7 @@ const INITIAL_STATE: IMatchesStore = {
 
 
 export enum MatchesActions {
-  Init = 'INIT',
+  Init = 'INIT_MATCHES',
   SetMatches = 'SET_MATCHES',
   SetMatch = 'SET_MATCH',
   UnsetMatch = 'UNSET_MATCH',

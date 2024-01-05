@@ -189,7 +189,7 @@ function AppNavigation({ userStore, streetpassStore, chatsStore, actions, }: IMa
     shouldResubscribe: true,
     onData: (data) => {
       const { chat, message, metadata, } = data?.data?.data?.messages as { chat?: IChat, message: IMessage, metadata: IMessageMetadata, }
-      if (getDeviceId() === 'iPhone15,4') console.log('[LOG]', message.message)
+      // if (getDeviceId() === 'iPhone15,4') console.log('[LOG]', message.message)
       if (message.reaction) {
         actions.setMessageReaction({ userId: metadata.recipient, messageId: message.messageId, reaction: message.reaction === 'null' ? null : message.reaction, })
         return

@@ -93,7 +93,7 @@ const INITIAL_STATE: IUserStore = {
 }
 
 export enum UserActions {
-  Init = 'INIT',
+  Init = 'INIT_USER',
   SignIn = 'SIGN_IN',
   SetPhoneNumber = 'SET_PHONE_NUMBER',
   SetUser = 'SET_USER',

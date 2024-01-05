@@ -1,5 +1,5 @@
 import { IGetChatsRes, IGetMessagesRes, ISearchChatsRes, IUpdateChatsRes, IUpdateMessagesRes } from '../../api/chats'
-import { ISetChat, ISetChatKey, ISetChatMessage, ISetChatNotifications, ISetMessage, ISetMessageReaction, ISetMessages, ISetUpdateMessages, IUnsetChat } from '../actions/ChatsActions'
+import { ISetChat, ISetChatKey, ISetChatNotifications, ISetMessage, ISetMessageReaction, ISetMessages, ISetUpdateMessages, IUnsetChat } from '../actions/ChatsActions'
 import { IMedia } from './UserReducer'
 
 export interface IMessageMetadata {
@@ -17,9 +17,8 @@ export interface IMessage {
 }
 
 export interface IMessages {
-  messages: Array<IMessage>,
-  message: string,
-  continue: boolean,
+  messages?: Array<IMessage>,
+  continue?: boolean,
 }
 
 export interface IChat {
@@ -46,7 +45,7 @@ export interface IChatsStore {
   chats: Array<IChat> | null,
   chatsSearch: Array<IChat> | null,
   chatKey: string | null,
-  messages: Record<string, IMessages>,
+  messages: Record<string, IMessages | undefined>,
   unread: number | null,
   continue: boolean,
   lastUpdated: Date | null,
@@ -54,7 +53,7 @@ export interface IChatsStore {
 }
 
 export enum ChatsActions {
-  Init = 'INIT',
+  Init = 'INIT_CHATS',
   SetChats = 'SET_CHATS',
   SetUpdateChats = 'SET_UPDATE_CHATS',
   SetChat = 'SET_CHAT',
@@ -68,7 +67,6 @@ export enum ChatsActions {
   SetUpdateMessages = 'SET_UPDATE_MESSAGES',
   SetMessage = 'SET_MESSAGE',
   SetMessageReaction = 'SET_MESSAGE_REACTION',
-  SetChatMessage = 'SET_CHAT_MESSAGE',
   ChatsError = 'CHATS_ERROR',
 }
 
@@ -87,7 +85,6 @@ type ChatsAction =
   | { type: ChatsActions.SetUpdateMessages, payload: IUpdateMessagesRes & ISetUpdateMessages, }
   | { type: ChatsActions.SetMessage, payload: ISetMessage, }
   | { type: ChatsActions.SetMessageReaction, payload: ISetMessageReaction, }
-  | { type: ChatsActions.SetChatMessage, payload: ISetChatMessage, }
   | { type: ChatsActions.ChatsError, }
 
 const INITIAL_STATE: IChatsStore = {
@@ -106,9 +103,17 @@ const chatsStore = (state = INITIAL_STATE, action: ChatsAction) => {
     case ChatsActions.Init:
       return INITIAL_STATE
     case ChatsActions.SetChats:
+      // return {
+      //   ...state,
+      //   chats: state.chats ? [...state.chats, ...action.payload.chats] : action.payload.chats,
+      //   continue: action.payload.continue,
+      //   lastUpdated: action.payload.lastUpdated,
+      // }
       return {
         ...state,
-        chats: state.chats ? [...state.chats, ...action.payload.chats] : action.payload.chats,
+        chats: state.chats
+          ? state.chats.concat(action.payload.chats.filter(p => !state.chats?.some(s => s.chatId === p.chatId)))
+          : action.payload.chats,
         continue: action.payload.continue,
         lastUpdated: action.payload.lastUpdated,
       }
@@ -155,20 +160,52 @@ const chatsStore = (state = INITIAL_STATE, action: ChatsAction) => {
     case ChatsActions.SetChatNotifications:
       return {
         ...state,
-        chats: state.chats ? state.chats.map(chat => chat.chatId === action.payload.chatId ? { ...chat, notifications: action.payload.notifications, } : chat) : state.chats,
+        chats: state.chats
+          ? state.chats.map(chat => chat.chatId === action.payload.chatId ? { ...chat, notifications: action.payload.notifications, } : chat)
+          : state.chats,
       }
+    // case ChatsActions.SetMessages:
+    //   return {
+    //     ...state,
+    //     messages: {
+    //       ...state.messages,
+    //       [action.payload.userId]: {
+    //         messages: state.messages[action.payload.userId]
+    //           ? [...state.messages[action.payload.userId].messages, ...action.payload.messages]
+    //           : action.payload.messages,
+    //         continue: action.payload.continue,
+    //       },
+    //     },
+    //   }
     case ChatsActions.SetMessages:
       return {
         ...state,
         messages: {
           ...state.messages,
           [action.payload.userId]: {
-            messages: state.messages[action.payload.userId] ? [...state.messages[action.payload.userId].messages, ...action.payload.messages] : action.payload.messages,
-            message: state.messages[action.payload.userId] ? state.messages[action.payload.userId].message : '',
+            messages: state.messages[action.payload.userId] ?
+              [
+                ...state.messages[action.payload.userId]?.messages || [],
+                ...action.payload.messages.filter(p => !state.messages[action.payload.userId]?.messages?.some(s => s.messageId === p.messageId))
+              ]              
+              : action.payload.messages,
             continue: action.payload.continue,
           },
         },
       }
+    // case ChatsActions.SetUpdateMessages:
+    //   return {
+    //     ...state,
+    //     messages: {
+    //       ...state.messages,
+    //       [action.payload.userId] : {
+    //         ...state.messages[action.payload.userId],
+    //         messages: state.messages[action.payload.userId]
+    //           ? [...state.messages[action.payload.userId].messages, ...action.payload.messages]
+    //           : action.payload.messages,
+    //       }
+    //     }
+    //   }
     case ChatsActions.SetUpdateMessages:
       return {
         ...state,
@@ -176,7 +213,12 @@ const chatsStore = (state = INITIAL_STATE, action: ChatsAction) => {
           ...state.messages,
           [action.payload.userId] : {
             ...state.messages[action.payload.userId],
-            messages: state.messages[action.payload.userId] ? [...state.messages[action.payload.userId].messages, ...action.payload.messages] : action.payload.messages,
+            messages: state.messages[action.payload.userId] ?
+              [
+                ...state.messages[action.payload.userId]?.messages || [],
+                ...action.payload.messages.filter(p => !state.messages[action.payload.userId]?.messages?.some(s => s.messageId === p.messageId))
+              ]  
+              : action.payload.messages,
           }
         }
       }
@@ -186,19 +228,23 @@ const chatsStore = (state = INITIAL_STATE, action: ChatsAction) => {
         chats: state.chats ?
           [
             ...state.chats.filter(chat => chat.userId === action.payload.userId).map(chat => ({
-              ...chat, date: action.payload.message.date, lastMessage: action.payload.message.message, lastMessageId: action.payload.message.messageId, lastMessageUserId: action.payload.message.userId, unread: true,
+              ...chat,
+              date: action.payload.message.date,
+              lastMessage: action.payload.message.message,
+              lastMessageId: action.payload.message.messageId,
+              lastMessageUserId: action.payload.message.userId,
+              unread: true,
             })),
             ...state.chats.filter(chat => chat.userId !== action.payload.userId),
           ]
-        : state.chats,
+          : state.chats,
         messages: {
           ...state.messages,
           [action.payload.userId]: {
             messages: state.messages[action.payload.userId]
-              ? [action.payload.message, ...state.messages[action.payload.userId].messages.filter(message => message.messageId !== action.payload.message.messageId)]
+              ? [action.payload.message, ...state.messages[action.payload.userId]?.messages?.filter(message => message.messageId !== action.payload.message.messageId) || []]
               : [action.payload.message],
-            message: state.messages[action.payload.userId] ? state.messages[action.payload.userId].message : '',
-            continue: state.messages[action.payload.userId] ? state.messages[action.payload.userId].continue : true,
+            continue: state.messages[action.payload.userId] ? state.messages[action.payload.userId]?.continue : true,
           },
         },
       }
@@ -209,21 +255,9 @@ const chatsStore = (state = INITIAL_STATE, action: ChatsAction) => {
           ...state.messages,
           [action.payload.userId]: state.messages[action.payload.userId] ? {
             ...state.messages[action.payload.userId],
-            messages: state.messages[action.payload.userId].messages.map(message => message.messageId === action.payload.messageId ? { ...message, reaction: action.payload.reaction } : message),
+            messages: state.messages[action.payload.userId]?.messages?.map(message => message.messageId === action.payload.messageId ? { ...message, reaction: action.payload.reaction } : message),
           } : undefined,
         },
-      }
-    case ChatsActions.SetChatMessage:
-      return {
-        ...state,
-        messages: {
-          ...state.messages,
-          [action.payload.userId]: {
-            messages: state.messages[action.payload.userId] ? state.messages[action.payload.userId].messages : [],
-            message: action.payload.message,
-            continue: state.messages[action.payload.userId] ? state.messages[action.payload.userId].continue : true,
-          }
-        }
       }
     case ChatsActions.ChatsError:
       return {

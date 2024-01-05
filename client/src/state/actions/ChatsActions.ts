@@ -1,5 +1,11 @@
-import { IChatNotificationsReq, IGetChatsReq, IGetChatsRes, IGetMessagesReq, IGetMessagesRes, IReadChatReq, IReadChatRes, ISearchChatsReq, ISearchChatsRes, IUpdateChatsReq, IUpdateChatsRes, IUpdateMessagesReq, IUpdateMessagesRes, chatNotifications, getChats, getMessages, readChat, searchChats, updateChats, updateMessages } from '../../api/chats'
+import { IChatNotificationsReq, IGetChatsReq, IGetChatsRes, IGetMessagesReq, IGetMessagesRes, IReadChatReq, ISearchChatsReq, ISearchChatsRes, IUpdateChatsReq, IUpdateChatsRes, IUpdateMessagesReq, IUpdateMessagesRes, chatNotifications, getChats, getMessages, readChat, searchChats, updateChats, updateMessages } from '../../api/chats'
 import { ChatsActions, IChat, IMessage } from '../reducers/ChatsReducer'
+
+export function initChats() {
+  return {
+    type: ChatsActions.Init,
+  }
+}
 
 export type ISetChats = IGetChatsReq
 export function setChats(input: ISetChats) {
@@ -169,17 +175,6 @@ export interface ISetMessageReaction {
 export function setMessageReaction(input: ISetMessageReaction) {
   return {
     type: ChatsActions.SetMessageReaction,
-    payload: input,
-  }
-}
-
-export interface ISetChatMessage {
-  userId: string,
-  message: string,
-}
-export function setChatMessage(input: ISetChatMessage) {
-  return {
-    type: ChatsActions.SetChatMessage,
     payload: input,
   }
 }

@@ -30,10 +30,11 @@ import StreetpassModal from '../streetpassModal'
 import { IMatch } from '../../state/reducers/MatchesReducer'
 import { IChat, IMessage, IMessages } from '../../state/reducers/ChatsReducer'
 import { sendMessage } from '../../api/chats'
-import { ISetChatKey, ISetChatMessage, ISetChatNotifications, ISetMessages, ISetReadChat, IUnsetChat } from '../../state/actions/ChatsActions'
+import { ISetChatKey, ISetChatNotifications, ISetMessages, ISetReadChat, IUnsetChat } from '../../state/actions/ChatsActions'
 import { IUnsetMatch } from '../../state/actions/MatchesActions'
 import { timePassedSince } from '../../utils/functions'
 import { blockUser } from '../../api/user'
+import { ISetChatMessage } from '../../state/actions/ChatMessagesActions'
 
 interface IChatBlockProps {
   navigation: any,
@@ -41,19 +42,19 @@ interface IChatBlockProps {
   systemStore: ISystemStore,
   userStore: IUserStore,
   state: IChatScreenState,
-  messages: IMessages,
+  messages?: IMessages,
+  chatMessage: string,
   setState: (params: any) => void,
   actions: {
     setMessages: (params: ISetMessages) => void,
-    setChatMessage: (params: ISetChatMessage) => void,
     unsetMatch: (params: IUnsetMatch) => void,
     unsetChat: (params: IUnsetChat) => void,
     setChatKey: (params: ISetChatKey) => void,
-    setReadChat: (params: ISetReadChat) => void,
     setChatNotifications: (params: ISetChatNotifications) => void,
+    setChatMessage: (params: ISetChatMessage) => void,
   }
 }
-const ChatBlock: React.FC<IChatBlockProps> = ({ navigation, route, systemStore, userStore, state, messages, setState, actions, }) => {
+const ChatBlock: React.FC<IChatBlockProps> = ({ navigation, route, systemStore, userStore, state, messages, chatMessage, setState, actions, }) => {
   const { Colors, Fonts, } = systemStore
   const listRef = useRef<FlashList<IMessage>>(null)
   const scrollTo = useCallback(async (index: number) => listRef.current?.scrollToIndex({ index: index, animated: true, viewPosition: 0.5, }), [])
@@ -83,7 +84,6 @@ const ChatBlock: React.FC<IChatBlockProps> = ({ navigation, route, systemStore, 
         EndIcon={EllipsisIcon}
         onPress={() => {
           actions.setChatKey(null)
-          if (state.chat && state.chat.unread) actions.setReadChat({ chatId: state.chat.chatId, })
           navigation.goBack()
         }}
         onPressEnd={() => {
@@ -143,7 +143,7 @@ const ChatBlock: React.FC<IChatBlockProps> = ({ navigation, route, systemStore, 
                   index={index}
                   systemStore={systemStore}
                   userId={userStore.user.userId}
-                  messages={messages.messages || []}
+                  messages={messages?.messages || []}
                   messageId={state.messageId}
                   messageIndex={state.messageIndex}
                   messageTime={state.messageTime}
@@ -190,8 +190,7 @@ const ChatBlock: React.FC<IChatBlockProps> = ({ navigation, route, systemStore, 
             onEndReached={async () => {
               if (state.chat && messages && messages.continue !== false && !state.paginating) {
                 setState({ paginating: true, })
-                console.log('[PAGINATING]')
-                await actions.setMessages({ chatId: state.chat.chatId, userId: state.userId, index: messages.messages.length || 0, })
+                await actions.setMessages({ chatId: state.chat.chatId, userId: state.userId, index: messages.messages?.length || 0, })
                 setState({ paginating: false, })
               }
             }}
@@ -213,7 +212,7 @@ const ChatBlock: React.FC<IChatBlockProps> = ({ navigation, route, systemStore, 
               <View style={{flex: 1, padding: 16, paddingVertical: 8,}}>
                 <TextInput
                   systemStore={systemStore}
-                  value={messages?.message || ''}
+                  value={chatMessage || ''}
                   loading={state.sending}
                   disabled={state.sending}
                   onChangeText={(text: string) => {
@@ -231,7 +230,7 @@ const ChatBlock: React.FC<IChatBlockProps> = ({ navigation, route, systemStore, 
                     await sendMessage({
                       chatId: undefined,
                       userId: state.userId,
-                      message: messages.message,
+                      message: chatMessage,
                     })
                     actions.setChatMessage({ userId: state.userId, message: '', })
                     setState({ sending: false, })

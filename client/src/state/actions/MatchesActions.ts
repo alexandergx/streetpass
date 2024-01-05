@@ -2,7 +2,11 @@ import { StreetpassActions } from '../reducers/StreetpassReducer'
 import { IMatch, MatchesActions } from '../reducers/MatchesReducer'
 import { IGetMatchesReq, IGetMatchesRes, ISeenMatchReq, IUnmatchReq, getMatches, seenMatch, unmatch } from '../../api/matches'
 
-export function initMatches() { return { type: MatchesActions.Init, } }
+export function initMatches() {
+  return {
+    type: MatchesActions.Init,
+  }
+}
 
 export type ISetMatches = IGetMatchesReq
 export function setMatches(input: ISetMatches) {

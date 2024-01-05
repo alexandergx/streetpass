@@ -27,7 +27,7 @@ const INITIAL_STATE: IStreetpassStore = {
 
 
 export enum StreetpassActions {
-  Init = 'INIT',
+  Init = 'INIT_STREETPASS',
   SetStreetpasses = 'SET_STREETPASSES',
   SetStreetpass = 'SET_STREETPASS',
   StreetpassError = 'STREETPASS_ERROR',

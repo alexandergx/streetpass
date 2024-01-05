@@ -1,7 +1,11 @@
 import { StreetpassActions } from '../reducers/StreetpassReducer'
 import { IGetStreetPassesRes, getStreetpasses, } from '../../api/streetpass'
 
-export function initStreetpass() { return { type: StreetpassActions.Init, } }
+export function initStreetpass() {
+  return {
+    type: StreetpassActions.Init,
+  }
+}
 
 export function setStreetpasses() {
   return async (dispatch: any) => {

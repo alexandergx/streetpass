@@ -148,6 +148,8 @@ type Query {
   getUser(input: GetUserDto!): UserProfile!
   refreshTokens: AuthTokens!
   searchChats(input: SearchChatsDto!): [UserChat!]!
+  updateChats(input: UpdateChatsDto!): UpdateChats!
+  updateMessages(input: UpdateMessagesDto!): UpdateMessages!
 }
 
 input ReactMessageDto {
@@ -241,6 +243,26 @@ type Subscription {
 }
 
 input UnmatchDto {
+  userId: String!
+}
+
+type UpdateChats {
+  chats: [UserChat!]!
+  lastUpdated: String
+}
+
+input UpdateChatsDto {
+  index: Float
+  lastUpdated: DateTime
+}
+
+type UpdateMessages {
+  messages: [UserMessage!]!
+}
+
+input UpdateMessagesDto {
+  chatId: String!
+  messageId: String!
   userId: String!
 }
 

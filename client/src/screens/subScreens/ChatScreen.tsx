@@ -13,11 +13,13 @@ import { IMatch } from '../../state/reducers/MatchesReducer'
 import { IStreetpass } from '../../state/reducers/StreetpassReducer'
 import { ISetSeenMatch, IUnsetMatch, setSeenMatch, unsetMatch } from '../../state/actions/MatchesActions'
 import { IChat, IChatsStore, } from '../../state/reducers/ChatsReducer'
-import { ISetChatKey, ISetChatMessage, ISetChatNotifications, ISetMessages, ISetReadChat, ISetUpdateMessages, IUnsetChat, setChatKey, setChatMessage, setChatNotifications, setMessages, setReadChat, setUpdateMessages, unsetChat } from '../../state/actions/ChatsActions'
+import { ISetChatKey, ISetChatNotifications, ISetMessages, ISetReadChat, ISetUpdateMessages, IUnsetChat, setChatKey, setChatNotifications, setMessages, setReadChat, setUpdateMessages, unsetChat } from '../../state/actions/ChatsActions'
+import { ISetChatMessage, setChatMessage } from '../../state/actions/ChatMessagesActions'
+import { IChatMessagesStore } from '../../state/reducers/ChatMessagesReducer'
 
 const mapStateToProps = (state: IStores) => {
-  const { systemStore, userStore, chatsStore, } = state
-  return { systemStore, userStore, chatsStore, }
+  const { systemStore, userStore, chatsStore, chatMessagesStore, } = state
+  return { systemStore, userStore, chatsStore, chatMessagesStore, }
 }
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => ({
   actions: bindActionCreators(Object.assign(
@@ -25,12 +27,12 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => ({
       setSeenMatch,
       setMessages,
       setUpdateMessages,
-      setChatMessage,
       unsetMatch,
       unsetChat,
       setChatKey,
       setReadChat,
       setChatNotifications,
+      setChatMessage,
     }
   ), dispatch),
 })
@@ -41,16 +43,17 @@ interface IChatScreenProps {
   systemStore: ISystemStore,
   userStore: IUserStore,
   chatsStore: IChatsStore,
+  chatMessagesStore: IChatMessagesStore,
   actions: {
     setSeenMatch: (params: ISetSeenMatch) => void,
     setMessages: (params: ISetMessages) => void,
     setUpdateMessages: (params: ISetUpdateMessages) => void,
-    setChatMessage: (params: ISetChatMessage) => void,
     unsetMatch: (params: IUnsetMatch) => void,
     unsetChat: (params: IUnsetChat) => void,
     setChatKey: (params: ISetChatKey) => void,
     setReadChat: (params: ISetReadChat) => void,
     setChatNotifications: (params: ISetChatNotifications) => void,
+    setChatMessage: (params: ISetChatMessage) => void,
   },
 }
 export interface IChatScreenState {
@@ -108,11 +111,11 @@ class ChatScreen extends React.Component<IChatScreenProps> {
     if (this.state.chat && this.props.chatsStore.messages[this.state.userId]?.continue !== false) {
       this.props.actions.setMessages({ chatId: this.state.chat.chatId, userId: this.state.userId, index: undefined, })
     }
-    if (this.state.chat && this.state.chat.lastMessageId !== this.props.chatsStore.messages[this.state.userId]?.messages[0]?.messageId) {
+    if (this.state.chat && this.state.chat.lastMessageId !== this.props.chatsStore.messages[this.state.userId]?.messages?.[0]?.messageId) {
       this.props.actions.setUpdateMessages({
         chatId: this.state.chat.chatId,
         userId: this.state.chat.userId,
-        messageId: this.props.chatsStore.messages[this.state.userId].messages[0].messageId,
+        messageId: this.props.chatsStore.messages[this.state.userId]?.messages?.[0]?.messageId as string,
       })
     }
   }
@@ -136,18 +139,18 @@ class ChatScreen extends React.Component<IChatScreenProps> {
     this.keyboardWillHideListener.remove()
     this.props.actions.setChatKey(null)
     if (this.state.appStateListener) this.state.appStateListener.remove()
-    if (this.state.chat && this.state.chat.unread) this.props.actions.setReadChat({ chatId: this.state.chat.chatId, })
+    if (this.state.chat && this.props.chatsStore.chats?.find(chat => chat.chatId === this.state.chat?.chatId)?.unread) this.props.actions.setReadChat({ chatId: this.state.chat.chatId, })
   }
 
   appStateChange = (nextAppState: any) => {
     if ((this.state.appState === 'inactive' && nextAppState === 'background') || (this.state.appState === 'background' && nextAppState === 'active')) {
-      if (this.state.chat && this.state.chat.unread) this.props.actions.setReadChat({ chatId: this.state.chat.chatId, })
+      if (this.state.chat && this.props.chatsStore.chats?.find(chat => chat.chatId === this.state.chat?.chatId)?.unread) this.props.actions.setReadChat({ chatId: this.state.chat.chatId, })
     }
     this.setState({ appState: nextAppState, })
   }
 
   render() {
-    const { navigation, systemStore, userStore, chatsStore, actions, }: IChatScreenProps = this.props
+    const { navigation, systemStore, userStore, chatsStore, chatMessagesStore, actions, }: IChatScreenProps = this.props
 
     return (
       <>
@@ -161,6 +164,7 @@ class ChatScreen extends React.Component<IChatScreenProps> {
           userStore={userStore}
           state={this.state}
           messages={chatsStore.messages[this.state.userId]}
+          chatMessage={chatMessagesStore.chatMessages[this.state.userId]}
           setState={(params) => this.setState({ ...params, })}
           actions={{
             setMessages: actions.setMessages,
@@ -168,7 +172,6 @@ class ChatScreen extends React.Component<IChatScreenProps> {
             unsetMatch: actions.unsetMatch,
             unsetChat: actions.unsetChat,
             setChatKey: actions.setChatKey,
-            setReadChat: actions.setReadChat,
             setChatNotifications: actions.setChatNotifications,
           }}
         />
