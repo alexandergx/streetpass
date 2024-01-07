@@ -69,7 +69,7 @@ const Message: React.FC<IMessageProps>  = React.memo(({ systemStore, userId, ite
         >
           <View
             style={{
-              alignItems: 'center', overflow: 'hidden', maxWidth: '80%', marginTop: 3,
+              alignItems: 'center', overflow: 'hidden', maxWidth: '80%', marginTop: 3, marginBottom: item.reaction ? 10 : 0,
               borderTopLeftRadius: prev && !me ? 4 : 20, borderTopRightRadius: prev && me ? 4 : 20,
               borderBottomLeftRadius: next && !me ? 4 : 20, borderBottomRightRadius: next && me ? 4 : 20,
             }}
@@ -95,27 +95,27 @@ const Message: React.FC<IMessageProps>  = React.memo(({ systemStore, userId, ite
             />
           </View>
 
-          <View
-            style={{
-              position: 'absolute', zIndex: 1, alignSelf: me ? 'flex-start' : 'flex-end', left: me ? -4 : undefined, right: me ? undefined : -4,
-              flexDirection: 'row', bottom: -6, borderRadius: 16, overflow: 'hidden',
-            }}
-          >
-            {messageId && messageId !== item.messageId &&
-              <BlurView
-                blurAmount={1}
-                style={{position: 'absolute', zIndex: 1, width: '100%', height: '100%',}}
-              />
-            }
+          {item.reaction &&
+            <View
+              style={{
+                position: 'absolute', zIndex: 1, alignSelf: me ? 'flex-start' : 'flex-end', left: me ? -6 : undefined, right: me ? undefined : -6,
+                flexDirection: 'row', bottom: 2, borderRadius: 16, overflow: 'hidden',
+              }}
+            >
+              {messageId && messageId !== item.messageId &&
+                <BlurView
+                  blurAmount={1}
+                  style={{position: 'absolute', zIndex: 1, width: '100%', height: '100%',}}
+                />
+              }
 
-            <BlurView blurType={me ? Colors.safeDarkestBlur : Colors.safeDarkerBlur } style={{position: 'absolute', zIndex: -1, height: '100%', width: '100%', display: 'flex',}} />
+              <BlurView blurType={me ? Colors.safeDarkestBlur : Colors.safeDarkerBlur } style={{position: 'absolute', zIndex: -1, height: '100%', width: '100%', display: 'flex',}} />
 
-            <View style={{position: 'absolute', zIndex: -1, width: '100%', height: '100%', backgroundColor: me ? Colors.lightBlue : Colors.lightGrey,}} />
+              <View style={{position: 'absolute', zIndex: -1, width: '100%', height: '100%', backgroundColor: me ? Colors.lightBlue : Colors.lightGrey,}} />
 
-            {item.reaction &&
               <View style={{padding: 4,}}><Text style={{color: Colors.lightest, fontSize: Fonts.sm,}}>{item.reaction}</Text></View>
-            }
-          </View>
+            </View>
+          }
         </TouchableOpacity>
 
         {messageTime === item.messageId &&

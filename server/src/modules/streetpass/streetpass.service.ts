@@ -1,5 +1,5 @@
-import { CanActivate, ExecutionContext, Inject, Injectable, } from '@nestjs/common'
-import { Context, GqlExecutionContext, } from '@nestjs/graphql'
+import { Inject, Injectable, } from '@nestjs/common'
+import { Context, } from '@nestjs/graphql'
 import { InjectModel, } from '@nestjs/mongoose'
 import mongoose, { Model, } from 'mongoose'
 import { User, UserDocument, } from 'src/schemas/user.schema'
@@ -7,13 +7,14 @@ import { JwtService, } from '@nestjs/jwt'
 import { AuthDecodedToken, } from '../auth/auth.entities'
 import { GraphQLError, } from 'graphql'
 import { StreetpassDto, } from './streetpass.dto'
-import { Errors, Subscriptions, Time, streetpassLimit, } from 'src/utils/constants'
+import { Errors, NotificationType, Subscriptions, Time, streetpassLimit, } from 'src/utils/constants'
 import { Blocked, BlockedDocument, } from 'src/schemas/blocked.schema'
 import { Streetpasses, StreetpassesDocument, } from 'src/schemas/streetpasses.schema'
 import { Streetpassed, StreetpassedDocument, } from 'src/schemas/streetpassed.schema'
 import { Streetpass, } from './streetpass.entities'
 import { getAge, } from 'src/utils/functions'
 import { RedisPubSub, } from 'graphql-redis-subscriptions'
+import { NotificationsService } from '../app/app.service'
 
 @Injectable()
 export class StreetpassSubscriptionsService {
@@ -30,6 +31,7 @@ export class StreetpassService {
     @InjectModel(Blocked.name) private blockedModel: Model<BlockedDocument>,
     private readonly jwtService: JwtService,
     private readonly streetpassSubscriptionsService: StreetpassSubscriptionsService,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async streetpass(input: StreetpassDto, @Context() context: any): Promise<Boolean> {
@@ -70,7 +72,6 @@ export class StreetpassService {
           },
         },
       ])
-      // console.log(input, users)
       let streetpasses = []
       for (const user of users) {
         const streetpassed = await this.streetpassedModel.updateOne({ userId: userId, }, { $addToSet: { streetpassed: user._id.toString(), }, })
@@ -79,7 +80,17 @@ export class StreetpassService {
       if (streetpasses.length) {
         await this.streetpassesModel.updateOne({ userId: userId, }, { $push: { streetpasses: { $each: streetpasses, }, }, })
         this.streetpassSubscriptionsService.publish({ userId: userId, })
-        // TODO - push notification new streetpasses
+        this.notificationsService.createNotification(
+          {
+            userId: userId,
+            notificationPreferences: user.notificationPreferences,
+            deviceTokens: user.deviceTokens,
+            message: `new streetpasses`,
+            payload: {
+              type: NotificationType.Streetpass,
+            },
+          },
+        )
       }
       return true
     }

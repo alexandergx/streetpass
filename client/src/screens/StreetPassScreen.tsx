@@ -58,10 +58,10 @@ interface IStreetpassScreenProps {
   userStore: IUserStore,
   streetpassStore: IStreetpassStore,
   actions: {
-    setUpdateUser: (params: ISetUpdateUser) => void,
-    setStreetpasses: () => void,
+    setUpdateUser: (params: ISetUpdateUser) => Promise<void>,
+    setStreetpasses: () => Promise<void>,
     setStreetpass: () => void,
-    unsetMatch: (params: IUnsetMatch) => void,
+    unsetMatch: (params: IUnsetMatch) => Promise<void>,
     unsetChat: (params: IUnsetChat) => void,
   },
 }
@@ -112,6 +112,7 @@ class StreetpassScreen extends React.Component<IStreetpassScreenProps> {
     if (this.props.streetpassStore.streetpasses?.length === this.props.streetpassStore.count && !this.state.streetpassLoading) {
       this.props.actions.setStreetpasses()
     }
+    if (!this.props.userStore.user.streetpass) this.stopStreetPass()
   }
 
   handleAppStateChange = async (nextAppState: any) => {

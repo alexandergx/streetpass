@@ -29,12 +29,14 @@ import { baseUrl, protocol } from '../../api'
 import StreetpassModal from '../streetpassModal'
 import { IMatch } from '../../state/reducers/MatchesReducer'
 import { IChat, IMessage, IMessages } from '../../state/reducers/ChatsReducer'
-import { sendMessage } from '../../api/chats'
+import { alertTyping, sendMessage } from '../../api/chats'
 import { ISetChatKey, ISetChatNotifications, ISetMessages, ISetReadChat, IUnsetChat } from '../../state/actions/ChatsActions'
 import { IUnsetMatch } from '../../state/actions/MatchesActions'
 import { timePassedSince } from '../../utils/functions'
 import { blockUser } from '../../api/user'
 import { ISetChatMessage } from '../../state/actions/ChatMessagesActions'
+import LottieView from 'lottie-react-native'
+import { IChatMessage } from '../../state/reducers/ChatMessagesReducer'
 
 interface IChatBlockProps {
   navigation: any,
@@ -43,14 +45,14 @@ interface IChatBlockProps {
   userStore: IUserStore,
   state: IChatScreenState,
   messages?: IMessages,
-  chatMessage: string,
+  chatMessage: IChatMessage,
   setState: (params: any) => void,
   actions: {
-    setMessages: (params: ISetMessages) => void,
-    unsetMatch: (params: IUnsetMatch) => void,
+    setMessages: (params: ISetMessages) => Promise<void>,
+    unsetMatch: (params: IUnsetMatch) => Promise<void>,
     unsetChat: (params: IUnsetChat) => void,
     setChatKey: (params: ISetChatKey) => void,
-    setChatNotifications: (params: ISetChatNotifications) => void,
+    setChatNotifications: (params: ISetChatNotifications) => Promise<void>,
     setChatMessage: (params: ISetChatMessage) => void,
   }
 }
@@ -58,6 +60,21 @@ const ChatBlock: React.FC<IChatBlockProps> = ({ navigation, route, systemStore, 
   const { Colors, Fonts, } = systemStore
   const listRef = useRef<FlashList<IMessage>>(null)
   const scrollTo = useCallback(async (index: number) => listRef.current?.scrollToIndex({ index: index, animated: true, viewPosition: 0.5, }), [])
+  const [typing, setTyping] = useState<boolean>(false)
+
+  useEffect(() => {
+    if (chatMessage?.typing) {
+      const typingTime = new Date(chatMessage.typing).getTime()
+      const currentTime = new Date().getTime()
+      if (currentTime - typingTime < 5300) {
+        setTyping(true)
+        const timeoutId = setTimeout(() => {
+          setTyping(false)
+        }, 5300 - (currentTime - typingTime))
+        return () => clearTimeout(timeoutId)
+      }
+    }
+  }, [chatMessage?.typing])
 
   return (
     <>
@@ -155,6 +172,30 @@ const ChatBlock: React.FC<IChatBlockProps> = ({ navigation, route, systemStore, 
             ListHeaderComponent={
               <>
                 <View style={{height: state.keyboard ? 88 : 112,}} />
+
+                {typing &&
+                  <View style={{
+                    width: 64, height: 34, bottom: 104, justifyContent: 'center', alignItems: 'center',
+                    left: 16, borderRadius: 16, borderBottomLeftRadius: 4, overflow: 'hidden',
+                  }}>
+                    <LottieView
+                      source={require('../../assets/animations/typing.json')}
+                      autoPlay={true}
+                      loop={true}
+                      speed={1}
+                      style={{width: '100%', height: '100%',}}
+                    />
+                    {state.messageId &&
+                      <BlurView
+                        blurAmount={1}
+                        style={{position: 'absolute', zIndex: 1, width: '100%', height: '100%',}}
+                      />
+                    }
+                    <BlurView blurType={Colors.safeDarkerBlur } style={{position: 'absolute', zIndex: -1, height: '100%', width: '100%', display: 'flex',}} />
+                    <View style={{position: 'absolute', zIndex: -1, width: '100%', height: '100%', backgroundColor: Colors.lightGrey,}} />
+                  </View>
+                }
+
                 {/* {state.messageId &&
                   <TouchableOpacity
                     // onPress={() => setMessageId(null)}
@@ -212,12 +253,17 @@ const ChatBlock: React.FC<IChatBlockProps> = ({ navigation, route, systemStore, 
               <View style={{flex: 1, padding: 16, paddingVertical: 8,}}>
                 <TextInput
                   systemStore={systemStore}
-                  value={chatMessage || ''}
+                  value={chatMessage?.message || ''}
                   loading={state.sending}
                   disabled={state.sending}
                   onChangeText={(text: string) => {
                     actions.setChatMessage({ userId: state.userId, message: text, })
                     setState({ messageId: null, messageIndex: null, messageTime: null, })
+                    const typingTimePassed = state.alertTypingTime ? (new Date().getTime() - state.alertTypingTime.getTime()) / 1000 : null
+                    if (state.chat && (!typingTimePassed || typingTimePassed >= 5)) {
+                      setState({ alertTypingTime: new Date(), })
+                      alertTyping({ chatId: state.chat?.chatId, userId: state.userId, })
+                    }
                   }}
                   placeholder={`${Lit[systemStore.Locale].Button.Message}...`}
                   multiline={true}
@@ -230,7 +276,7 @@ const ChatBlock: React.FC<IChatBlockProps> = ({ navigation, route, systemStore, 
                     await sendMessage({
                       chatId: undefined,
                       userId: state.userId,
-                      message: chatMessage,
+                      message: chatMessage.message,
                     })
                     actions.setChatMessage({ userId: state.userId, message: '', })
                     setState({ sending: false, })

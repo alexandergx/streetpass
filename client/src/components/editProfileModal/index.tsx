@@ -31,9 +31,9 @@ export interface IEditProfileModalProps {
   toggleModal: () => void,
   onPress?: () => void,
   actions: {
-    setUser: () => void,
-    setUpdateUser: (params: ISetUpdateUser) => void,
-    setSortMedia: (params: ISetSortMedia) => void,
+    setUser: () => Promise<void>,
+    setUpdateUser: (params: ISetUpdateUser) => Promise<void>,
+    setSortMedia: (params: ISetSortMedia) => Promise<void>,
   }
 }
 export interface IEditProfileModalState {
@@ -110,7 +110,6 @@ class EditProfileModal extends React.Component<IEditProfileModalProps> {
         || this.state.school !== this.props.userStore.user.school
       )) await this.props.actions.setUpdateUser({ bio: this.state.bio, work: this.state.work, school: this.state.school, })
       await this.props.actions.setUser()
-      // this.props.navigation.navigate(Screens.Streetpass)
       this.props.onPress ? this.props.onPress() : this.close()
     }
     this.setState({ loading: false, editProfile: true, })

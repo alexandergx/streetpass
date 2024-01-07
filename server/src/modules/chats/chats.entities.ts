@@ -69,8 +69,8 @@ export class ChatsPagination {
 
 @ObjectType()
 export class UpdateChats {
-  @Field(() => [UserChat])
-  chats: UserChat[]
+  @Field(() => [UserChat], { nullable: true, })
+  chats?: UserChat[]
 
   @Field(() => String, { nullable: true, })
   lastUpdated?: string
@@ -119,6 +119,12 @@ export class MessageMetadata {
 
   @Field(() => String)
   recipient: string
+
+  @Field(() => Boolean, { nullable: true, })
+  typing?: boolean
+
+  @Field(() => String, { nullable: true, })
+  lastUpdated?: string
 }
 
 @ObjectType()

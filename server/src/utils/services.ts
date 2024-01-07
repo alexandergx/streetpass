@@ -1,8 +1,8 @@
 import * as dotenv from 'dotenv'; dotenv.config()
 import { ConsoleLogger, LoggerService, } from '@nestjs/common'
-import { Errors, NotificationType, OS, Time, s3, } from './constants'
+import { Errors, NotificationType, OS, PushNotificationMessage, Time, s3, } from './constants'
 import apn from 'apn'
-import { DeviceTokens, } from 'src/schemas/user.schema'
+import { DeviceTokens, NotificationPreferences, } from 'src/schemas/user.schema'
 import { Worker, } from 'worker_threads'
 import { getS3Key, } from './functions'
 import appleSignin from 'apple-signin-auth'
@@ -50,21 +50,25 @@ export async function verifyGoogleAuth(googleAuth: string): Promise<string | nul
   }
 }
 
-const providerAPNs: any = undefined
-// const providerAPNs = new apn.Provider({
-//   token: {
-//     key: `./credentials/AuthKey_${process.env.APPLE_DEVELOPER_KEY_ID}.p8`,
-//     keyId: process.env.APPLE_DEVELOPER_KEY_ID,
-//     teamId: process.env.APPLE_DEVELOPER_TEAM_ID,
-//   },
-//   production: process.env.APP_ENV === 'production' ? true : false,
-// })
+const providerAPNs = new apn.Provider({
+  token: {
+    key: `./credentials/AuthKey_${process.env.APPLE_DEVELOPER_KEY_ID}.p8`,
+    keyId: process.env.APPLE_DEVELOPER_KEY_ID,
+    teamId: process.env.APPLE_DEVELOPER_TEAM_ID,
+  },
+  production: process.env.APP_ENV === 'production' ? true : false,
+})
 export interface SendPushNotification {
+  userId: string,
+  notificationPreferences: NotificationPreferences,
   deviceTokens: DeviceTokens,
   message: string,
   unread?: number,
   payload: {
     type: NotificationType,
+    name?: string,
+    chatId?: string,
+    userId?: string,
   },
 }
 export async function sendPushNotification({ deviceTokens, message, unread, payload, }: SendPushNotification) {
@@ -97,12 +101,12 @@ export async function sendPushNotification({ deviceTokens, message, unread, payl
 
 // const notification   = new apn.Notification()
 // notification.expiry  = Math.floor(Date.now() / 1000) + 3600
-// notification.sound   = 'ping.aiff'
-// notification.alert   = `${PushNotificationMessage[NotificationType.Streetpass]}`
-// notification.payload = { type: NotificationType.Streetpass, streetpassId: 'testing', }
+// // notification.sound   = 'ping.aiff'
+// notification.alert   = `${PushNotificationMessage[NotificationType.Message]}`
+// notification.payload = { type: NotificationType.Message, chatId: '6594a0b6ab4530b64a620399', userId: '658f1a8b075f1ad8b4aff386', }
 // notification.topic   = process.env.APPLE_APP_BUNDLE_IDENTIFIER
 // notification.badge   = undefined
-// providerAPNs.send(notification, '5325ca54cd16f2bf2e336f5d2bfa2dcc1decb07be3bac4f3857ad8bb41ac7e24')
+// providerAPNs.send(notification, '80602f6acb301d249a7363771275f08b3c22ae81ecef513bf4f48c75316dfd7b8aca52fce4c094cbc3018638fdbb75408334443e1527583e933f4abf486119c97576d982bb02612abbc17e9954e7ff10')
 
 export interface SendSMS {
   phonenumber: string,

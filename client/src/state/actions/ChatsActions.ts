@@ -159,6 +159,7 @@ export function setUpdateMessages(input: ISetUpdateMessages) {
 export interface ISetMessage {
   userId: string,
   message: IMessage,
+  lastUpdated: Date,
 }
 export function setMessage(input: ISetMessage) {
   return {

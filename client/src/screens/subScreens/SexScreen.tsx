@@ -42,9 +42,9 @@ interface IDOBScreenProps {
   systemStore: ISystemStore,
   userStore: IUserStore,
   actions: {
-    setUser: () => void,
-    setUpdateUser: (params: ISetUpdateUser) => void,
-    setSortMedia: (params: ISetSortMedia) => void,
+    setUser: () => Promise<void>,
+    setUpdateUser: (params: ISetUpdateUser) => Promise<void>,
+    setSortMedia: (params: ISetSortMedia) => Promise<void>,
   }
 }
 interface IDOBScreenState {

@@ -167,15 +167,11 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
 // Called when a notification is delivered to a foreground app.
 -(void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler
 {
-  // Still call the javascript onNotification handler so it can display the new message right away
   NSDictionary *userInfo = notification.request.content.userInfo;
-  [RNCPushNotificationIOS didReceiveRemoteNotification:userInfo];
-  // completionHandler(UNNotificationPresentationOptionSound | UNNotificationPresentationOptionAlert | UNNotificationPresentationOptionBadge);
-  if (userInfo[@"chatId"] || userInfo[@"matchId"] || userInfo[@"streetpassId"]) {
-    // If chatId or matchId or streetpassId is present, do not present the notification
+  if ([notification.request.trigger isKindOfClass:[UNPushNotificationTrigger class]]) {
+    [RNCPushNotificationIOS didReceiveRemoteNotification:userInfo];
     completionHandler(UNNotificationPresentationOptionNone);
   } else {
-    // If chatId is not present, present the notification
     completionHandler(UNNotificationPresentationOptionSound | UNNotificationPresentationOptionAlert | UNNotificationPresentationOptionBadge);
   }
 }

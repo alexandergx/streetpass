@@ -1,5 +1,5 @@
 import { MMKVLoader } from 'react-native-mmkv-storage'
-import { IGetUserReq, IGetUserRes, ISendPinReq, ISignInReq, IUpdateUserReq, getUser, sendPin, signIn, sortMedia, updateUser, } from '../../api/user'
+import { IGetUserRes, ISendPinReq, ISignInReq, IUpdateUserReq, getUser, sendPin, signIn, sortMedia, updateUser, } from '../../api/user'
 import { AuthStore, ISignInErrors, LocalStorage } from '../../utils/constants'
 import { IUser, UserActions } from '../reducers/UserReducer'
 import { IUploadMedia } from '../../components/editProfileModal'
@@ -7,10 +7,18 @@ import { IUploadMedia } from '../../components/editProfileModal'
 const MMKV = new MMKVLoader().withEncryption().withInstanceID(LocalStorage.AuthStore).initialize()
 
 export function setSignOut() {
-  MMKV.removeItem(AuthStore.AccessToken)
-  MMKV.removeItem(AuthStore.RefreshToken)
-  return {
-    type: UserActions.Init,
+  return async (dispatch: any) => {
+    try {
+      MMKV.removeItem(AuthStore.AccessToken)
+      MMKV.removeItem(AuthStore.RefreshToken)
+      return dispatch({
+        type: UserActions.Init,
+      })
+    } catch (e) {
+      return dispatch({
+        type: UserActions.UserError,
+      })
+    }
   }
 }
 

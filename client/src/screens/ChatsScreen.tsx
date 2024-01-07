@@ -60,11 +60,11 @@ interface IChatsScreenProps {
   matchesStore: IMatchesStore,
   chatsStore: IChatsStore,
   actions: {
-    setChats: (params: ISetChats) => void,
+    setChats: (params: ISetChats) => Promise<void>,
     unsetChat: (params: IUnsetChat) => void,
-    setChatsSearch: (params: ISetChatsSearch) => void,
+    setChatsSearch: (params: ISetChatsSearch) => Promise<void>,
     unsetChatsSearch: () => void,
-    setMatches: (params: ISetMatches) => void,
+    setMatches: (params: ISetMatches) => Promise<void>,
     unsetMatch: (params: IUnsetMatch) => void,
   },
 }

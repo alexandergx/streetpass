@@ -2,6 +2,11 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+input AlertTypingDto {
+  chatId: String
+  userId: String!
+}
+
 type Auth {
   accessToken: String!
   code: String
@@ -96,8 +101,10 @@ type MatchesPagination {
 }
 
 type MessageMetadata {
+  lastUpdated: String
   recipient: String!
   sender: String!
+  typing: Boolean
 }
 
 type MessagesPagination {
@@ -141,6 +148,7 @@ type NotificationPreferences {
 }
 
 type Query {
+  alertTyping(input: AlertTypingDto!): Boolean!
   getChats(input: GetChatsDto!): ChatsPagination!
   getMatches(input: GetMatchesDto!): MatchesPagination!
   getMessages(input: GetMessagesDto!): MessagesPagination!
@@ -247,7 +255,7 @@ input UnmatchDto {
 }
 
 type UpdateChats {
-  chats: [UserChat!]!
+  chats: [UserChat!]
   lastUpdated: String
 }
 

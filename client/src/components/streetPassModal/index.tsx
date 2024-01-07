@@ -41,7 +41,7 @@ interface IStreetpassModalProps {
   hideActions?: boolean,
   toggleModal: () => void,
   actions: {
-    unsetMatch: (params: IUnsetMatch) => void,
+    unsetMatch: (params: IUnsetMatch) => Promise<void>,
     unsetChat: (params: IUnsetChat) => void,
   }
 }

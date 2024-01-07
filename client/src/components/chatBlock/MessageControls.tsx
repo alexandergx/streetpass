@@ -69,7 +69,7 @@ const MessageControls: React.FC<IMessageProps>  = React.memo(({ systemStore, ite
           />
         </View>
 
-        {!me &&
+        {me &&
           <View style={{alignSelf: me ? 'flex-end' : 'flex-start', maxWidth: '85%', height: 52, borderRadius: 16, overflow: 'hidden',}}>
             <BlurView blurType={Colors.darkestBlur } style={{position: 'absolute', zIndex: -1, height: '100%', width: '100%', display: 'flex', backgroundColor: Colors.darkerBackground,}} />
 

@@ -18,6 +18,7 @@ import { UsersModule, } from '../users/users.module'
 import { StreetpassModule, } from '../streetpass/streetpass.module'
 import { MatchesModule } from '../matches/matches.module'
 import { ChatsModule } from '../chats/chats.module'
+import { User, UserSchema } from 'src/schemas/user.schema'
 
 @Module({
   imports: [
@@ -51,6 +52,9 @@ import { ChatsModule } from '../chats/chats.module'
       formatError: error => { return error },
     }),
     MongooseModule.forRoot(process.env.DB_HOST),
+    MongooseModule.forFeature([
+      { name: User.name, collection: User.name, schema: UserSchema, },
+    ]),
     ThrottlerModule.forRoot({ ttl: Time.Minute * 6, limit: 1000, }),
     AuthModule,
     UsersModule,

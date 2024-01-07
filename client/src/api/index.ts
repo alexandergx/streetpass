@@ -758,6 +758,23 @@ export const REACT_MESSAGE = (input: IReactMessageMutation) => {
   return gql(mutation)
 }
 
+export interface IAlertTypingQuery {
+  chatId: string,
+  userId: string,
+}
+export const ALERT_TYPING = (input: IAlertTypingQuery) => {
+  let query = `
+  query {
+      alertTyping(input: {
+  `
+  query = query + inputConstructor(input)
+  query = query + `
+      })
+    }
+  `
+  return gql(query)
+}
+
 export interface ISubscribeMessagesSubscription {
   chatId?: string,
   userId: string,
@@ -805,6 +822,8 @@ export const SUBSCRIBE_MESSAGES = (input: ISubscribeMessagesSubscription) => {
       metadata {
         sender
         recipient
+        typing
+        lastUpdated
       }
      }
    }

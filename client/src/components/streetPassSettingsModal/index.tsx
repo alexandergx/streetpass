@@ -21,7 +21,7 @@ interface IStreetpassSettingsModalProps {
   userStore: IUserStore,
   toggleModal: () => void,
   actions: {
-    setUpdateUser: (params: ISetUpdateUser) => void,
+    setUpdateUser: (params: ISetUpdateUser) => Promise<void>,
   }
 }
 export interface IStreetpassSettingsModalState {

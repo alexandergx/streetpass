@@ -7,7 +7,7 @@ import { JwtService, } from '@nestjs/jwt'
 import { AuthDecodedToken, } from '../auth/auth.entities'
 import { GraphQLError, } from 'graphql'
 import { GetMatchesDto, MatchDto, SeenMatchDto, UnmatchDto, } from './matches.dto'
-import { Errors, Subscriptions, } from 'src/utils/constants'
+import { Errors, NotificationType, Subscriptions, } from 'src/utils/constants'
 import { Streetpasses, StreetpassesDocument, } from 'src/schemas/streetpasses.schema'
 import { Streetpassed, StreetpassedDocument, } from 'src/schemas/streetpassed.schema'
 import { MatchDocument, Matches, MatchesDocument, } from 'src/schemas/matches.schema'
@@ -16,6 +16,7 @@ import { Match, MatchesPagination, } from './matches.entities'
 import { getAge, } from 'src/utils/functions'
 import { RedisPubSub, } from 'graphql-redis-subscriptions'
 import { UserChats, UserChatsDocument } from 'src/schemas/userChats.schema'
+import { NotificationsService } from '../app/app.service'
 
 @Injectable()
 export class MatchSubscriptionsService {
@@ -34,6 +35,7 @@ export class MatchesService {
     @InjectModel(UserChats.name) private userChatsModel: Model<UserChatsDocument>,
     private readonly jwtService: JwtService,
     private readonly matchSubscriptionsService: MatchSubscriptionsService,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async match(input: MatchDto, @Context() context: any): Promise<Boolean> {
@@ -80,7 +82,30 @@ export class MatchesService {
             matchDate: date.toISOString(),
             unmatch: false,
           }, })
-          // TODO - push notification new match
+          this.notificationsService.createNotification(
+            {
+              userId: userId,
+              notificationPreferences: user.notificationPreferences,
+              deviceTokens: user.deviceTokens,
+              message: `${authUser.name} ...`,
+              payload: {
+                type: NotificationType.Match,
+                name: authUser.name,
+              },
+            },
+          )
+          this.notificationsService.createNotification(
+            {
+              userId: input.userId,
+              notificationPreferences: authUser.notificationPreferences,
+              deviceTokens: authUser.deviceTokens,
+              message: `${user.name} ...`,
+              payload: {
+                type: NotificationType.Match,
+                name: user.name,
+              },
+            },
+          )
         } else {
           const streetpassed = await this.streetpassedModel.findOne({ userId: input.userId, streetpassed: userId, }, { streetpassed: false, }).lean()
           if (!streetpassed) {

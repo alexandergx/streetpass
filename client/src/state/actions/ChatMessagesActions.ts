@@ -16,3 +16,14 @@ export function setChatMessage(input: ISetChatMessage) {
     payload: input,
   }
 }
+
+export interface ISetChatTyping {
+  userId: string,
+  typing: Date | null,
+}
+export function setChatTyping(input: ISetChatTyping) {
+  return {
+    type: ChatMessagesActions.SetChatTyping,
+    payload: input,
+  }
+}

@@ -3,19 +3,19 @@ import { Context, } from '@nestjs/graphql'
 import { InjectModel, } from '@nestjs/mongoose'
 import mongoose, { Model, } from 'mongoose'
 import { User, UserDocument, } from 'src/schemas/user.schema'
-import { GetChatsDto, GetMessagesDto, ReadChatDto, SearchChatsDto, ChatNotificationsDto, SendMessageDto, ReactMessageDto, UpdateChatsDto, UpdateMessagesDto, } from './chats.dto'
+import { GetChatsDto, GetMessagesDto, ReadChatDto, SearchChatsDto, ChatNotificationsDto, SendMessageDto, ReactMessageDto, UpdateChatsDto, UpdateMessagesDto, AlertTypingDto, } from './chats.dto'
 import { ChatsPagination, MessageMetadata, MessagesPagination, UpdateChats, UpdateMessages, UserChat, UserMessage } from './chats.entities'
 import { JwtService, } from '@nestjs/jwt'
 import { AuthDecodedToken, } from '../auth/auth.entities'
 import { GraphQLError, } from 'graphql'
 import { Errors, NotificationType, PushNotificationMessage, Subscriptions, } from 'src/utils/constants'
-// import { NotificationsService } from '../notifications/notifications.service'
 import { Chat, ChatDocument, MessageDocument, } from 'src/schemas/chat.schema'
 import { UserChatDocument, UserChats, UserChatsDocument, } from 'src/schemas/userChats.schema'
 import { RedisPubSub, } from 'graphql-redis-subscriptions'
 import { getAge } from 'src/utils/functions'
 import { MatchSubscriptionsService } from '../matches/matches.service'
 import { Matches, MatchesDocument } from 'src/schemas/matches.schema'
+import { NotificationsService } from '../app/app.service'
 
 @Injectable()
 export class ChatsSubscriptionsService {
@@ -33,7 +33,7 @@ export class ChatsService {
     private readonly jwtService: JwtService,
     private readonly chatsSubscriptionsService: ChatsSubscriptionsService,
     private readonly matchSubscriptionsService: MatchSubscriptionsService,
-    // private readonly notificationsService: NotificationsService,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async getChats(input: GetChatsDto, @Context() context: any): Promise<ChatsPagination> {
@@ -118,7 +118,7 @@ export class ChatsService {
         return { chats: returnList, lastUpdated: userChat.lastUpdated.toISOString(), }
       }
     }
-    return { chats: [], lastUpdated: null, }
+    return { chats: null, lastUpdated: null, }
   }
 
   async searchChats(input: SearchChatsDto, @Context() context: any): Promise<UserChat[]> {
@@ -259,8 +259,26 @@ export class ChatsService {
       this.chatsSubscriptionsService.publish({
         participants: [userId, input.userId],
         message: { chatId: authChat.chatId, messageId: messageId, userId: userId, message: input.message, date: date.toISOString(), },
-        metadata: { sender: userId, recipient: input.userId, },
+        metadata: { sender: userId, recipient: input.userId, lastUpdated: date.toISOString(), },
       })
+      const authUser = await this.userModel.findOne({ _id: new mongoose.mongo.ObjectId(userId), }).lean()
+      const user = await this.userModel.findOne({ _id: new mongoose.mongo.ObjectId(input.userId), }).lean()
+      // TODO - get unread count
+      this.notificationsService.createNotification(
+        {
+          userId: input.userId,
+          notificationPreferences: user.notificationPreferences,
+          deviceTokens: user.deviceTokens,
+          message: `${authUser.name} messaged you`,
+          unread: 0,
+          payload: {
+            type: NotificationType.Message,
+            name: authUser.name,
+            chatId: authChat.chatId,
+            userId: userId,
+          },
+        },
+      )
     } else {
       const { matches, } = await this.matchesModel.findOne({ userId: userId, }, { matches: { $elemMatch: { userId: input.userId, }, }, }).lean()
       const [match] = matches
@@ -357,7 +375,7 @@ export class ChatsService {
           chatDate: date.toISOString(),
         },
         message: { chatId: chatId, messageId: messageId, userId: userId, message: input.message, date: date.toISOString(), },
-        metadata: { sender: userId, recipient: input.userId, },
+        metadata: { sender: userId, recipient: input.userId, lastUpdated: date.toISOString(), },
       })
       this.chatsSubscriptionsService.publish({
         participants: [input.userId],
@@ -381,8 +399,24 @@ export class ChatsService {
           chatDate: date.toISOString(),
         },
         message: { chatId: chatId, messageId: messageId, userId: userId, message: input.message, date: date.toISOString(), },
-        metadata: { sender: userId, recipient: input.userId, },
+        metadata: { sender: userId, recipient: input.userId, lastUpdated: date.toISOString(), },
       })
+      // TODO - get unread count
+      this.notificationsService.createNotification(
+        {
+          userId: input.userId,
+          notificationPreferences: user.notificationPreferences,
+          deviceTokens: user.deviceTokens,
+          message: `${authUser.name} messaged you`,
+          unread: 0,
+          payload: {
+            type: NotificationType.Message,
+            name: authUser.name,
+            chatId: chatId,
+            userId: userId,
+          },
+        },
+      )
     }
     return true
   }
@@ -396,8 +430,18 @@ export class ChatsService {
     this.chatsSubscriptionsService.publish({
       participants: chat.participants,
       message: { chatId: input.chatId, messageId: input.messageId, userId: userId, message: '', date: new Date().toISOString(), reaction: input.reaction || 'null', },
-      metadata: { sender: userId, recipient: chat.participants.filter(participant => participant !== userId)[0], },
+      metadata: { sender: userId, recipient: chat.participants.filter(participant => participant !== userId)[0], lastUpdated: null, },
     })
-    return false
+    return true
+  }
+
+  async alertTyping(input: AlertTypingDto, @Context() context: any): Promise<boolean> {
+    const { userId, } = this.jwtService.decode(context.req.headers['access-token']) as AuthDecodedToken
+    this.chatsSubscriptionsService.publish({
+      participants: [userId, input.userId],
+      message: { chatId: input.chatId, messageId: '', userId: userId, message: '', date: new Date().toISOString(), },
+      metadata: { sender: userId, recipient: input.userId, typing: true, lastUpdated: null, },
+    })
+    return true
   }
 }

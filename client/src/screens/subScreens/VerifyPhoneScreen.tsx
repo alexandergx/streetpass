@@ -42,7 +42,7 @@ interface IVerifyPhoneScreenProps {
   systemStore: ISystemStore,
   userStore: IUserStore,
   actions: {
-    setPhoneNumber: (params: ISetPhoneNumber) => void,
+    setPhoneNumber: (params: ISetPhoneNumber) => Promise<void>,
   },
 }
 interface IVerifyPhoneScreenState {

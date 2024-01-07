@@ -38,8 +38,8 @@ interface ISignInScreenProps {
   systemStore: ISystemStore,
   userStore: IUserStore,
   actions: {
-    setSignIn: (params: ISetSignIn) => Promise<any>,
-    setUpdateUser: (params: ISetUpdateUser) => void,
+    setSignIn: (params: ISetSignIn) => Promise<void>,
+    setUpdateUser: (params: ISetUpdateUser) => Promise<void>,
   },
 }
 interface ISignInScreenState {

@@ -13,6 +13,7 @@ import { PubSubOptions, Subscriptions } from 'src/utils/constants'
 import { RedisPubSub } from 'graphql-redis-subscriptions'
 import Redis from 'ioredis'
 import { UserChats, UserChatsSchema } from 'src/schemas/userChats.schema'
+import { NotificationsService } from '../app/app.service'
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { UserChats, UserChatsSchema } from 'src/schemas/userChats.schema'
     MatchesResolver,
     MatchesService,
     MatchSubscriptionsService,
+    NotificationsService,
   ]
 })
 export class MatchesModule {}

@@ -41,7 +41,7 @@ interface IDOBScreenProps {
   systemStore: ISystemStore,
   userStore: IUserStore,
   actions: {
-    setUpdateUser: (params: ISetUpdateUser) => void,
+    setUpdateUser: (params: ISetUpdateUser) => Promise<void>,
   }
 }
 interface IDOBScreenState {

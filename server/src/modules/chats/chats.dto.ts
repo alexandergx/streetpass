@@ -92,3 +92,12 @@ export class ReactMessageDto {
   @Field(() => String, { nullable: true, })
   reaction?: string
 }
+
+@InputType()
+export class AlertTypingDto {
+  @Field(() => String, { nullable: true, })
+  chatId?: string
+
+  @Field(() => String)
+  userId: string
+}

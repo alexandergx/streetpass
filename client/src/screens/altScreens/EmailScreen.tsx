@@ -36,7 +36,7 @@ interface IEmailScreenProps {
   systemStore: ISystemStore,
   email: string,
   actions: {
-    setUpdateUser: (params: ISetUpdateUser) => void,
+    setUpdateUser: (params: ISetUpdateUser) => Promise<void>,
   }
 }
 interface IEmailScreenState {

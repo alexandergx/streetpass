@@ -12,6 +12,7 @@ import { Matches, MatchesSchema } from 'src/schemas/matches.schema'
 import { PubSubOptions, Subscriptions } from 'src/utils/constants'
 import { RedisPubSub } from 'graphql-redis-subscriptions'
 import Redis from 'ioredis'
+import { NotificationsService } from '../app/app.service'
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import Redis from 'ioredis'
     StreetpassResolver,
     StreetpassService,
     StreetpassSubscriptionsService,
+    NotificationsService,
   ]
 })
 export class StreetpassModule {}

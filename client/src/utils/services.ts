@@ -3,13 +3,14 @@ import { check, request, PERMISSIONS, RESULTS, } from 'react-native-permissions'
 import Contacts from 'react-native-contacts'
 import { Alert, Linking, Share, Platform, } from 'react-native'
 import SendSMS from 'react-native-sms'
-import { Domain, } from './constants'
+import { AppName, Domain, INotification, NotificationType, PushNotificationMessage, } from './constants'
 import ReactNativeHapticFeedback from 'react-native-haptic-feedback'
 // import Geolocation from '@react-native-community/geolocation'
 import { NetworkInfo, } from 'react-native-network-info'
 import { Lit, Locales, } from './locale'
 import { ISignInErrors } from './constants'
-import { Screens } from '../navigation'
+import { Screens, getActiveScreen } from '../navigation'
+import { IChatsStore } from '../state/reducers/ChatsReducer'
 
 export const signInCallback = (navigation: any, code: ISignInErrors | null) => {
   if (!navigation.isReady()) return
@@ -28,6 +29,64 @@ export const signInCallback = (navigation: any, code: ISignInErrors | null) => {
       break
     default:
       navigation.navigate(Screens.Streetpass)
+  }
+}
+
+export const onNotification = async ({ navigation, chatsStore, notification, userInteraction, }: { navigation: any, chatsStore?: IChatsStore, notification: INotification, userInteraction: number, }) => {
+  if (userInteraction) {
+    switch (notification.type) {
+      case NotificationType.Message:
+        const chat = chatsStore?.chats ? chatsStore.chats.find(chat => chat.chatId === notification.chatId) : null
+        if (chat) navigation.navigate(Screens.Chat, { chat: chat, })
+        else navigation.navigate(Screens.Chats)
+        break
+      case NotificationType.Match:
+        navigation.navigate(Screens.Chats)
+        return
+      case NotificationType.Streetpass:
+        navigation.navigate(Screens.Streetpass)
+        return
+      default:
+        break
+    }
+  } else {
+    switch (notification.type) {
+      case NotificationType.Message:
+        if (chatsStore?.chatKey !== notification.userId && !notification.localNotification && getActiveScreen() !== Screens.Chats) {
+          PushNotificationIOS.addNotificationRequest({
+            id: AppName,
+            title: AppName,
+            body: `${PushNotificationMessage[NotificationType.Message]}`,
+            userInfo: { data: { ...notification, localNotification: true, }, },
+          })
+        }
+        break
+      case NotificationType.Match:
+        if (!notification.localNotification && getActiveScreen() !== Screens.Chats) {
+          PushNotificationIOS.addNotificationRequest({
+            id: AppName,
+            title: AppName,
+            body: `${PushNotificationMessage[NotificationType.Match]}`,
+            userInfo: { data: { ...notification, localNotification: true, }, },
+          })
+        }
+        break
+      case NotificationType.Streetpass:
+        if (!notification.localNotification && getActiveScreen() !== Screens.Streetpass) {
+          PushNotificationIOS.addNotificationRequest({
+            id: AppName,
+            title: AppName,
+            body: `${PushNotificationMessage[NotificationType.Streetpass]}`,
+            userInfo: { data: { ...notification, localNotification: true, }, },
+          })
+        }
+        return
+      default:
+        break
+    }
+    PushNotificationIOS.getApplicationIconBadgeNumber((badgeCount: number) => {
+      // TODO - set badge count
+    })
   }
 }
 

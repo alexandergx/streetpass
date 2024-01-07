@@ -39,7 +39,7 @@ interface IProfileBlockProps {
   state: IEditProfileModalState,
   setState: (params: any) => void,
   actions: {
-    setSortMedia: (params: ISetSortMedia) => void,
+    setSortMedia: (params: ISetSortMedia) => Promise<void>,
   }
 }
 const ProfileMedia = forwardRef<ProfileMediaMethods, IProfileBlockProps>(({ systemStore, state, setState, actions, }, ref) => {

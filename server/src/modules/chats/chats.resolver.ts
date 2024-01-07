@@ -1,7 +1,7 @@
 import { Resolver, Query, Mutation, Args, Context, Subscription } from '@nestjs/graphql'
 import { ChatsService, ChatsSubscriptionsService, } from './chats.service'
 import { ChatsPagination, MessagesPagination, MessagesSubscription, UpdateChats, UpdateMessages, UserChat, UserMessage, } from './chats.entities'
-import { GetChatsDto, GetMessagesDto, ReadChatDto, SearchChatsDto, ChatNotificationsDto, SubscribeChatsDto, SendMessageDto, ReactMessageDto, UpdateMessagesDto, UpdateChatsDto, } from './chats.dto'
+import { GetChatsDto, GetMessagesDto, ReadChatDto, SearchChatsDto, ChatNotificationsDto, SubscribeChatsDto, SendMessageDto, ReactMessageDto, UpdateMessagesDto, UpdateChatsDto, AlertTypingDto, } from './chats.dto'
 import { UseGuards } from '@nestjs/common'
 import { AuthGuard } from '../auth/auth.service'
 import { Errors, InputLimits, Subscriptions, Time } from 'src/utils/constants'
@@ -71,8 +71,16 @@ export class ChatsResolver {
 
   @Mutation(() => Boolean)
   @UseGuards(AuthGuard)
+  @Throttle(20, Time.Minute)
   async reactMessage(@Args('input') input: ReactMessageDto, @Context() context: any) {
     return this.chatsService.reactMessage(input, context)
+  }
+
+  @Query(() => Boolean)
+  @UseGuards(AuthGuard)
+  @Throttle(12, Time.Minute)
+  async alertTyping(@Args('input') input: AlertTypingDto, @Context() context: any) {
+    return this.chatsService.alertTyping(input, context)
   }
 
   @Subscription(() => MessagesSubscription, {

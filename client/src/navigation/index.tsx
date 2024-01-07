@@ -7,8 +7,7 @@ import { bindActionCreators, Dispatch, AnyAction, } from 'redux'
 import { IStores } from '../state/store'
 import { MMKVLoader } from 'react-native-mmkv-storage'
 import { IUserStore } from '../state/reducers/UserReducer'
-import { ISystemStore } from '../state/reducers/SystemReducer'
-import { AppVersion, AuthStore, LocalStorage, OS, } from '../utils/constants'
+import { AppName, AppVersion, AuthStore, INotification, LocalStorage, NotificationType, OS, PushNotificationMessage, } from '../utils/constants'
 import { getDeviceId, getCarrier, } from 'react-native-device-info'
 // import { getIP, getLocation, requestPushNotifications } from '../utils/services'
 
@@ -30,7 +29,7 @@ import EmailScreen from '../screens/altScreens/EmailScreen'
 import PhoneNumberScreen from '../screens/altScreens/PhoneNumberScreen'
 import DeleteAccountScreen from '../screens/altScreens/DeleteAccountScreen'
 import { ISetSignIn, ISetUpdateUser, setSignIn, setUpdateUser, } from '../state/actions/UserActions'
-import { requestPushNotifications, signInCallback } from '../utils/services'
+import { onNotification, requestPushNotifications, signInCallback } from '../utils/services'
 import { registerDevice } from '../api/user'
 import { ISetMatch, ISetMatches, setMatch, setMatches } from '../state/actions/MatchesActions'
 import { setStreetpasses } from '../state/actions/StreetpassActions'
@@ -40,8 +39,11 @@ import { IMatch } from '../state/reducers/MatchesReducer'
 import { IStreetpassStore } from '../state/reducers/StreetpassReducer'
 import { ISetChat, ISetChats, ISetMessage, ISetMessageReaction, ISetUpdateChats, IUnsetChat, setChat, setChats, setMessage, setMessageReaction, setUpdateChats, unsetChat } from '../state/actions/ChatsActions'
 import { IChat, IChatsStore, IMessage, IMessageMetadata } from '../state/reducers/ChatsReducer'
+import PushNotificationIOS from '@react-native-community/push-notification-ios'
+import { ISetChatTyping, setChatTyping } from '../state/actions/ChatMessagesActions'
 
-export const navigationRef = createNavigationContainerRef()
+export const navigationRef: any = createNavigationContainerRef()
+export const getActiveScreen = () => navigationRef.current?.getCurrentRoute()?.name
 
 const MMKV = new MMKVLoader().withEncryption().withInstanceID(LocalStorage.AuthStore).initialize()
 
@@ -63,6 +65,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => ({
       unsetChat,
       setMessage,
       setMessageReaction,
+      setChatTyping,
     }
   ), dispatch),
 })
@@ -94,36 +97,70 @@ interface IMapScreenProps {
   streetpassStore: IStreetpassStore,
   chatsStore: IChatsStore,
   actions: {
-    setSignIn: (params: ISetSignIn) => Promise<any>,
-    setUpdateUser: (params: ISetUpdateUser) => void,
-    setStreetpasses: () => void,
-    setMatches: (params: ISetMatches) => void,
+    setSignIn: (params: ISetSignIn) => Promise<void>,
+    setUpdateUser: (params: ISetUpdateUser) => Promise<void>,
+    setStreetpasses: () => Promise<void>,
+    setMatches: (params: ISetMatches) => Promise<void>,
     setMatch: (params: ISetMatch) => void,
-    setChats: (params: ISetChats) => void,
-    setUpdateChats: (params: ISetUpdateChats) => void,
+    setChats: (params: ISetChats) => Promise<void>,
+    setUpdateChats: (params: ISetUpdateChats) => Promise<void>,
     setChat: (params: ISetChat) => void,
     unsetChat: (params: IUnsetChat) => void,
     setMessage: (params: ISetMessage) => void,
     setMessageReaction: (params: ISetMessageReaction) => void,
+    setChatTyping: (params: ISetChatTyping) => void,
   },
 }
 
 function AppNavigation({ userStore, streetpassStore, chatsStore, actions, }: IMapScreenProps) {
   const [initialized, setInitialized] = useState<boolean>(false)
+  const [updating, setUpdating] = useState<boolean>(false)
   const appState = useRef<AppStateStatus>(AppState.currentState)
   const accessToken = MMKV.getString(AuthStore.AccessToken)
 
   useEffect(() => {
-    const handleAppStateChange = (nextAppState: AppStateStatus) => {
+    const handleAppStateChange = async (nextAppState: AppStateStatus) => {
       if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
         if (userStore.signedIn) {
-          if (chatsStore.chats) actions.setUpdateChats({ index: chatsStore.chats.length, lastUpdated: chatsStore.lastUpdated, })
+          setUpdating(true)
+          // PushNotificationIOS.getApplicationIconBadgeNumber((badgeCount: number) => {
+          //   // TODO - set badge count
+          // })
+          if (chatsStore.chats) await actions.setUpdateChats({ index: chatsStore.chats.length, lastUpdated: chatsStore.lastUpdated, })
+          setUpdating(false)
         }
+        // else {
+        //   // TODO - set badge count 0
+        // }
       }
       appState.current = nextAppState
     }
     const subscription = AppState.addEventListener('change', handleAppStateChange)
     return () => subscription.remove()
+  }, [])
+
+  const chatsStoreRef = useRef<IChatsStore>(chatsStore)
+  useEffect(() => { chatsStoreRef.current = chatsStore }, [chatsStore])
+  useEffect(() => {
+    const onInitNotification = async (notificationPromise: any) => {
+      const notification = await notificationPromise
+      if (notification) onNotification({ navigation: navigationRef, chatsStore: chatsStoreRef.current, notification: notification, userInteraction: 1, })
+    }
+    onInitNotification(PushNotificationIOS.getInitialNotification())
+    PushNotificationIOS.addEventListener('notification', (notification) => {
+      const data: any = notification.getData()
+      if (data.data) onNotification({ navigation: navigationRef, chatsStore: chatsStoreRef.current, notification: data.data, userInteraction: data?.userInteraction, })
+      else onNotification({ navigation: navigationRef, chatsStore: chatsStoreRef.current, notification: data, userInteraction: data?.userInteraction, })
+    })
+    PushNotificationIOS.addEventListener('localNotification', (notification) => {
+      const data: any = notification.getData()
+      if (data.data) onNotification({ navigation: navigationRef, chatsStore: chatsStoreRef.current, notification: data.data, userInteraction: data?.userInteraction, })
+      else onNotification({ navigation: navigationRef, chatsStore: chatsStoreRef.current, notification: data.data, userInteraction: data?.userInteraction, })
+    })
+    return () => {
+      PushNotificationIOS.removeEventListener('notification')
+      PushNotificationIOS.removeEventListener('localNotification')
+    }
   }, [])
 
   useEffect(() => {
@@ -189,13 +226,19 @@ function AppNavigation({ userStore, streetpassStore, chatsStore, actions, }: IMa
     shouldResubscribe: true,
     onData: (data) => {
       const { chat, message, metadata, } = data?.data?.data?.messages as { chat?: IChat, message: IMessage, metadata: IMessageMetadata, }
-      // if (getDeviceId() === 'iPhone15,4') console.log('[LOG]', message.message)
       if (message.reaction) {
         actions.setMessageReaction({ userId: metadata.recipient, messageId: message.messageId, reaction: message.reaction === 'null' ? null : message.reaction, })
         return
       }
-      if (chat) actions.setChat(chat)
-      actions.setMessage({ userId: metadata.sender === userStore.user.userId ? metadata.recipient : metadata.sender, message: message, })
+      if (metadata.typing) {
+        actions.setChatTyping({ userId: metadata.recipient, typing: new Date(), })
+        return
+      }
+      if (!updating) {
+        if (chat) actions.setChat(chat)
+        actions.setMessage({ userId: metadata.sender === userStore.user.userId ? metadata.recipient : metadata.sender, message: message, lastUpdated: metadata.lastUpdated, })
+        actions.setChatTyping({ userId: metadata.recipient, typing: null, })
+      }
     },
     onError: async (error) => {
       console.log('[SUBSCRIBE MESSAGES ERROR]', error)

@@ -48,7 +48,7 @@ interface IDeleteAccountScreenProps {
   systemStore: ISystemStore,
   userStore: IUserStore,
   actions: {
-    setSignOut: () => void,
+    setSignOut: () => Promise<void>,
   },
 }
 interface IDeleteAccountScreenState {

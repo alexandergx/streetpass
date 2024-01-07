@@ -49,7 +49,7 @@ interface INotificationsScreenProps {
   systemStore: ISystemStore,
   userStore: IUserStore,
   actions: {
-    setUpdateUser: (params: ISetUpdateUser) => void,
+    setUpdateUser: (params: ISetUpdateUser) => Promise<void>,
   }
 }
 interface INotificationsScreenState {

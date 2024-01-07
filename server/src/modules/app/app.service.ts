@@ -1,11 +1,13 @@
-import { CallHandler, CanActivate, ExecutionContext, HttpException, HttpStatus, Injectable, NestInterceptor, NestMiddleware, SetMetadata } from '@nestjs/common'
-import { TOS } from 'src/utils/constants'
+import { CanActivate, ExecutionContext, Injectable, NestMiddleware, } from '@nestjs/common'
+import { OS, TOS } from 'src/utils/constants'
 import { Request, Response, NextFunction } from 'express'
 import rateLimit from 'express-rate-limit'
 import { ThrottlerGuard } from '@nestjs/throttler'
 import { GqlExecutionContext, GraphQLModule } from '@nestjs/graphql'
-import { Reflector } from '@nestjs/core'
-import { Observable } from 'rxjs'
+import { SendPushNotification, sendPushNotification } from 'src/utils/services'
+import { User, UserDocument } from 'src/schemas/user.schema'
+import mongoose, { Model } from 'mongoose'
+import { InjectModel } from '@nestjs/mongoose'
 
 @Injectable()
 export class AppService {
@@ -32,6 +34,26 @@ export class AppService {
   notFound(): string {
     return `
     `
+  }
+}
+
+@Injectable()
+export class NotificationsService {
+  constructor(
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+  ) {}
+  async createNotification(notification: SendPushNotification): Promise<boolean> {
+    if (notification.notificationPreferences[notification.payload.type] || notification.notificationPreferences[notification.payload.type] === undefined) {
+      sendPushNotification({ ...notification, payload: { ...notification.payload, }, unread: notification.unread, }).then(removeTokens => {
+        if (removeTokens[OS.ios].length || removeTokens[OS.android].length) {
+          this.userModel.updateOne(
+            { userId: new mongoose.mongo.ObjectId(notification.userId), },
+            { $pull: { 'deviceTokens.Apple': { $in: removeTokens[OS.ios], }, 'deviceTokens.Google': { $in: removeTokens[OS.android], }, }, },
+          )
+        }
+      })
+    }
+    return true
   }
 }
 

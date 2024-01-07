@@ -15,6 +15,7 @@ import { ChatsResolver } from './chats.resolver'
 import { Blocked, BlockedSchema } from 'src/schemas/blocked.schema'
 import { MatchSubscriptionsService } from '../matches/matches.service'
 import { Matches, MatchesSchema } from 'src/schemas/matches.schema'
+import { NotificationsService } from '../app/app.service'
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { Matches, MatchesSchema } from 'src/schemas/matches.schema'
     ChatsService,
     ChatsSubscriptionsService,
     MatchSubscriptionsService,
+    NotificationsService,
   ],
 })
 export class ChatsModule {}

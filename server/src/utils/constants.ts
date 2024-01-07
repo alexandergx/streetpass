@@ -46,7 +46,7 @@ export const InputLimits = {
   NameMin: 0,
   NameMax: 32,
   DescriptionMin: 0,
-  DescriptionMax: 256,
+  DescriptionMax: 512,
   EmailMin: 0,
   EmailMax: 64,
   ShareMax: 50,

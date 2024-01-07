@@ -42,7 +42,7 @@ interface IPhoneNumberScreenProps {
   phoneNumber: string,
   countryCode: string,
   actions: {
-    setPhoneNumber: (params: ISetPhoneNumber) => void,
+    setPhoneNumber: (params: ISetPhoneNumber) => Promise<void>,
   }
 }
 interface IPhoneNumberScreenState {

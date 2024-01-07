@@ -1,13 +1,14 @@
 import * as PackageJson from '../../package.json'
 
 export const AppVersion = PackageJson.version
+export const AppName = PackageJson.name
 export const Domain = 'https://streetpass.app'
 
 export const InputLimits = {
   NameMin: 3,
   NameMax: 32,
   DescriptionMin: 0,
-  DescriptionMax: 256,
+  DescriptionMax: 512,
   EmailMin: 0,
   EmailMax: 64,
   VideoLengthMax: 15,
@@ -123,6 +124,14 @@ export enum NotificationType { // NotificationPreferences property names
   Message = 'messages',
   Match = 'matches',
   Streetpass = 'streetpass',
+}
+
+export interface INotification {
+  type: NotificationType,
+  name?: string,
+  chatId?: string,
+  userId?: string,
+  localNotification: boolean,
 }
 
 // TODO - replace with localization

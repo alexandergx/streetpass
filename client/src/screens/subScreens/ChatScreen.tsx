@@ -45,14 +45,14 @@ interface IChatScreenProps {
   chatsStore: IChatsStore,
   chatMessagesStore: IChatMessagesStore,
   actions: {
-    setSeenMatch: (params: ISetSeenMatch) => void,
-    setMessages: (params: ISetMessages) => void,
-    setUpdateMessages: (params: ISetUpdateMessages) => void,
-    unsetMatch: (params: IUnsetMatch) => void,
+    setSeenMatch: (params: ISetSeenMatch) => Promise<void>,
+    setMessages: (params: ISetMessages) => Promise<void>,
+    setUpdateMessages: (params: ISetUpdateMessages) => Promise<void>,
+    unsetMatch: (params: IUnsetMatch) => Promise<void>,
     unsetChat: (params: IUnsetChat) => void,
     setChatKey: (params: ISetChatKey) => void,
-    setReadChat: (params: ISetReadChat) => void,
-    setChatNotifications: (params: ISetChatNotifications) => void,
+    setReadChat: (params: ISetReadChat) => Promise<void>,
+    setChatNotifications: (params: ISetChatNotifications) => Promise<void>,
     setChatMessage: (params: ISetChatMessage) => void,
   },
 }
@@ -68,6 +68,7 @@ export interface IChatScreenState {
   messageId: string | null,
   messageIndex: number | null
   messageTime: string | null,
+  alertTypingTime: Date | null,
   sending: boolean,
   paginating: boolean,
 }
@@ -90,6 +91,7 @@ class ChatScreen extends React.Component<IChatScreenProps> {
     messageId: null,
     messageIndex: null,
     messageTime: null,
+    alertTypingTime: null,
     sending: false,
     paginating: false,
   }
@@ -109,9 +111,10 @@ class ChatScreen extends React.Component<IChatScreenProps> {
     this.props.actions.setChatKey(this.state.userId)
     if (!this.props.chatsStore.messages[this.state.userId]) this.props.actions.setChatMessage({ userId: this.state.userId, message: '', })
     if (this.state.chat && this.props.chatsStore.messages[this.state.userId]?.continue !== false) {
-      this.props.actions.setMessages({ chatId: this.state.chat.chatId, userId: this.state.userId, index: undefined, })
+      await this.props.actions.setMessages({ chatId: this.state.chat.chatId, userId: this.state.userId, index: undefined, })
     }
-    if (this.state.chat && this.state.chat.lastMessageId !== this.props.chatsStore.messages[this.state.userId]?.messages?.[0]?.messageId) {
+    if (this.state.chat && this.props.chatsStore.messages[this.state.userId]?.messages?.[0]?.messageId
+      && this.state.chat.lastMessageId !== this.props.chatsStore.messages[this.state.userId]?.messages?.[0]?.messageId) {
       this.props.actions.setUpdateMessages({
         chatId: this.state.chat.chatId,
         userId: this.state.chat.userId,
@@ -131,6 +134,14 @@ class ChatScreen extends React.Component<IChatScreenProps> {
     if (!this.state.chat) {
       const chat = this.props.chatsStore.chats?.find(chat => chat.userId === this.state.userId)
       if (chat) this.setState({ chat: chat, })
+    }
+    if (this.state.chat && this.props.chatsStore.messages[this.state.userId]?.messages?.[0]?.messageId
+      && this.state.chat.lastMessageId !== this.props.chatsStore.messages[this.state.userId]?.messages?.[0]?.messageId) {
+      this.props.actions.setUpdateMessages({
+        chatId: this.state.chat.chatId,
+        userId: this.state.chat.userId,
+        messageId: this.props.chatsStore.messages[this.state.userId]?.messages?.[0]?.messageId as string,
+      })
     }
   }
 

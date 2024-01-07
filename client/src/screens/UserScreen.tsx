@@ -57,10 +57,10 @@ interface IUserScreenProps {
   systemStore: ISystemStore,
   userStore: IUserStore,
   actions: {
-    setUser: () => void,
-    setUpdateUser: (params: ISetUpdateUser) => void,
-    setSortMedia: (params: ISetSortMedia) => void,
-    setSignOut: () => void,
+    setUser: () => Promise<void>,
+    setUpdateUser: (params: ISetUpdateUser) => Promise<void>,
+    setSortMedia: (params: ISetSortMedia) => Promise<void>,
+    setSignOut: () => Promise<void>,
   },
 }
 interface IUserScreenState {

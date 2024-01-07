@@ -1,4 +1,4 @@
-import { CHAT_NOTIFICATIONS, GET_CHATS, GET_MESSAGES, IChatNotificationsMutation, IGetChatsQuery, IGetMessagesQuery, IReactMessageMutation, IReadChatMutation, ISearchChatsQuery, ISendMessageMutation, IUpdateChatsQuery, IUpdateMessagesQuery, REACT_MESSAGE, READ_CHAT, SEARCH_CHATS, SEND_MESSAGE, UPDATE_CHATS, UPDATE_MESSAGES, apiRequest } from '.'
+import { ALERT_TYPING, CHAT_NOTIFICATIONS, GET_CHATS, GET_MESSAGES, IAlertTypingQuery, IChatNotificationsMutation, IGetChatsQuery, IGetMessagesQuery, IReactMessageMutation, IReadChatMutation, ISearchChatsQuery, ISendMessageMutation, IUpdateChatsQuery, IUpdateMessagesQuery, REACT_MESSAGE, READ_CHAT, SEARCH_CHATS, SEND_MESSAGE, UPDATE_CHATS, UPDATE_MESSAGES, apiRequest } from '.'
 import { IChat, IMessage } from '../state/reducers/ChatsReducer'
 
 export type IGetChatsReq = IGetChatsQuery
@@ -18,7 +18,7 @@ export const getChats = async (input: IGetChatsReq): Promise<IGetChatsRes> => {
 
 export type IUpdateChatsReq = IUpdateChatsQuery
 export interface IUpdateChatsRes {
-  chats: Array<IChat>,
+  chats: Array<IChat> | null,
   lastUpdated: Date | null,
 }
 export const updateChats = async (input: IUpdateChatsReq): Promise<IUpdateChatsRes> => {
@@ -106,6 +106,17 @@ export type IReactMessageRes = boolean
 export const reactMessage = async (input: IReactMessageReq): Promise<IReactMessageRes> => {
   try {
     const { data, } = await apiRequest(REACT_MESSAGE(input))
+    return data.sendMessage
+  } catch(e) {
+    throw new Error
+  }
+}
+
+export type IAlertTypingReq = IAlertTypingQuery
+export type IAlertTypingRes = boolean
+export const alertTyping = async (input: IAlertTypingReq): Promise<IAlertTypingRes> => {
+  try {
+    const { data, } = await apiRequest(ALERT_TYPING(input))
     return data.sendMessage
   } catch(e) {
     throw new Error

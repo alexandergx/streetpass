@@ -5,6 +5,8 @@ import { IMedia } from './UserReducer'
 export interface IMessageMetadata {
   sender: string,
   recipient: string,
+  typing?: boolean,
+  lastUpdated: Date,
 }
 
 export interface IMessage {
@@ -120,7 +122,7 @@ const chatsStore = (state = INITIAL_STATE, action: ChatsAction) => {
     case ChatsActions.SetUpdateChats:
       return {
         ...state,
-        chats: action.payload.chats.length ? action.payload.chats : state.chats,
+        chats: action.payload.chats ? action.payload.chats : state.chats,
         lastUpdated: action.payload.lastUpdated,
       }
     case ChatsActions.SetChat:
@@ -247,6 +249,7 @@ const chatsStore = (state = INITIAL_STATE, action: ChatsAction) => {
             continue: state.messages[action.payload.userId] ? state.messages[action.payload.userId]?.continue : true,
           },
         },
+        lastUpdated: action.payload.lastUpdated,
       }
     case ChatsActions.SetMessageReaction:
       return {

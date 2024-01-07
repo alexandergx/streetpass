@@ -1,19 +1,26 @@
-import { ISetChatMessage } from '../actions/ChatMessagesActions'
+import { ISetChatMessage, ISetChatTyping } from '../actions/ChatMessagesActions'
+
+export interface IChatMessage {
+  message: string,
+  typing?: Date | null,
+}
 
 export interface IChatMessagesStore {
-  chatMessages: Record<string, string>,
+  chatMessages: Record<string, IChatMessage>,
   chatMessagesError: boolean,
 }
 
 export enum ChatMessagesActions {
   Init = 'INIT_CHAT_MESSAGES',
   SetChatMessage = 'SET_CHAT_MESSAGE',
+  SetChatTyping = 'SET_CHAT_TYPING',
   ChatMessagesError = 'CHAT_MESSAGES_ERROR',
 }
 
 type ChatMessagesAction =
   | { type: ChatMessagesActions.Init, }
   | { type: ChatMessagesActions.SetChatMessage, payload: ISetChatMessage, }
+  | { type: ChatMessagesActions.SetChatTyping, payload: ISetChatTyping, }
   | { type: ChatMessagesActions.ChatMessagesError, }
 
 const INITIAL_STATE: IChatMessagesStore = {
@@ -30,7 +37,21 @@ const chatMessagesStore = (state = INITIAL_STATE, action: ChatMessagesAction) =>
         ...state,
         chatMessages: {
           ...state.chatMessages,
-          [action.payload.userId]: action.payload.message,
+          [action.payload.userId]: {
+            ...state.chatMessages[action.payload.userId],
+            message: action.payload.message
+          },
+        }
+      }
+    case ChatMessagesActions.SetChatTyping:
+      return {
+        ...state,
+        chatMessages: {
+          ...state.chatMessages,
+          [action.payload.userId]: {
+            ...state.chatMessages[action.payload.userId],
+            typing: action.payload.typing,
+          },
         }
       }
     case ChatMessagesActions.ChatMessagesError:
